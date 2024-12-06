@@ -2,7 +2,7 @@
 
 namespace DockerHubBackend.Models
 {
-    public abstract class BaseUser : RepositoryOwner
+    public abstract class BaseUser : BaseEntity
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
