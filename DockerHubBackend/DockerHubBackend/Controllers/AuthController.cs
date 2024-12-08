@@ -13,16 +13,26 @@ namespace DockerHubBackend.Controllers
     public class AuthController : ControllerBase
     {        
         private readonly IAuthService _authService;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IConfiguration configuration)
         {
             _authService = authService;
+            _configuration = configuration;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginCredentialsDto credentials)
         {
-            var response = await _authService.Login(credentials, Response);
+            var response = await _authService.Login(credentials);
+            var tokenExpiration = Convert.ToInt32(_configuration["JWT:Expiration"]);
+            Response.Cookies.Append("AuthToken", response.Jwt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(tokenExpiration)
+            });
             return Ok(response);
         }
     }

@@ -10,20 +10,18 @@ namespace DockerHubBackend.Services.Implementation
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;        
         private readonly IPasswordHasher<string> _passwordHasher;
         private readonly JwtHelper _jwtHelper;
 
-        public AuthService(IUserRepository userRepository, JwtHelper jwtHelper, IConfiguration configuration, IPasswordHasher<string> passwordHasher)
+        public AuthService(IUserRepository userRepository, JwtHelper jwtHelper, IPasswordHasher<string> passwordHasher)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
-            _configuration = configuration;
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<LoginResponse> Login(LoginCredentialsDto credentials, HttpResponse response)
+        public async Task<LoginResponseWithJwt> Login(LoginCredentialsDto credentials)
         {
             var user = await _userRepository.GetUserByEmail(credentials.Email);
             if (user == null)
@@ -36,20 +34,18 @@ namespace DockerHubBackend.Services.Implementation
             }
 
             var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.LastPasswordChangeDate);
-            var tokenExpiration = Convert.ToInt32(_configuration["JWT:Expiration"]);
-            response.Cookies.Append("AuthToken", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(tokenExpiration)
-            });
+
             LoginResponse loginResponse = new LoginResponse {
                 UserEmail = user.Email,
                 UserId = user.Id.ToString(),
                 UserRole = user.GetType().Name
             };
-            return loginResponse;
+            LoginResponseWithJwt response = new LoginResponseWithJwt
+            {
+                Response = loginResponse,
+                Jwt = token
+            };
+            return response;
         }
     }
 }

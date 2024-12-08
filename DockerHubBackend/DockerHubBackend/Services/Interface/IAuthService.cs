@@ -5,6 +5,6 @@ namespace DockerHubBackend.Services.Interface
 {
     public interface IAuthService
     {
-        Task<LoginResponse> Login(LoginCredentialsDto credentials, HttpResponse response);
+        Task<LoginResponseWithJwt> Login(LoginCredentialsDto credentials);
     }
 }
