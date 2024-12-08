@@ -8,6 +8,7 @@ using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 // Add services to the container.
 
 // Authentication
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,6 +35,23 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtIssuer,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var claimsPrincipal = context.Principal;
+            var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lastPasswordChangeInToken = DateTime.Parse(claimsPrincipal.FindFirstValue("LastPasswordChange"));
+
+            var dbContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
+            var user = await dbContext.Users.FindAsync(userId);
+
+            if (user == null || user.LastPasswordChangeDate > lastPasswordChangeInToken)
+            {
+                context.Fail("Token is invalid due to password change.");
+            }
+        }
     };
 });
 builder.Services.AddSingleton<JwtHelper>();
@@ -77,6 +96,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
