@@ -6,6 +6,7 @@ using DockerHubBackend.Security;
 using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -19,6 +20,7 @@ var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 // Add services to the container.
 
 // Authentication
+builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
 
 builder.Services.AddAuthentication(options =>
 {

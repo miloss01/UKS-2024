@@ -1,4 +1,5 @@
 ﻿using DockerHubBackend.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DockerHubBackend.Data
 {
@@ -8,12 +9,14 @@ namespace DockerHubBackend.Data
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+            var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<string>>();
 
+            var passwordHash = passwordHasher.HashPassword(String.Empty, "123456");
             if (!context.Users.Any())
             {
                 context.Users.AddRange(
-                    new StandardUser { Email = "user1@email.com", IsVerified = true, Password = "test123"},
-                    new StandardUser { Email = "user2@email.com", IsVerified = true, Password = "123456" }
+                    new StandardUser { Email = "user1@email.com", IsVerified = true, Password = passwordHash },
+                    new StandardUser { Email = "user2@email.com", IsVerified = true, Password = passwordHash }
                 );
                 await context.SaveChangesAsync();
             }

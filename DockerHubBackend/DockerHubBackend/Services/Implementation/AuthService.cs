@@ -4,6 +4,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
+using Microsoft.AspNetCore.Identity;
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -11,13 +12,15 @@ namespace DockerHubBackend.Services.Implementation
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IPasswordHasher<string> _passwordHasher;
         private readonly JwtHelper _jwtHelper;
 
-        public AuthService(IUserRepository userRepository, JwtHelper jwtHelper, IConfiguration configuration)
+        public AuthService(IUserRepository userRepository, JwtHelper jwtHelper, IConfiguration configuration, IPasswordHasher<string> passwordHasher)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
             _configuration = configuration;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<LoginResponse> Login(LoginCredentialsDto credentials, HttpResponse response)
@@ -26,8 +29,8 @@ namespace DockerHubBackend.Services.Implementation
             if (user == null)
             {
                 throw new BadRequestException("Wrong email or password");
-            }
-            if (user.Password != credentials.Password)
+            }            
+            if (_passwordHasher.VerifyHashedPassword(String.Empty, user.Password, credentials.Password) != PasswordVerificationResult.Success)
             {
                 throw new BadRequestException("Wrong email or password");
             }
