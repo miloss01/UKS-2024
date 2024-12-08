@@ -27,6 +27,10 @@ namespace DockerHubBackend.Services.Implementation
             {
                 throw new BadRequestException("Wrong email or password");
             }
+            if (user.Password != credentials.Password)
+            {
+                throw new BadRequestException("Wrong email or password");
+            }
 
             var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString());
             var tokenExpiration = Convert.ToInt32(_configuration["JWT:Expiration"]);
