@@ -48,7 +48,6 @@ builder.Services.AddCors(options =>
 
 // Database
 builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -66,6 +65,8 @@ builder.Services.AddControllers(options =>
 });
 
 var app = builder.Build();
+
+await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
