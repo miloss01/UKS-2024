@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DockerHubBackend.Security
 {
-    public class JwtHelper
+    public class JwtHelper : IJwtHelper
     {
         private readonly string _key;
         private readonly string _issuer;
@@ -21,7 +21,7 @@ namespace DockerHubBackend.Security
         {
             string lastPasswordChangeStr = lastPasswordChange != null ? lastPasswordChange.ToString() : DateTime.MinValue.ToString("o");
             var claims = new[]
-            {                
+            {
                 new Claim(ClaimTypes.Role, role),
                 new Claim(ClaimTypes.NameIdentifier, userId),
                 new Claim("LastPasswordChange", lastPasswordChangeStr)

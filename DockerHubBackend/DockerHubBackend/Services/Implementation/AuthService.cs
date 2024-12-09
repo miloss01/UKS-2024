@@ -12,9 +12,9 @@ namespace DockerHubBackend.Services.Implementation
     {
         private readonly IUserRepository _userRepository;        
         private readonly IPasswordHasher<string> _passwordHasher;
-        private readonly JwtHelper _jwtHelper;
+        private readonly IJwtHelper _jwtHelper;
 
-        public AuthService(IUserRepository userRepository, JwtHelper jwtHelper, IPasswordHasher<string> passwordHasher)
+        public AuthService(IUserRepository userRepository, IJwtHelper jwtHelper, IPasswordHasher<string> passwordHasher)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
@@ -26,11 +26,15 @@ namespace DockerHubBackend.Services.Implementation
             var user = await _userRepository.GetUserByEmail(credentials.Email);
             if (user == null)
             {
-                throw new BadRequestException("Wrong email or password");
-            }            
+                throw new UnauthorizedException("Wrong email or password");
+            }
+            if(!user.IsVerified)
+            {
+                throw new UnauthorizedException("Account not verified");
+            }
             if (_passwordHasher.VerifyHashedPassword(String.Empty, user.Password, credentials.Password) != PasswordVerificationResult.Success)
             {
-                throw new BadRequestException("Wrong email or password");
+                throw new UnauthorizedException("Wrong email or password");
             }
 
             var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.LastPasswordChangeDate);
