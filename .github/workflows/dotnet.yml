@@ -47,4 +47,4 @@ jobs:
     - name: Build
       run: dotnet build ./DockerHubBackend/DockerHubBackend --no-restore
     - name: Test
-      run: dotnet test ./DockerHubBackend/DockerHubBackend --no-build --verbosity normal
+      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests --no-build --verbosity normal
