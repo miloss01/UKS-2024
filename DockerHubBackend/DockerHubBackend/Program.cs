@@ -56,7 +56,7 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
-builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddSingleton<IJwtHelper,JwtHelper>();
 
 builder.Services.AddCors(options =>
 {
