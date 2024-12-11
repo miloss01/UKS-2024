@@ -1,12 +1,80 @@
 using DockerHubBackend.Data;
 using DockerHubBackend.Filters;
+using DockerHubBackend.Repository.Implementation;
+using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Security;
+using DockerHubBackend.Services.Implementation;
+using DockerHubBackend.Services.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+
 // Add services to the container.
 
+// Authentication
+builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var claimsPrincipal = context.Principal;
+            var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lastPasswordChangeInToken = DateTime.Parse(claimsPrincipal.FindFirstValue("LastPasswordChange"));
+
+            var dbContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
+            var user = await dbContext.Users.FindAsync(userId);
+
+            if (user == null || user.LastPasswordChangeDate > lastPasswordChangeInToken)
+            {
+                context.Fail("Token is invalid due to password change.");
+            }
+        }
+    };
+});
+builder.Services.AddSingleton<IJwtHelper,JwtHelper>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "CORS_CONFIG",
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+                      });
+});
+
+// Database
 builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Repository
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -19,6 +87,8 @@ builder.Services.AddControllers(options =>
 
 var app = builder.Build();
 
+await DatabaseContextSeed.SeedDataAsync(app.Services);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -28,6 +98,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
