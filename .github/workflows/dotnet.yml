@@ -46,8 +46,8 @@ jobs:
     - name: Restore dependencies for default project
       run: dotnet restore ./DockerHubBackend/DockerHubBackend
     - name: Restore dependencies for test project
-      run: dotnet restore ./DockerHubBackend/DockerHubBackend.Tests/DockerHubBackend.Tests
+      run: dotnet restore ./DockerHubBackend/DockerHubBackend.Tests
     - name: Build default project
       run: dotnet build ./DockerHubBackend/DockerHubBackend --no-restore
     - name: Test
-      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests/DockerHubBackend.Tests --no-build --verbosity normal
+      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests --no-build --verbosity normal
