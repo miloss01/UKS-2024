@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtCookieName = builder.Configuration["JWT:CookieName"];
 
 // Add services to the container.
 
@@ -40,6 +41,14 @@ builder.Services.AddAuthentication(options =>
     };
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            if (context.HttpContext.Request.Cookies.TryGetValue(jwtCookieName, out var token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        },
         OnTokenValidated = async context =>
         {
             var claimsPrincipal = context.Principal;
@@ -63,7 +72,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "CORS_CONFIG",
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+                          policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                       });
 });
 
@@ -100,6 +109,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("CORS_CONFIG");
 
 app.MapControllers();
 

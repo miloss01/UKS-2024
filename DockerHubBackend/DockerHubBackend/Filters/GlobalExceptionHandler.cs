@@ -14,12 +14,13 @@ namespace DockerHubBackend.Filters
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
                 ForbiddenException => StatusCodes.Status403Forbidden,
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
 
             var response = new
             {
-                Error = context.Exception.Message              
+                message = context.Exception.Message              
             };
 
             context.HttpContext.Response.StatusCode = statusCode;
