@@ -44,8 +44,11 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = async context =>
         {
             var claimsPrincipal = context.Principal;
-            var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            Guid userId;
+            if(!Guid.TryParse(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier), out userId))
+            {
+                context.Fail("Token is invalid");
+            }
             var dbContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
             var user = await dbContext.Users.FindAsync(userId);
 
