@@ -6,6 +6,7 @@ import {NgIf} from "@angular/common";
 import {LoginCredentials} from "../../../models/models";
 import {AuthService} from "../../../services/auth.service";
 import {HttpErrorResponse} from "@angular/common/http";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login-page',
@@ -26,7 +27,7 @@ export class LoginPageComponent {
     password: new FormControl('', [Validators.required])
   });
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
   }
 
   submitForm(){
@@ -43,8 +44,8 @@ export class LoginPageComponent {
 
   private login(credentials:LoginCredentials){
     this.authService.login(credentials).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
+        this.router.navigate(["/home"]);
       },
       error: (error) => {
         if(error instanceof HttpErrorResponse){
