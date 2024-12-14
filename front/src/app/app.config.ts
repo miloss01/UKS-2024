@@ -4,11 +4,12 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import {provideAnimations} from "@angular/platform-browser/animations";
 import {BrowserModule} from "@angular/platform-browser";
-import {provideHttpClient} from "@angular/common/http";
+import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {authInterceptor} from "./security/auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     importProvidersFrom(BrowserModule),
     provideAnimations(),
     provideZoneChangeDetection({ eventCoalescing: true }),
