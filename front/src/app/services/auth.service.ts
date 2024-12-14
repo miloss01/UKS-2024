@@ -11,10 +11,17 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 export class AuthService {
 
   public userData?: UserData;
+  private static tokenStorageName: string = "token";
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.loadUserData();
+  }
 
-  private loadUserData(token: string){
+  private loadUserData(){
+    const token: string | null = localStorage.getItem(AuthService.tokenStorageName);
+    if(!token){
+      return;
+    }
     const helper = new JwtHelperService();
     const decodedToken = helper.decodeToken(token);
     const id:string = decodedToken.nameid;
@@ -25,7 +32,6 @@ export class AuthService {
       userEmail: email,
       userRole: role
     };
-    console.log(this.userData);
   }
 
   login(credentials: LoginCredentials): Observable<{accessToken: string}>{
@@ -34,11 +40,14 @@ export class AuthService {
     }).pipe(
       tap({
         next: resp => {
-          localStorage.setItem('token', resp.accessToken);
-          this.loadUserData(resp.accessToken);
+          localStorage.setItem(AuthService.tokenStorageName, resp.accessToken);
+          this.loadUserData();
         }
       })
     );
   }
 
+  logout(){
+    localStorage.removeItem(AuthService.tokenStorageName);
+  }
 }
