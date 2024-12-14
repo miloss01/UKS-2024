@@ -45,7 +45,6 @@ export class LoginPageComponent {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log(response);
-        this.authService.userInfo = response;
       },
       error: (error) => {
         if(error instanceof HttpErrorResponse){
