@@ -45,14 +45,13 @@ builder.Services.AddAuthentication(options =>
         {
             var claimsPrincipal = context.Principal;
             var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lastPasswordChangeInToken = DateTime.Parse(claimsPrincipal.FindFirstValue("LastPasswordChange"));
 
             var dbContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
             var user = await dbContext.Users.FindAsync(userId);
 
-            if (user == null || user.LastPasswordChangeDate > lastPasswordChangeInToken)
+            if (user == null || user.LastPasswordChangeDate > context.SecurityToken.ValidFrom)
             {
-                context.Fail("Token is invalid due to password change.");
+                context.Fail("Token is invalid due to password change");
             }
         }
     };
