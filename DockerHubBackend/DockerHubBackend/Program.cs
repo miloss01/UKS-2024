@@ -41,14 +41,6 @@ builder.Services.AddAuthentication(options =>
     };
     options.Events = new JwtBearerEvents
     {
-        OnMessageReceived = context =>
-        {
-            if (context.HttpContext.Request.Cookies.TryGetValue(jwtCookieName, out var token))
-            {
-                context.Token = token;
-            }
-            return Task.CompletedTask;
-        },
         OnTokenValidated = async context =>
         {
             var claimsPrincipal = context.Principal;

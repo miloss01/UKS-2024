@@ -44,10 +44,7 @@ namespace DockerHubBackend.Tests.UnitTests
             var result = await _service.Login(credentials);
 
             Assert.NotNull(result);
-            Assert.Equal(user.Email, result.Response.UserEmail);
-            Assert.Equal(user.Id.ToString(), result.Response.UserId);
-            Assert.Equal(user.GetType().Name, result.Response.UserRole);
-            Assert.Equal("dummyToken", result.Jwt);
+            Assert.Equal("dummyToken", result.AccessToken);
         }
 
         [Fact]
