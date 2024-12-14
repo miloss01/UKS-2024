@@ -37,7 +37,7 @@ namespace DockerHubBackend.Tests.UnitTests
                       .Returns(PasswordVerificationResult.Success);
 
 
-            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.LastPasswordChangeDate))
+            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email))
                          .Returns("dummyToken");
 
 
@@ -82,7 +82,7 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                         .Returns(PasswordVerificationResult.Success);
-            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.LastPasswordChangeDate))
+            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email))
                          .Returns("dummyToken");
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _service.Login(credentials));

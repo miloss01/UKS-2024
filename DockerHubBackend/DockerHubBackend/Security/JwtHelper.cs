@@ -23,7 +23,8 @@ namespace DockerHubBackend.Security
             {
                 new Claim(ClaimTypes.Role, role),
                 new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Email, userEmail)
+                new Claim(ClaimTypes.Email, userEmail),
+                new Claim("type", "Bearer")
             };
 
             var keyBytes = Encoding.UTF8.GetBytes(_key);
@@ -32,7 +33,6 @@ namespace DockerHubBackend.Security
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                TokenType = "Bearer",
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddMinutes(_expiration),
                 Issuer = _issuer,
