@@ -32,6 +32,7 @@ namespace DockerHubBackend.Security
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                TokenType = "Bearer",
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddMinutes(_expiration),
                 Issuer = _issuer,
