@@ -4,9 +4,7 @@ namespace DockerHubBackend.Dto.Response
 {
     public class LoginResponse
     {
-        public string UserId { get; set; }
-        public string UserEmail { get; set; }
-        public string UserRole { get; set; }
+        public string AccessToken { get; set; }
 
         public override string ToString()
         {
