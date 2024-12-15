@@ -14,3 +14,21 @@ export enum UserRole{
   Admin = "Admin",
   SuperAdmin = "SuperAdmin"
 }
+
+export interface DockerImageDTO {
+  imageId: string;
+  repositoryName: string;
+  repositoryId: string;
+  badge: string;
+  starCount: number;
+  description: string;
+  tags: string[];
+  lastPush: string;
+  owner: string;
+  createdAt: string;
+}
+
+export interface PageDTO<T> {
+  data: T[];
+  totalNumberOfElements: number;
+}
