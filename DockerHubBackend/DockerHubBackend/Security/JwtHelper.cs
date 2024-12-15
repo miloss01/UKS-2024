@@ -17,14 +17,14 @@ namespace DockerHubBackend.Security
             _issuer = configuration["Jwt:Issuer"];
             _expiration = Convert.ToInt32(configuration["Jwt:Expiration"]);
         }
-        public string GenerateToken(string role, string userId, DateTime? lastPasswordChange)
+        public string GenerateToken(string role, string userId, string userEmail)
         {
-            string lastPasswordChangeStr = lastPasswordChange != null ? lastPasswordChange.ToString() : DateTime.MinValue.ToString("o");
             var claims = new[]
             {
                 new Claim(ClaimTypes.Role, role),
                 new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim("LastPasswordChange", lastPasswordChangeStr)
+                new Claim(ClaimTypes.Email, userEmail),
+                new Claim("type", "Bearer")
             };
 
             var keyBytes = Encoding.UTF8.GetBytes(_key);
@@ -33,6 +33,7 @@ namespace DockerHubBackend.Security
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddMinutes(_expiration),
                 Issuer = _issuer,
                 Audience = _issuer,

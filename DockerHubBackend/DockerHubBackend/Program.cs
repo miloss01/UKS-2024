@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtCookieName = builder.Configuration["JWT:CookieName"];
 
 // Add services to the container.
 
@@ -43,15 +44,17 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = async context =>
         {
             var claimsPrincipal = context.Principal;
-            var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lastPasswordChangeInToken = DateTime.Parse(claimsPrincipal.FindFirstValue("LastPasswordChange"));
-
+            Guid userId;
+            if(!Guid.TryParse(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier), out userId))
+            {
+                context.Fail("Token is invalid");
+            }
             var dbContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
             var user = await dbContext.Users.FindAsync(userId);
 
-            if (user == null || user.LastPasswordChangeDate > lastPasswordChangeInToken)
+            if (user == null || user.LastPasswordChangeDate > context.SecurityToken.ValidFrom)
             {
-                context.Fail("Token is invalid due to password change.");
+                context.Fail("Token is invalid due to password change");
             }
         }
     };
@@ -63,7 +66,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "CORS_CONFIG",
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+                          policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                       });
 });
 
@@ -100,6 +103,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("CORS_CONFIG");
 
 app.MapControllers();
 

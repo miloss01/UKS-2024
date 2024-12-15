@@ -1,5 +1,5 @@
-<p>toolbar works!</p>
-<button
-  mat-raised-button
-  matTooltip="This is a tooltip!"> button </button>
-
+<mat-toolbar color="primary">
+  <span>Application Title</span>
+  <span class="fill-remaining-space"></span>
+  <a class="nav-button" *ngIf="authService.userData != undefined" (click)="logout()">Logout</a>
+</mat-toolbar>

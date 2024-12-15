@@ -21,7 +21,7 @@ namespace DockerHubBackend.Services.Implementation
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<LoginResponseWithJwt> Login(LoginCredentialsDto credentials)
+        public async Task<LoginResponse> Login(LoginCredentialsDto credentials)
         {
             var user = await _userRepository.GetUserByEmail(credentials.Email);
             if (user == null)
@@ -37,17 +37,10 @@ namespace DockerHubBackend.Services.Implementation
                 throw new UnauthorizedException("Wrong email or password");
             }
 
-            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.LastPasswordChangeDate);
+            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email);
 
-            LoginResponse loginResponse = new LoginResponse {
-                UserEmail = user.Email,
-                UserId = user.Id.ToString(),
-                UserRole = user.GetType().Name
-            };
-            LoginResponseWithJwt response = new LoginResponseWithJwt
-            {
-                Response = loginResponse,
-                Jwt = token
+            LoginResponse response = new LoginResponse {
+                AccessToken = token
             };
             return response;
         }
