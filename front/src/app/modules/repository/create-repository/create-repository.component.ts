@@ -1,9 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { Repository } from 'app/models/models';
+import RepositoryCreation from 'app/models/models';
 
 @Component({
   selector: 'app-create-repository',
@@ -14,7 +12,7 @@ import { Repository } from 'app/models/models';
 })
 export class CreateRepositoryComponent {
   namespaces: string[] = ['namespace1', 'namespace2', 'namespace3'];
-  repository: Repository = {
+  repository: RepositoryCreation = {
     name: '',
     namespace: '',
     description: '',
