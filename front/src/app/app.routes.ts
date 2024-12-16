@@ -6,7 +6,7 @@ import {HomePageComponent} from "./modules/layout/home-page/home-page.component"
 import { SingeRepositoryComponent } from './modules/repository/singe-repository/singe-repository.component';
 
 export const routes: Routes = [
-  { path: '**', component: SingeRepositoryComponent },
+  { path: 'single-repo', component: SingeRepositoryComponent },
   { path: 'create-repo', component: CreateRepositoryComponent },
   { path: 'login', component: LoginPageComponent },
   { path: 'home', component: HomePageComponent },
