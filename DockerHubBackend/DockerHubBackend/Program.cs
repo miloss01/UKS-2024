@@ -5,6 +5,7 @@ using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
+using DockerHubBackend.Startup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -87,6 +88,8 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionHandler>();
 });
+
+builder.Services.AddHostedService<StartupScript>();
 
 var app = builder.Build();
 
