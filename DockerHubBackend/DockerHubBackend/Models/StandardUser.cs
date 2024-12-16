@@ -9,7 +9,6 @@ namespace DockerHubBackend.Models
         public ICollection<DockerRepository> MyRepositories { get; set; } = new HashSet<DockerRepository>();
         public ICollection<Organization> MyOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
-        [JsonIgnore]
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
 
     }

@@ -1,10 +1,11 @@
-﻿using DockerHubBackend.Models;
+﻿using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Services.Interface
 {
     public interface ITeamService
     {
-        public Task<ICollection<Team>?> GetTeams(Guid organizationId);
+        public Task<ICollection<TeamDto>?> GetTeams(Guid organizationId);
 
         public Team Create(Team team);
 

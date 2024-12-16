@@ -1,4 +1,5 @@
-﻿using DockerHubBackend.Models;
+﻿using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
 
@@ -12,7 +13,7 @@ namespace DockerHubBackend.Services.Implementation
             _repository = repository;
         }
 
-        public async Task<ICollection<Team>?> GetTeams(Guid organizationId)
+        public async Task<ICollection<TeamDto>?> GetTeams(Guid organizationId)
         {
             return await _repository.GetTeamsByOrganizationId(organizationId);
         }
