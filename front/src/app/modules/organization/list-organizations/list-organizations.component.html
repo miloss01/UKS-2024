@@ -1,0 +1,65 @@
+<div class="search-container">
+    <div class="search-input">
+      <span class="search-icon"> 🔍 </span>
+      <input 
+        type="text" 
+        placeholder="Search by organization name" 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchRepository()"/>
+    </div>
+    <button class="create-btn">Create an organization</button>
+  </div>
+  
+<!-- Paginacija -->
+<div class="pagination-container">
+    <!-- Previous Button -->
+    <button (click)="changePage(-1)" [disabled]="currentPage === 1" class="pagination-btn">
+      Previous
+    </button>
+  
+    <!-- Indikator stranice -->
+    <span class="page-indicator">
+      {{ currentPage }} / {{ totalPages }}
+    </span>
+  
+    <!-- Next Button -->
+    <button (click)="changePage(1)" [disabled]="currentPage === totalPages" class="pagination-btn">
+      Next
+    </button>
+  
+    <!-- Page Size Dropdown -->
+    <div class="page-size-container">
+      <label for="page-size">Page Size:</label>
+      <select id="page-size" (change)="changePageSize($event)">
+        <option [value]="2">2</option>
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+      </select>
+    </div>
+  </div>
+
+<!-- Lista organizacija -->
+<div class="extensions-container">
+    <!-- Ponavljanje za svaku ekstenziju -->
+    <div class="extension-card" *ngFor="let extension of paginatedExtensions">
+      <!-- Ikona ekstenzije -->
+      <div class="icon">
+        <img [src]="extension.icon" alt="{{ extension.name }} icon" />
+      </div>
+  
+      <!-- Detalji ekstenzije -->
+      <div class="details">
+        <h3>{{ extension.name }}</h3>
+        <p class="publisher">By {{ extension.publisher }} · Updated {{ extension.updated }}</p>
+        <p>{{ extension.description }}</p>
+      </div>
+  
+      <!-- Informacije i akcije -->
+      <div class="actions">
+        <p>Reviewed · {{ extension.downloads }}K</p>
+        <button class="install-btn" >Install</button>
+        <button class="menu-btn">⋮</button>
+      </div>
+    </div>
+  </div>
+  
