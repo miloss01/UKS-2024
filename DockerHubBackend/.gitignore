@@ -786,4 +786,5 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,visualstudio,rider,csharp
 
 **/Migrations/*
+**/super_admin_cred.json
 
