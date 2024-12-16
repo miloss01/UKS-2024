@@ -4,9 +4,11 @@ import { CreateRepositoryComponent } from './modules/repository/create-repositor
 import {LoginPageComponent} from "./modules/layout/login-page/login-page.component";
 import {HomePageComponent} from "./modules/layout/home-page/home-page.component";
 import { SingeRepositoryComponent } from './modules/repository/singe-repository/singe-repository.component';
+import { AllRepositoriesComponent } from './modules/repository/all-repositories/all-repositories.component';
 
 export const routes: Routes = [
-  { path: 'single-repo', component: SingeRepositoryComponent },
+  { path: 'all-user-repo', component: AllRepositoriesComponent },
+  { path: 'single-repo/:id', component: SingeRepositoryComponent },
   { path: 'create-repo', component: CreateRepositoryComponent },
   { path: 'login', component: LoginPageComponent },
   { path: 'home', component: HomePageComponent },
