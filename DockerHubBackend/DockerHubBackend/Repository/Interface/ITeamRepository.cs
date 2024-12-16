@@ -13,5 +13,7 @@ namespace DockerHubBackend.Repository.Interface
         Task<ICollection<TeamResponseDto>> GetByOrganizationId(Guid organizationId);
 
         Task<Team> GetByName(string name);
+
+        Task<ICollection<StandardUser>> GetMembers(Guid id);
     }
 }

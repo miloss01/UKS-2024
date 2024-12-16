@@ -25,46 +25,49 @@ namespace DockerHubBackend.Services.Implementation
 
         public async Task<TeamResponseDto> Create(TeamRequestDto teamDto)
         {
-            Organization organization = await _organizationRepository.Get(teamDto.OrganizationId);
+            Organization? organization = await _organizationRepository.Get(teamDto.OrganizationId);
             Team team = teamDto.ToTeam(organization);
-
-            ICollection<StandardUser> members = new HashSet<StandardUser>();
-            foreach (MemberDto memberDto in teamDto.Members)
-            {
-                BaseUser? baseUser =  await _userRepository.GetUserByEmail(memberDto.Email);
-                StandardUser user = (StandardUser)baseUser;
-                members.Add(user);
-            }
-            team.Members = members;
-
+            team.Members = await toStandardUsers(teamDto.Members);
             await _repository.Create(team);
             
             Team returnedTeam = await _repository.GetByName(teamDto.Name);
             ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
             foreach (StandardUser user in team.Members) { memberDtos.Add(user.ToMemberDto()); }
            
-            return new TeamResponseDto
-            {
-                Name = returnedTeam.Name,
-                Description = returnedTeam.Description,
-                Members = memberDtos,
-            };
+            return new TeamResponseDto(returnedTeam.Name, returnedTeam.Description, memberDtos);
             
         }
 
-        public Team AddMembers(Guid teamId, ICollection<StandardUser> members)
+        public async Task<TeamResponseDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
+        {
+            Team? team = await _repository.Get(teamId);
+            team.Members = await toStandardUsers(memberDtos);
+            Team? updatedTeam = await _repository.Update(team);
+
+            return new TeamResponseDto(updatedTeam);
+        }
+
+        public Task<Team> ChangePersmissions(Guid teamId, PermissionType permissionType)
         {
             throw new NotImplementedException();
         }
 
-        public Team ChangePersmissions(Guid teamId, PermissionType permissionType)
+        public async Task<Team> Update(Team team)
         {
             throw new NotImplementedException();
         }
 
-        public Team Update(Team team)
+        private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
-            throw new NotImplementedException();
+            ICollection<StandardUser?> members = new HashSet<StandardUser?>();
+            foreach (MemberDto memberDto in memberDtos)
+            {
+                BaseUser? baseUser = await _userRepository.GetUserByEmail(memberDto.Email);
+                StandardUser user = (StandardUser)baseUser;
+                members.Add(user);
+            }
+            return members;
         }
+
     }
 }

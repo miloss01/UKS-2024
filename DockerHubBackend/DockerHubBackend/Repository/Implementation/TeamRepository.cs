@@ -22,14 +22,14 @@ namespace DockerHubBackend.Repository.Implementation
                 .Where(team => team.OrganizationId == organizationId)
                 .Include(team => team.Members)
                 .Select(team => new TeamResponseDto
-                {
-                    Name = team.Name,
-                    Description = team.Description,
-                    Members = team.Members.Select(member => new MemberDto
+                (
+                    team.Name,
+                    team.Description,
+                    team.Members.Select(member => new MemberDto
                     {
                         Email = member.Email,
                     }).ToList()
-                })
+                ))
                 .ToListAsync();
             return new Collection<TeamResponseDto>(teams);
 
@@ -38,6 +38,21 @@ namespace DockerHubBackend.Repository.Implementation
         public async Task<Team> GetByName(string name)
         {
             return await _context.Teams.FirstOrDefaultAsync(team => team.Name == name);
+        }
+
+        public async Task<ICollection<StandardUser>> GetMembers(Guid id)
+        {
+            Team? team = await _context.Teams
+                .Where(t => t.Id == id)
+                .Include(t => t.Members)
+                .FirstOrDefaultAsync();
+
+            if (team == null)
+            {
+                throw new KeyNotFoundException($"Team with ID {id} not found.");
+            }
+
+            return team.Members.ToList();
         }
     }
 }

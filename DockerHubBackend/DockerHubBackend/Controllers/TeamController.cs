@@ -36,5 +36,12 @@ namespace DockerHubBackend.Controllers
             return Ok(team);
         }
 
+        [HttpPut("member/{id}")]
+        public async Task<IActionResult> UpdateMembers([FromBody] ICollection<MemberDto> memberDtos, [FromRoute] Guid id)
+        {
+            var result = await _teamService.AddMembers(id, memberDtos);
+            return Ok(result);
+        }
+
     }
 }
