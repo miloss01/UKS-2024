@@ -4,7 +4,7 @@ namespace DockerHubBackend.Services.Interface
 {
     public interface ITeamService
     {
-        public ICollection<Team> GetTeams(Guid organizationId);
+        public Task<ICollection<Team>?> GetTeams(Guid organizationId);
 
         public Team Create(Team team);
 

@@ -1,6 +1,8 @@
-﻿using DockerHubBackend.Services.Interface;
+﻿using System.Collections.ObjectModel;
+using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Controllers
 {
@@ -21,7 +23,8 @@ namespace DockerHubBackend.Controllers
         [HttpGet("{organizationId}")]
         public async Task<IActionResult> GetTeamsByOrganizationId([FromRoute] Guid organizationId)
         {
-            return Ok();
+            ICollection<Team> teams = await _teamService.GetTeams(organizationId);
+            return Ok(teams);
         }
 
     }

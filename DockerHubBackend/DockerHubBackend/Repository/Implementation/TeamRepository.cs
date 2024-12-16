@@ -1,8 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using DockerHubBackend.Data;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace DockerHubBackend.Repository.Implementation
 {
@@ -11,9 +14,11 @@ namespace DockerHubBackend.Repository.Implementation
 
         public TeamRepository(DataContext context) : base(context) { }
 
-        public async Task<List<Team>> GetTeamsByOrganizationId(Guid organizationId)
+        public async Task<ICollection<Team>> GetTeamsByOrganizationId(Guid organizationId)
         {
-            throw new NotImplementedException();
+            var teams = await _context.Teams.Where(team => team.OrganizationId == organizationId).ToListAsync();
+            return new Collection<Team>(teams);
+
         }
     }
 }

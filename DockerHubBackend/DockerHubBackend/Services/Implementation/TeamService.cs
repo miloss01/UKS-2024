@@ -12,9 +12,9 @@ namespace DockerHubBackend.Services.Implementation
             _repository = repository;
         }
 
-        public ICollection<Team> GetTeams(Guid organizationId)
+        public async Task<ICollection<Team>?> GetTeams(Guid organizationId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetTeamsByOrganizationId(organizationId);
         }
 
         public Team Create(Team team)
