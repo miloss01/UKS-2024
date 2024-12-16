@@ -39,7 +39,9 @@ namespace DockerHubBackend.Data
             if (!context.Teams.Any()) 
             {
                 HashSet<StandardUser> members = new HashSet<StandardUser>();
+                Console.WriteLine("addeddddd");
                 members.Add((StandardUser)context.Users.OrderBy(u => u.Id).Last());
+                Console.WriteLine(members.ToString());
                 context.Teams.AddRange(
                     new Team 
                     {  

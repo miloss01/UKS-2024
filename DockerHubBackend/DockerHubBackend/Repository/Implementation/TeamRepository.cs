@@ -16,7 +16,7 @@ namespace DockerHubBackend.Repository.Implementation
 
         public async Task<ICollection<Team>> GetTeamsByOrganizationId(Guid organizationId)
         {
-            var teams = await _context.Teams.Where(team => team.OrganizationId == organizationId).ToListAsync();
+            var teams = await _context.Teams.Where(team => team.OrganizationId == organizationId).Include(team => team.Members).ToListAsync();
             return new Collection<Team>(teams);
 
         }
