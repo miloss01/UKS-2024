@@ -37,7 +37,7 @@ namespace DockerHubBackend.Services.Implementation
                 throw new UnauthorizedException("Wrong email or password");
             }
 
-            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email);
+            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email, user.IsVerified);
 
             LoginResponse response = new LoginResponse {
                 AccessToken = token
