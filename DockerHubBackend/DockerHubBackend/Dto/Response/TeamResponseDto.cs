@@ -3,7 +3,7 @@ using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Dto.Response
 {
-    public class TeamDto
+    public class TeamResponseDto
     {
         public required string Name { get; set; }
         public ICollection<MemberDto> Members { get; set; } = new HashSet<MemberDto>();

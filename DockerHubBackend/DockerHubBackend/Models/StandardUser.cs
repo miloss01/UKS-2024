@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using DockerHubBackend.Dto.Response;
 
 namespace DockerHubBackend.Models
 {
@@ -10,6 +11,11 @@ namespace DockerHubBackend.Models
         public ICollection<Organization> MyOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
+
+        public MemberDto ToMemberDto()
+        {
+            return new MemberDto { Email = Email };
+        }
 
     }
 }
