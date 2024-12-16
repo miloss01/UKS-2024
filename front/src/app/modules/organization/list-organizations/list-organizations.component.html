@@ -7,23 +7,23 @@
         [(ngModel)]="searchQuery" 
         (input)="onSearchRepository()"/>
     </div>
-    <button class="create-btn">Create an organization</button>
+    <button mat-raised-button color="primary" class="create-btn">Create an organization</button>
   </div>
   
-<!-- Paginacija -->
+<!-- Pagination -->
 <div class="pagination-container">
     <!-- Previous Button -->
-    <button (click)="changePage(-1)" [disabled]="currentPage === 1" class="pagination-btn">
+    <button mat-raised-button color="primary" (click)="changePage(-1)" [disabled]="currentPage === 1" class="pagination-btn">
       Previous
     </button>
   
-    <!-- Indikator stranice -->
+    <!-- Page indicator -->
     <span class="page-indicator">
       {{ currentPage }} / {{ totalPages }}
     </span>
   
     <!-- Next Button -->
-    <button (click)="changePage(1)" [disabled]="currentPage === totalPages" class="pagination-btn">
+    <button mat-raised-button color="primary" (click)="changePage(1)" [disabled]="currentPage === totalPages" class="pagination-btn">
       Next
     </button>
   
@@ -38,27 +38,18 @@
     </div>
   </div>
 
-<!-- Lista organizacija -->
+<!-- List of organizations -->
 <div class="extensions-container">
-    <!-- Ponavljanje za svaku ekstenziju -->
     <div class="extension-card" *ngFor="let extension of paginatedExtensions">
-      <!-- Ikona ekstenzije -->
+
       <div class="icon">
         <img [src]="extension.icon" alt="{{ extension.name }} icon" />
       </div>
   
-      <!-- Detalji ekstenzije -->
       <div class="details">
         <h3>{{ extension.name }}</h3>
         <p class="publisher">By {{ extension.publisher }} · Updated {{ extension.updated }}</p>
         <p>{{ extension.description }}</p>
-      </div>
-  
-      <!-- Informacije i akcije -->
-      <div class="actions">
-        <p>Reviewed · {{ extension.downloads }}K</p>
-        <button class="install-btn" >Install</button>
-        <button class="menu-btn">⋮</button>
       </div>
     </div>
   </div>

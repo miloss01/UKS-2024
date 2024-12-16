@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-list-organizations',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MaterialModule],
   templateUrl: './list-organizations.component.html',
   styleUrl: './list-organizations.component.css'
 })
 export class ListOrganizationsComponent implements OnInit {
   searchQuery: string = '';
-  // Dummy podaci za testiranje
+
   extensions = [
     {
       name: 'Harpoon',
@@ -36,13 +37,22 @@ export class ListOrganizationsComponent implements OnInit {
       description: 'Securely connect to Docker containers without exposing them.',
       downloads: 10.0,
       icon: 'assets/tailscale-icon.png'
+    },
+    {
+      name: 'LAAAAAA',
+      publisher: 'Tailscale Inc.',
+      updated: '1 month ago',
+      description: 'Securely connect to Docker containers without exposing them.',
+      downloads: 10.0,
+      icon: 'assets/tailscale-icon.png'
     }
   ];
 
   filteredExtensions = this.extensions;
-  currentPage = 1; // Trenutna stranica
-  pageSize = 1; // Broj stavki po stranici
-  totalPages = 1; // Ukupan broj stranica
+
+  currentPage = 1; // current page
+  pageSize = 2; // number items per page
+  totalPages = 1; // num pages
   
   ngOnInit() {
     this.updatePagination();
@@ -50,18 +60,16 @@ export class ListOrganizationsComponent implements OnInit {
 
   onCreateRepository() {
     console.log('Create repository button clicked');
-    // Ovde dodaj logiku za kreiranje repozitorijuma
   }
 
   onSearchRepository() {
     this.filteredExtensions = this.extensions.filter(extension =>
       extension.name.toLowerCase().includes(this.searchQuery?.toLowerCase() || '')
     );
-    this.currentPage = 1; // Resetujemo na prvu stranicu
+    this.currentPage = 1; 
     this.updatePagination();
   }
 
-  // Funkcija za ažuriranje paginacije
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredExtensions.length / this.pageSize);
   }
@@ -70,14 +78,12 @@ export class ListOrganizationsComponent implements OnInit {
     this.totalPages = Math.ceil(this.extensions.length / this.pageSize);
   }
 
-  // Dobijamo podatke za trenutnu stranicu
   get paginatedExtensions() {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
     return this.extensions.slice(start, end);
   }
 
-  // Promena stranice
   changePage(step: number) {
     const newPage = this.currentPage + step;
     if (newPage > 0 && newPage <= this.totalPages) {
@@ -85,11 +91,10 @@ export class ListOrganizationsComponent implements OnInit {
     }
   }
 
-  // Promena veličine stranice
   changePageSize(event: Event) {
     const newSize = (event.target as HTMLSelectElement).value; // Kastovanje
-    this.pageSize = +newSize; // Pretvara vrednost u broj
-    this.currentPage = 1; // Resetujemo na prvu stranicu
+    this.pageSize = +newSize; 
+    this.currentPage = 1; 
     this.updateTotalPages();
   }  
 }
