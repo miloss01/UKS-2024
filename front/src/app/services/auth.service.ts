@@ -26,11 +26,13 @@ export class AuthService {
     const decodedToken = helper.decodeToken(token);
     const id:string = decodedToken.nameid;
     const email:string = decodedToken.email;
+    const isVerified:boolean = decodedToken.isVerified.toLowerCase() == "true";
     const role:UserRole = decodedToken.role as UserRole;
     this.userData = {
       userId: id,
       userEmail: email,
-      userRole: role
+      userRole: role,
+      isVerified: isVerified
     };
   }
 

@@ -6,7 +6,8 @@ export interface LoginCredentials {
 export interface UserData{
   userId: string,
   userEmail: string,
-  userRole: UserRole
+  userRole: UserRole,
+  isVerified: boolean
 }
 
 export enum UserRole{
