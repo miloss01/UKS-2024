@@ -12,7 +12,12 @@ namespace DockerHubBackend.Repository.Implementation
     {
         public DockerRepositoryRepository(DataContext context) : base(context) { }
 
-        public DockerRepository GetFullDockerRepositoryById(Guid id)
+		public async Task<DockerRepository?> GetDockerRepositoryById(Guid id)
+		{
+			return await _context.DockerRepositories.FirstOrDefaultAsync(repo => repo.Id == id);
+		}
+
+		public DockerRepository GetFullDockerRepositoryById(Guid id)
         {
             return _context.DockerRepositories
                 .AsQueryable()

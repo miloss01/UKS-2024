@@ -37,32 +37,21 @@ namespace DockerHubBackend.Controllers
             var dockerRepository = _dockerRepositoryService.GetDockerRepositoryById(repositoryId);
             Console.WriteLine(dockerRepository.Images == null);
 
-            var dockerRepositoryDto = new DockerRepositoryDTO
-            {
-                Id = dockerRepository.Id.ToString(),
-                Name = dockerRepository.Name,
-                Description = dockerRepository.Description,
-                Badge = dockerRepository.Badge.ToString(),
-                CreatedAt = dockerRepository.CreatedAt.ToString(),
-                IsPublic = dockerRepository.IsPublic,
-                StarCount = dockerRepository.StarCount,
-                Owner = dockerRepository.OrganizationOwner == null ? dockerRepository.UserOwner.Email : dockerRepository.OrganizationOwner.Name,
-                Images = dockerRepository.Images.Select(img => new DockerImageDTO
-                {
-                    RepositoryName = img.Repository.Name,
-                    RepositoryId = img.Repository.Id.ToString(),
-                    Badge = img.Repository.Badge.ToString(),
-                    Description = img.Repository.Description,
-                    CreatedAt = img.CreatedAt.ToString(),
-                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
-                    ImageId = img.Id.ToString(),
-                    StarCount = img.Repository.StarCount,
-                    Tags = img.Tags,
-                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
-                }).ToList()
-            };
+            var dockerRepositoryDto = new DockerRepositoryDTO(dockerRepository);
 
             return Ok(dockerRepositoryDto);
         }
-    }
+
+		[HttpPost]
+		public IActionResult CreateRepository([FromBody] CreateRepositoryDto dto)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			_dockerRepositoryService.CreateDockerRepository(dto);
+			return Ok(new { Message = "Repository created successfully!" });
+		}
+	}
 }
