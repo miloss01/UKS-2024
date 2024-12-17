@@ -23,6 +23,7 @@ export class TeamsComponent {
     this.teamService.getTeams(organizationId).subscribe(
       (data: TeamsData[]) => {
         this.teams = data;
+        this.teams.sort((a, b) => a.name.localeCompare(b.name));
         console.log('Teams loaded:', this.teams);
       },
       (error) => {
