@@ -5,6 +5,6 @@ namespace DockerHubBackend.Repository.Interface
 {
     public interface IOrganizationRepository : ICrudRepository<BaseUser>
     {
-        Task<BaseUser?> AddOrganization(string email);
+        Task<Organization> AddOrganization(Organization organization);
     }
 }

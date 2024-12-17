@@ -10,9 +10,15 @@ namespace DockerHubBackend.Repository.Implementation
     {
         public OrganizationRepository(DataContext context) : base(context) { }
 
-        public async Task<BaseUser?> AddOrganization(string email)
+        public async Task<Organization> AddOrganization(Organization organization)
         {
-            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
+            // Dodavanje organizacije u DbSet
+            _context.Organizations.Add(organization);
+
+            // Cuvanje promena u bazi podataka
+            await _context.SaveChangesAsync();
+
+            return organization; // Vraca novododatu organizaciju (moyete vracati i samo ID, ako je potrebno)          
         }
     }
 }

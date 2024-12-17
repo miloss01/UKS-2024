@@ -1,6 +1,8 @@
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
+using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,29 +17,24 @@ namespace DockerHubBackend.Controllers
     [ApiController]
     public class OrganizationController : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly IConfiguration _configuration;
+        private readonly IOrganizationService _orgService;
 
-        public OrganizationController(IAuthService authService, IConfiguration configuration)
+        public OrganizationController(IOrganizationService organizationService)
         {
-            _authService = authService;
-            _configuration = configuration;
+            _orgService = organizationService;
         }
 
         [HttpPost]
+        // todo promeni ovo da uzima dto, a ne organizaciju iz body-a
         public async Task<IActionResult> AddOrganization([FromBody] AddOrganizationDto dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Product data is null");
-            }
+            Console.WriteLine("TU SMOOOOOOOOOOOOOOOOOOO");
+            //if (dto == null)
+            //{
+            //    return BadRequest("Product data is null");
+            //}
+            //var addedOrganization = await _orgService.AddOrganization(dto);
 
-            //// Dodavanje proizvoda u bazu
-            //_context.Products.Add(product);
-            //await _context.SaveChangesAsync();
-
-            //// Vracanje odgovora sa status kodom 201 (Created)
-            //return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
             return Ok();
         }
     }

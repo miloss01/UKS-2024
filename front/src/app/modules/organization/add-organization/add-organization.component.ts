@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { OrganizationService } from 'app/services/organization.service';
 
 @Component({
   selector: 'app-add-organization',
@@ -14,7 +16,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class AddOrganizationComponent {
   imagePreview: string | null = null; // URL za pregled slike
 
-  constructor(private dialogRef: MatDialogRef<AddOrganizationComponent>) {}
+  constructor(private dialogRef: MatDialogRef<AddOrganizationComponent>, 
+    private snackBar: MatSnackBar,
+    private organizationService: OrganizationService) 
+  {}
 
   // Funkcija za upload slike
   onFileSelected(event: Event): void {
@@ -37,7 +42,23 @@ export class AddOrganizationComponent {
   }
 
   onSave(): void {
-    console.log('Organizacija sačuvana!');
-    this.dialogRef.close(true);
+    const newOrganization = {
+      name: "New Organization",
+      description: "This is a new organization.",
+      image: ""
+    };
+  
+    this.organizationService.addOrganization(newOrganization).subscribe({
+      next: (response) => {
+        console.log('Organizacija sačuvana!', response);
+        this.snackBar.open('Organizacija je uspešno sačuvana!', 'Zatvori', { duration: 3000 });
+        this.dialogRef.close(true);
+      },
+      error: (error) => {
+        console.error('Greška prilikom čuvanja organizacije!', error);
+        this.snackBar.open('Došlo je do greške prilikom čuvanja organizacije!', 'Zatvori', { duration: 3000 });
+        this.dialogRef.close(false);
+      }
+    });
   }
 }
