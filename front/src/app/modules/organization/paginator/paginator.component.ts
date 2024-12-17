@@ -1,23 +1,24 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MaterialModule } from 'app/infrastructure/material/material.module';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-paginator',
   standalone: true,
+  imports: [CommonModule, FormsModule, MaterialModule],
   templateUrl: './paginator.component.html',
   styleUrls: ['./paginator.component.css']
 })
 export class PaginatorComponent {
-  @Input() currentPage: number = 1;  // Trenutna strana
-  @Input() totalItems: number = 0;   // Ukupno stavki (filtriranih podataka)
-  @Input() pageSize: number = 2;     // Veličina stranice
+  @Input() currentPage: number = 1;  
+  @Input() totalItems: number = 0;  
+  @Input() pageSize: number = 2;     
 
-  @Output() pageChange = new EventEmitter<number>();   // Za promenu stranice
-  @Output() pageSizeChange = new EventEmitter<number>(); // Za promenu veličine stranice
+  @Output() pageChange = new EventEmitter<number>();   
+  @Output() pageSizeChange = new EventEmitter<number>();
 
   get totalPages(): number {
-    console.log(this.totalItems)
-    console.log(this.pageSize)
-    console.log("==========================")
     return Math.ceil(this.totalItems / this.pageSize);
   }
 

@@ -10,27 +10,22 @@
     <button mat-raised-button color="primary" class="create-btn">Create an organization</button>
   </div>
   
-<!-- Pagination -->
 <div class="pagination-container">
-    <!-- Previous Button -->
     <button mat-raised-button color="primary" (click)="changePage(-1)" [disabled]="currentPage === 1" class="pagination-btn">
       Previous
     </button>
   
-    <!-- Page indicator -->
     <span class="page-indicator">
       {{ currentPage }} / {{ totalPages }}
     </span>
   
-    <!-- Next Button -->
     <button mat-raised-button color="primary" (click)="changePage(1)" [disabled]="currentPage === totalPages" class="pagination-btn">
       Next
     </button>
   
-    <!-- Page Size Dropdown -->
     <div class="page-size-container">
       <label for="page-size">Page Size:</label>
-      <select id="page-size" (change)="changePageSize($event)">
+      <select id="page-size" class="custom-select" (change)="changePageSize($event)">
         <option [value]="2">2</option>
         <option [value]="5">5</option>
         <option [value]="10">10</option>

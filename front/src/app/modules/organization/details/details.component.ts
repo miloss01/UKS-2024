@@ -89,22 +89,18 @@ export class DetailsComponent implements OnInit {
 
   onPageChangeMember(newPage: number) {
     this.currentPageMembers = newPage;
-    // this.updateDisplayedMembers();
+    this.updateDisplayedMembers();
   }
 
   onPageSizeChangeMember(newSize: number) {
-    // this.pageSizeMembers = newSize;
-    this.currentPageMembers = 0; 
-    // this.updateDisplayedMembers();
+    this.pageSizeMembers = newSize;
+    this.currentPageMembers = 1; 
+    this.updateDisplayedMembers();
   }
 
   updateDisplayedMembers() {
     const startIndex = (this.currentPageMembers - 1) * this.pageSizeMembers;
     const endIndex = startIndex + this.pageSizeMembers;
-    console.log("**************************")
-    console.log(startIndex)
-    console.log(endIndex)
-    console.log("**************************")
     this.displayedMembers = this.members.slice(startIndex, endIndex);
   }
 

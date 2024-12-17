@@ -1,7 +1,6 @@
 <div class="pagination-container">
-  <!-- Dugme za prethodnu stranu -->
   <button
-    mat-raised-button
+    mat-raised-button 
     color="primary"
     (click)="onPageChange(-1)"
     [disabled]="currentPage === 1"
@@ -9,12 +8,10 @@
     Previous
   </button>
 
-  <!-- Indikator strane -->
   <span class="page-indicator">
     {{ currentPage }} / {{ totalPages }}
   </span>
 
-  <!-- Dugme za sledeću stranu -->
   <button
     mat-raised-button
     color="primary"
@@ -24,10 +21,9 @@
     Next
   </button>
 
-  <!-- Izbor veličine strane -->
   <div class="page-size-container">
     <label for="page-size">Page Size:</label>
-    <select id="page-size" (change)="onPageSizeChange($event)">
+    <select id="page-size" class="custom-select" (change)="onPageSizeChange($event)">
       <option [value]="2">2</option>
       <option [value]="5">5</option>
       <option [value]="10">10</option>
