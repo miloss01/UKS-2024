@@ -1,8 +1,17 @@
+#title {
+    text-align: center;
+    font-size: 2em;
+}
+
+#table-container {
+    margin: auto;
+    width: 90%;
+}
 
 tr {
     cursor: pointer;
 }
 
-#row:hover {
+.row:hover {
     background-color: #cccccc;
 }

@@ -10,8 +10,15 @@ export interface UserData{
 }
 
 export interface TeamsData {
-  Name: string,
-  Description: string
+  id: string,
+  name: string,
+  description: string
+  members: Member[],
+  organizationId: string
+}
+
+export interface Member {
+  email: string
 }
 
 export enum UserRole{
