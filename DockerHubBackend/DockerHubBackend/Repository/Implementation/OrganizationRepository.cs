@@ -2,6 +2,7 @@ using DockerHubBackend.Data;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
+using DockerHubBackend.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Repository.Implementation

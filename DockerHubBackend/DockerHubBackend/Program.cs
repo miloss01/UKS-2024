@@ -1,3 +1,4 @@
+using DockerHubBackend.Config;
 using DockerHubBackend.Data;
 using DockerHubBackend.Filters;
 using DockerHubBackend.Repository.Implementation;
@@ -13,6 +14,8 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
