@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
+import { CreateTeamDialogComponent } from '../create-team-dialog/create-team-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-teams',
@@ -15,7 +17,7 @@ export class TeamsComponent {
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
 
-  constructor(private teamService: TeamService) {
+  constructor(private teamService: TeamService, private dialog: MatDialog) {
     this.getTeams("4e543f2d-799e-4538-a739-fbf5882761b6");
   }
 
@@ -34,6 +36,16 @@ export class TeamsComponent {
 
   onRowClick(row: any) {
     console.log(row);
+  }
+
+  openCreateTeamForm(): void {
+    const dialogRef = this.dialog.open(CreateTeamDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Team created:', result);
+      }
+    });
   }
 
 }

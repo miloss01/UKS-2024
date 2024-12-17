@@ -21,4 +21,6 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row class="row" *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)"></tr>
     </table>
+
+    <button color="primary" id="create-team-btn" mat-raised-button (click)="openCreateTeamForm()">Create Team</button>
 </div>

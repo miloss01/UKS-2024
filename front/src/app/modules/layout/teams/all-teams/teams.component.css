@@ -16,3 +16,7 @@ tr {
 .row:hover {
     background-color: #cccccc;
 }
+
+#create-team-btn {
+    margin-top: 2em; 
+}
