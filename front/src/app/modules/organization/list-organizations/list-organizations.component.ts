@@ -2,12 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AddOrganizationComponent } from '../add-organization/add-organization.component';
 
 @Component({
   selector: 'app-list-organizations',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule],
+  imports: [CommonModule, FormsModule, MaterialModule, RouterModule],
   templateUrl: './list-organizations.component.html',
   styleUrl: './list-organizations.component.css'
 })
@@ -59,7 +62,7 @@ export class ListOrganizationsComponent implements OnInit {
   pageSize = 2; // number items per page
   totalPages = 1; // num pages
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dialog: MatDialog) {}
   
   ngOnInit() {
     this.updatePagination();
@@ -107,5 +110,16 @@ export class ListOrganizationsComponent implements OnInit {
 
   goToDetails(id: number): void {
     this.router.navigate(['/org-details', id]);
+  }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(AddOrganizationComponent, {
+      width: '400px', // Možete odrediti širinu dijaloga
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dijalog je zatvoren');
+      console.log(result); // Možete obraditi rezultat iz dijaloga (ako je vraćen neki podataka)
+    });
   }
 }

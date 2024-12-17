@@ -7,7 +7,7 @@
         [(ngModel)]="searchQuery" 
         (input)="onSearchRepository()"/>
     </div>
-    <button mat-raised-button color="primary" class="create-btn">Create an organization</button>
+    <button mat-raised-button color="primary" class="create-btn" (click)="openDialog()">Create an organization</button>
   </div>
   
 <div class="pagination-container">
