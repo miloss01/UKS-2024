@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OrganizationService } from 'app/services/organization.service';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-add-organization',
@@ -14,26 +15,28 @@ import { OrganizationService } from 'app/services/organization.service';
   styleUrl: './add-organization.component.css'
 })
 export class AddOrganizationComponent {
+  organizationName: string = '';
+  organizationDescription: string = '';
+  imageFile: File | null = null;
   imagePreview: string | null = null; // URL za pregled slike
 
   constructor(private dialogRef: MatDialogRef<AddOrganizationComponent>, 
     private snackBar: MatSnackBar,
-    private organizationService: OrganizationService) 
+    private organizationService: OrganizationService,
+    private authService: AuthService) 
   {}
 
-  // Funkcija za upload slike
   onFileSelected(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
+    const inputElement = event.target as HTMLInputElement;
+    if (inputElement.files && inputElement.files.length > 0) {
+      this.imageFile = inputElement.files[0];
 
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-
-      // Kreiranje URL za pregled slike
+      // Prikaz slike kao preview
       const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result as string;
+      reader.onload = (e) => {
+        this.imagePreview = e.target?.result as string;
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(this.imageFile);
     }
   }
 
@@ -43,20 +46,20 @@ export class AddOrganizationComponent {
 
   onSave(): void {
     const newOrganization = {
-      name: "New Organization",
-      description: "This is a new organization.",
-      image: ""
+      name: this.organizationName,
+      description: this.organizationDescription,
+      ownerEmail: this.authService.userData?.userEmail
     };
-  
+    console.log(newOrganization)
     this.organizationService.addOrganization(newOrganization).subscribe({
       next: (response) => {
-        console.log('Organizacija sačuvana!', response);
-        this.snackBar.open('Organizacija je uspešno sačuvana!', 'Close', { duration: 3000 });
+        console.log('Organizacija sacuvana!', response);
+        this.snackBar.open('Successfully created an organization', 'Close', { duration: 3000 });
         this.dialogRef.close(true);
       },
       error: (error) => {
-        console.error('Greška prilikom čuvanja organizacije!', error);
-        this.snackBar.open('Došlo je do greške prilikom čuvanja organizacije!', 'Close', { duration: 3000 });
+        console.error('Greška prilikom cuvanja organizacije!', error);
+        this.snackBar.open('Error while creating an organization', 'Close', { duration: 3000 });
         this.dialogRef.close(false);
       }
     });

@@ -3,12 +3,12 @@
   <form class="organization-form">
     <mat-form-field appearance="outline" class="full-width first-field">
       <mat-label>Organization name</mat-label>
-      <input matInput placeholder="Input organization name" />
+      <input matInput placeholder="Input organization name" [(ngModel)]="organizationName" name="organizationName" />
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput placeholder="Input organization description"></textarea>
+      <textarea matInput placeholder="Input organization description" [(ngModel)]="organizationDescription" name="organizationDescription"></textarea>
     </mat-form-field>
 
     <div class="upload-container">
@@ -22,7 +22,7 @@
     </div>
 
     <div *ngIf="imagePreview" class="image-preview">
-      <img [src]="imagePreview" alt="Preview slike" class="preview-img" />
+      <img [src]="imagePreview" alt="Preview image" class="preview-img" />
     </div>
   </form>
 </mat-dialog-content>

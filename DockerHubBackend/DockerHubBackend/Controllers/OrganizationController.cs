@@ -25,15 +25,18 @@ namespace DockerHubBackend.Controllers
         }
 
         [HttpPost]
-        // todo promeni ovo da uzima dto, a ne organizaciju iz body-a
         public async Task<IActionResult> AddOrganization([FromBody] AddOrganizationDto dto)
         {
             Console.WriteLine("TU SMOOOOOOOOOOOOOOOOOOO");
-            //if (dto == null)
-            //{
-            //    return BadRequest("Product data is null");
-            //}
-            //var addedOrganization = await _orgService.AddOrganization(dto);
+            if (dto == null)
+            {
+                return BadRequest("Invalid dto");
+            }
+            var addedOrganization = await _orgService.AddOrganization(dto);
+            if(addedOrganization == null)
+            {
+                return BadRequest("Error database saving");
+            }
 
             return Ok();
         }

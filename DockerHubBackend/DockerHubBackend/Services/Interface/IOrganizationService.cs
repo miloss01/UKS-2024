@@ -1,9 +1,10 @@
+using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Services.Interface
 {
     public interface IOrganizationService
     {
-        Task<Organization> AddOrganization(Organization organization);
+        Task<Organization> AddOrganization(AddOrganizationDto organization);
     }
 }

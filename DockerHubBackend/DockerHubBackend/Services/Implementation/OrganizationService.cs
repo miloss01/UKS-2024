@@ -1,3 +1,4 @@
+using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
@@ -14,7 +15,7 @@ namespace DockerHubBackend.Services.Implementation
             _orgRepository = organizationRepository;
         }
 
-        public async Task<Organization> AddOrganization(Organization organization)
+        public async Task<Organization> AddOrganization(AddOrganizationDto organization)
         {
             // add logic (validacija, provera, itd.)
             return await _orgRepository.AddOrganization(organization);

@@ -1,4 +1,5 @@
-﻿namespace DockerHubBackend.Models
+﻿
+namespace DockerHubBackend.Models
 {
     public class StandardUser : BaseUser
     {
@@ -9,5 +10,6 @@
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
 
+        
     }
 }
