@@ -9,6 +9,11 @@ export interface UserData{
   userRole: UserRole
 }
 
+export interface TeamsData {
+  Name: string,
+  Description: string
+}
+
 export enum UserRole{
   StandardUser = "StandardUser",
   Admin = "Admin",
