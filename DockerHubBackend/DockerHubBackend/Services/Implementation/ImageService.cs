@@ -18,9 +18,9 @@ namespace DockerHubBackend.Services.Implementation
     public class ImageService : IImageService
     {
         private readonly IAmazonS3 _s3Client;
-        private readonly string _bucketName = "uks"; 
+        private readonly string _bucketName = "uks-2024"; 
         private readonly string _username = "examplegmail.com";   
-
+     
         public ImageService(IOptions<AwsSettings> awsSettings)
         {
             var awsConfig = awsSettings.Value;

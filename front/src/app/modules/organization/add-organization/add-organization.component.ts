@@ -51,12 +51,12 @@ export class AddOrganizationComponent {
     this.organizationService.addOrganization(newOrganization).subscribe({
       next: (response) => {
         console.log('Organizacija sačuvana!', response);
-        this.snackBar.open('Organizacija je uspešno sačuvana!', 'Zatvori', { duration: 3000 });
+        this.snackBar.open('Organizacija je uspešno sačuvana!', 'Close', { duration: 3000 });
         this.dialogRef.close(true);
       },
       error: (error) => {
         console.error('Greška prilikom čuvanja organizacije!', error);
-        this.snackBar.open('Došlo je do greške prilikom čuvanja organizacije!', 'Zatvori', { duration: 3000 });
+        this.snackBar.open('Došlo je do greške prilikom čuvanja organizacije!', 'Close', { duration: 3000 });
         this.dialogRef.close(false);
       }
     });

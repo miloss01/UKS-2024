@@ -1,0 +1,29 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from 'app/env/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ImageService {
+  private apiUrl = `${environment.apiHost}images`;
+
+  constructor(private http: HttpClient) {}
+
+  // Metod za dobijanje URL-a slike
+  getImageUrl(fileName: string): Observable<string> {
+    const url = `${this.apiUrl}/get-image-url?fileName=${encodeURIComponent(fileName)}`;
+    return this.http.get<string>(url);
+  }
+
+  // Metod za upload slike
+  uploadImage(estateName: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file); // 'file' je ključ koji backend očekuje
+    formData.append('estateName', estateName);
+
+    const url = `${this.apiUrl}/upload-images`;
+    return this.http.post(url, formData);
+  }
+}

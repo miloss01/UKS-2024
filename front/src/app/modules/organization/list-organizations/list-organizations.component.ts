@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AddOrganizationComponent } from '../add-organization/add-organization.component';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-list-organizations',
@@ -62,9 +63,10 @@ export class ListOrganizationsComponent implements OnInit {
   pageSize = 2; // number items per page
   totalPages = 1; // num pages
 
-  constructor(private router: Router, private dialog: MatDialog) {}
+  constructor(private router: Router, private dialog: MatDialog, private authService: AuthService) {}
   
   ngOnInit() {
+    console.log(this.authService.userData?.userEmail)
     this.updatePagination();
   }
 
