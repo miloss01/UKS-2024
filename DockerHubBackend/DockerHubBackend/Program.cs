@@ -75,11 +75,13 @@ builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configur
 // Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
+builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDockerImageService, DockerImageService>();
+builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
