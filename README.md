@@ -31,6 +31,20 @@ Ensure that your `appsettings.json` file is configured with the correct database
 }
 ```
 
+### 3. Configure `super_admin_cred.json`
+Create `super_admin_cred.json` file inside `Startup` folder. The file should have the structure as shown below:
+```json
+{
+  "generatePassword": false,
+  "password": "",
+  "email": "admin@email.com"
+}
+```
+`generatePassword` - Should the application generate super admin account on the first run  
+`password` - This attribute will be updated with super admin account password, after application is run, if the `generatePassword` is set to `true`  
+`email` - Email for super admin account  
+
+If `generatePassword` is true, after the first successful application run its value will be automatically changed to `false`.
 ## Running the Project
 
 ### 1. Apply Migrations
