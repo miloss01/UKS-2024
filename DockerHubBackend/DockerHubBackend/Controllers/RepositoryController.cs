@@ -1,11 +1,13 @@
-﻿using DockerHubBackend.Services.Interface;
+﻿using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DockerHubBackend.Controllers
 {
 	[Route("api/repo")]
 	[ApiController]
-	public class RepositoryController
+	public class RepositoryController : ControllerBase
 	{
 		private readonly IRepositoryService _repositoryService;
 
@@ -20,5 +22,17 @@ namespace DockerHubBackend.Controllers
 			var repositories = await _repositoryService.getUserRepositories();
 			return Ok(repositories);
 		}*/
+
+		[HttpPost]
+		public IActionResult CreateRepository([FromBody] CreateRepositoryDto dto)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			_repositoryService.CreateRepository(dto);
+			return Ok(new { Message = "Repository created successfully!" });
+		}
 	}
 }
