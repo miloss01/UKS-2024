@@ -1,0 +1,25 @@
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .pagination-btn {
+    margin: 0 5px;
+  }
+  
+  .page-indicator {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .page-size-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .page-size-container label {
+    margin-right: 10px;
+  }
+  

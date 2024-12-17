@@ -40,7 +40,10 @@
 
 <!-- List of organizations -->
 <div class="extensions-container">
-    <div class="extension-card" *ngFor="let extension of paginatedExtensions">
+    <div 
+      class="extension-card" 
+      *ngFor="let extension of paginatedExtensions"
+      (click)="goToDetails(extension.id)">
 
       <div class="icon">
         <img [src]="extension.icon" alt="{{ extension.name }} icon" />

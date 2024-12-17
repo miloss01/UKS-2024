@@ -1,0 +1,40 @@
+.members-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 16px;
+  }
+  
+  .left-card, .right-card {
+    width: 48%;
+  }
+
+  .org-title {
+    margin-left: 20px;
+  }
+  
+  .user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+  }
+  
+  .user-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+  
+  .search-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  button {
+    margin-left: 16px;
+  }
+  

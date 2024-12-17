@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list-organizations',
@@ -15,6 +16,7 @@ export class ListOrganizationsComponent implements OnInit {
 
   extensions = [
     {
+      id: 1,
       name: 'Harpoon',
       publisher: 'Harpoon Corp',
       updated: '2 weeks ago',
@@ -23,6 +25,7 @@ export class ListOrganizationsComponent implements OnInit {
       icon: 'assets/harpoon-icon.png'
     },
     {
+      id: 2,
       name: 'Grafana',
       publisher: 'Grafana Labs',
       updated: '1 month ago',
@@ -31,6 +34,7 @@ export class ListOrganizationsComponent implements OnInit {
       icon: 'assets/grafana-icon.png'
     },
     {
+      id: 3,
       name: 'Tailscale',
       publisher: 'Tailscale Inc.',
       updated: '1 month ago',
@@ -39,6 +43,7 @@ export class ListOrganizationsComponent implements OnInit {
       icon: 'assets/tailscale-icon.png'
     },
     {
+      id: 4,
       name: 'LAAAAAA',
       publisher: 'Tailscale Inc.',
       updated: '1 month ago',
@@ -53,6 +58,8 @@ export class ListOrganizationsComponent implements OnInit {
   currentPage = 1; // current page
   pageSize = 2; // number items per page
   totalPages = 1; // num pages
+
+  constructor(private router: Router) {}
   
   ngOnInit() {
     this.updatePagination();
@@ -81,8 +88,8 @@ export class ListOrganizationsComponent implements OnInit {
   get paginatedExtensions() {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.extensions.slice(start, end);
-  }
+    return this.filteredExtensions.slice(start, end);
+  }  
 
   changePage(step: number) {
     const newPage = this.currentPage + step;
@@ -97,4 +104,8 @@ export class ListOrganizationsComponent implements OnInit {
     this.currentPage = 1; 
     this.updateTotalPages();
   }  
+
+  goToDetails(id: number): void {
+    this.router.navigate(['/org-details', id]);
+  }
 }
