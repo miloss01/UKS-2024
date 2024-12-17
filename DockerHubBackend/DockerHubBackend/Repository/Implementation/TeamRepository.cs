@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
@@ -23,6 +24,7 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(team => team.Members)
                 .Select(team => new TeamDto
                 (
+                    team.Id,
                     team.Name,
                     team.Description,
                     team.Members.Select(member => new MemberDto

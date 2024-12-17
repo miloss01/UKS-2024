@@ -4,6 +4,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
+using Microsoft.AspNetCore.Routing.Template;
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -38,7 +39,7 @@ namespace DockerHubBackend.Services.Implementation
             ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
             foreach (StandardUser user in team.Members) { memberDtos.Add(user.ToMemberDto()); }
            
-            return new TeamDto(returnedTeam.Name, returnedTeam.Description, memberDtos);
+            return new TeamDto(returnedTeam.Id, returnedTeam.Name, returnedTeam.Description, memberDtos);
             
         }
 
@@ -70,9 +71,15 @@ namespace DockerHubBackend.Services.Implementation
             return new TeamPermissionResponseDto(tp);
         }
 
-        public async Task<Team> Update(Team team)
+        public async Task<TeamDto> Update(TeamDto teamDto, Guid id)
         {
-            throw new NotImplementedException();
+            Team? team = await _repository.Get(id);
+            if (team == null) { throw new NotFoundException("Team not found."); }
+            team.Name = teamDto.Name;
+            team.Description = teamDto.Description;
+            team = await _repository.Update(team);
+            if (team == null) { throw new NotFoundException("Team not found. Update aborted."); }
+            return new TeamDto(team);
         }
 
         private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
