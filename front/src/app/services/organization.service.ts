@@ -16,7 +16,7 @@ export class OrganizationService {
     return this.http.post<any>(this.apiUrl, organization);
   }
 
-  // getOrganizations(): Observable<any[]> {
-  //   return this.http.get<any[]>(this.apiUrl);
-  // }
+  getOrganizations(email: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${email}`);
+  }
 }

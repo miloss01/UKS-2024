@@ -5,6 +5,7 @@ namespace DockerHubBackend.Services.Interface
 {
     public interface IOrganizationService
     {
-        Task<Organization> AddOrganization(AddOrganizationDto organization);
+        Task<Organization?> AddOrganization(AddOrganizationDto organization);
+        Task<List<Organization>?> GetOrganizations(string email);
     }
 }

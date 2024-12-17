@@ -15,10 +15,14 @@ namespace DockerHubBackend.Services.Implementation
             _orgRepository = organizationRepository;
         }
 
-        public async Task<Organization> AddOrganization(AddOrganizationDto organization)
+        public async Task<Organization?> AddOrganization(AddOrganizationDto organization)
         {
-            // add logic (validacija, provera, itd.)
             return await _orgRepository.AddOrganization(organization);
+        }
+
+        public async Task<List<Organization>?> GetOrganizations(string email)
+        {
+            return await _orgRepository.GetUserOrganizations(email);
         }
     }
 }

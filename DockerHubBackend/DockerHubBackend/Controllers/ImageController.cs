@@ -24,15 +24,15 @@ namespace DockerHubBackend.Controllers
             _imageService = imageService;
         }
 
-        [HttpGet("get-image-url")]
-        public async Task<IActionResult> GetImageUrl([FromQuery] string fileName)
+        [HttpPut("get-image-url")]
+        public async Task<IActionResult> GetImageUrl([FromBody] ImageDto dto)
         {
-            if (string.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(dto.FileName))
             {
                 return BadRequest("File name is required.");
             }
 
-            var url = await _imageService.GetImageUrlAsync(fileName);
+            var url = await _imageService.GetImageUrlAsync(dto.FileName);
             if (url == null)
             {
                 return NotFound("Image not found.");

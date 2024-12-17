@@ -34,23 +34,15 @@ namespace DockerHubBackend.Services.Implementation
         {
             try
             {
-                //if (fileName.Contains("&"))
-                //{
-                //    var tokens = fileName.Split('&');
-                //    var folder = tokens[0];
-                //    var file = tokens[1];
-                //    fileName = $"{folder}/{file}";
-                //}
-
-                var request = new GetObjectRequest
+                var request = new GetPreSignedUrlRequest
                 {
                     BucketName = _bucketName,
-                    Key = fileName
+                    Key = fileName,
+                    Expires = DateTime.UtcNow.AddMinutes(60)
                 };
 
-                var response = await _s3Client.GetObjectAsync(request);
-                var url = $"https://{_bucketName}.s3.{RegionEndpoint.EUCentral1.SystemName}.amazonaws.com/{fileName}";
-                return url;
+                string preSignedUrl = _s3Client.GetPreSignedURL(request);
+                return preSignedUrl;
             }
             catch (Exception ex)
             {

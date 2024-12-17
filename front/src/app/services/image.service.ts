@@ -11,13 +11,12 @@ export class ImageService {
 
   constructor(private http: HttpClient) {}
 
-  // Metod za dobijanje URL-a slike
-  getImageUrl(fileName: string): Observable<string> {
-    const url = `${this.apiUrl}/get-image-url?fileName=${encodeURIComponent(fileName)}`;
-    return this.http.get<string>(url);
+  getImageUrl(fileName: string): Observable<any> {
+    const body = { fileName }; 
+    return this.http.put<{ imageUrl: string }>(`${this.apiUrl}/get-image-url`, body);
   }
 
-  // Metod za upload slike
+  
   uploadImage(filePath: string, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file); 

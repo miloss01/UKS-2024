@@ -50,6 +50,7 @@ export class AddOrganizationComponent {
     const newOrganization = {
       name: this.organizationName,
       description: this.organizationDescription,
+      imageLocation: this.authService.userData?.userEmail+"/"+this.organizationName+"/"+this.imageFile?.name,
       ownerEmail: this.authService.userData?.userEmail
     };
     console.log(newOrganization)

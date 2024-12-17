@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AddOrganizationComponent } from '../add-organization/add-organization.component';
 import { AuthService } from 'app/services/auth.service';
+import { OrganizationService } from 'app/services/organization.service';
+import { ImageService } from 'app/services/image.service';
 
 @Component({
   selector: 'app-list-organizations',
@@ -17,65 +19,56 @@ import { AuthService } from 'app/services/auth.service';
 })
 export class ListOrganizationsComponent implements OnInit {
   searchQuery: string = '';
-
-  extensions = [
-    {
-      id: 1,
-      name: 'Harpoon',
-      publisher: 'Harpoon Corp',
-      updated: '2 weeks ago',
-      description: 'Docker Extension for the No Code Kubernetes platform.',
-      downloads: 19.0,
-      icon: 'assets/harpoon-icon.png'
-    },
-    {
-      id: 2,
-      name: 'Grafana',
-      publisher: 'Grafana Labs',
-      updated: '1 month ago',
-      description: 'Monitor your Docker Desktop instance from Grafana cloud.',
-      downloads: 19.0,
-      icon: 'assets/grafana-icon.png'
-    },
-    {
-      id: 3,
-      name: 'Tailscale',
-      publisher: 'Tailscale Inc.',
-      updated: '1 month ago',
-      description: 'Securely connect to Docker containers without exposing them.',
-      downloads: 10.0,
-      icon: 'assets/tailscale-icon.png'
-    },
-    {
-      id: 4,
-      name: 'LAAAAAA',
-      publisher: 'Tailscale Inc.',
-      updated: '1 month ago',
-      description: 'Securely connect to Docker containers without exposing them.',
-      downloads: 10.0,
-      icon: 'assets/tailscale-icon.png'
-    }
-  ];
-
-  filteredExtensions = this.extensions;
+  organizations: any[] = []; 
+  filteredOrganizations: any[] = []; 
 
   currentPage = 1; // current page
   pageSize = 2; // number items per page
   totalPages = 1; // num pages
 
-  constructor(private router: Router, private dialog: MatDialog, private authService: AuthService) {}
+  constructor(private router: Router, private dialog: MatDialog, private authService: AuthService, private orgService: OrganizationService, private imageService: ImageService) 
+  {}
   
   ngOnInit() {
     console.log(this.authService.userData?.userEmail)
-    this.updatePagination();
+    this.fetchUserOrganizations();
   }
 
-  onCreateRepository() {
-    console.log('Create repository button clicked');
+  setImages() {
+    this.organizations.forEach((org) => {
+      this.imageService.getImageUrl(org.imageLocation).subscribe({
+        next: (response) => {
+          console.log(response.imageUrl)
+          org.imageUrl = response.imageUrl; 
+        },
+        error: (error) => {
+          console.error('Error fetching image URL:', error);
+        },
+      });
+    });
   }
 
-  onSearchRepository() {
-    this.filteredExtensions = this.extensions.filter(extension =>
+  fetchUserOrganizations() {
+    const email = this.authService.userData?.userEmail; 
+
+    if (email) {
+      this.orgService.getOrganizations(email).subscribe({
+        next: (data) => {
+          this.organizations = data;  
+          console.log(data)
+          this.filteredOrganizations = data;  
+          this.updatePagination();
+          this.setImages()
+        },
+        error: (err) => {
+          console.error('Error fetching organizations:', err);
+        }
+      });
+    }
+  }
+
+  onSearchOrganization() {
+    this.filteredOrganizations = this.organizations.filter(extension =>
       extension.name.toLowerCase().includes(this.searchQuery?.toLowerCase() || '')
     );
     this.currentPage = 1; 
@@ -83,17 +76,17 @@ export class ListOrganizationsComponent implements OnInit {
   }
 
   updatePagination() {
-    this.totalPages = Math.ceil(this.filteredExtensions.length / this.pageSize);
+    this.totalPages = Math.ceil(this.filteredOrganizations.length / this.pageSize);
   }
 
   updateTotalPages() {
-    this.totalPages = Math.ceil(this.extensions.length / this.pageSize);
+    this.totalPages = Math.ceil(this.organizations.length / this.pageSize);
   }
 
   get paginatedExtensions() {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.filteredExtensions.slice(start, end);
+    return this.filteredOrganizations.slice(start, end);
   }  
 
   changePage(step: number) {
@@ -120,8 +113,6 @@ export class ListOrganizationsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Dijalog je zatvoren');
-      console.log(result); // Možete obraditi rezultat iz dijaloga (ako je vraćen neki podataka)
     });
   }
 }

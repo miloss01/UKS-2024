@@ -39,5 +39,25 @@ namespace DockerHubBackend.Controllers
 
             return Ok();
         }
+
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUserOrganizations(string email)
+        {
+            try
+            {
+                var organizations = await _orgService.GetOrganizations(email);
+
+                if (organizations == null || !organizations.Any())
+                {
+                    return NotFound("User is not a member or owner of any organization.");
+                }
+
+                return Ok(organizations);  
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

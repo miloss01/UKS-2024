@@ -27,7 +27,6 @@ namespace DockerHubBackend.Repository.Implementation
             var standardUser = user as StandardUser;
             if (standardUser == null)
             {
-                Console.WriteLine("PROOOOBLEEEEEM");
                 return null;
             }
 
@@ -37,7 +36,7 @@ namespace DockerHubBackend.Repository.Implementation
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                ImageLocation = "",
+                ImageLocation = dto.ImageLocation,
                 OwnerId = user.Id,
                 Owner = standardUser,
                 Members = new HashSet<StandardUser>

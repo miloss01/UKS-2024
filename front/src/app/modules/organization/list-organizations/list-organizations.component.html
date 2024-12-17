@@ -5,7 +5,7 @@
         type="text" 
         placeholder="Search by organization name" 
         [(ngModel)]="searchQuery" 
-        (input)="onSearchRepository()"/>
+        (input)="onSearchOrganization()"/>
     </div>
     <button mat-raised-button color="primary" class="create-btn" (click)="openDialog()">Create an organization</button>
   </div>
@@ -37,17 +37,23 @@
 <div class="extensions-container">
     <div 
       class="extension-card" 
-      *ngFor="let extension of paginatedExtensions"
-      (click)="goToDetails(extension.id)">
+      *ngFor="let org of paginatedExtensions"
+      (click)="goToDetails(org.id)">
 
       <div class="icon">
-        <img [src]="extension.icon" alt="{{ extension.name }} icon" />
+        <img
+          *ngIf="org.imageUrl"
+          [src]="org.imageUrl"
+          alt="Organization Image"
+          width="300"
+        />
+        <p *ngIf="!org.imageUrl">Loading image...</p>
       </div>
   
       <div class="details">
-        <h3>{{ extension.name }}</h3>
-        <p class="publisher">By {{ extension.publisher }} · Updated {{ extension.updated }}</p>
-        <p>{{ extension.description }}</p>
+        <h3>{{ org.name }}</h3>
+        <p class="publisher">Created {{ org.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
+        <p>{{ org.description }}</p>
       </div>
     </div>
   </div>
