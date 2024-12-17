@@ -16,12 +16,12 @@ namespace DockerHubBackend.Repository.Implementation
 
         public TeamRepository(DataContext context) : base(context) { }
 
-        public async Task<ICollection<TeamResponseDto>> GetByOrganizationId(Guid organizationId)
+        public async Task<ICollection<TeamDto>> GetByOrganizationId(Guid organizationId)
         {
             var teams = await _context.Teams
                 .Where(team => team.OrganizationId == organizationId)
                 .Include(team => team.Members)
-                .Select(team => new TeamResponseDto
+                .Select(team => new TeamDto
                 (
                     team.Name,
                     team.Description,
@@ -31,7 +31,7 @@ namespace DockerHubBackend.Repository.Implementation
                     }).ToList()
                 ))
                 .ToListAsync();
-            return new Collection<TeamResponseDto>(teams);
+            return new Collection<TeamDto>(teams);
 
         }
 
@@ -53,6 +53,19 @@ namespace DockerHubBackend.Repository.Implementation
             }
 
             return team.Members.ToList();
+        }
+
+        public void AddPermissions(TeamPermission teamPermission)
+        {
+            _context.TeamPermissions.Add(teamPermission);
+            _context.SaveChangesAsync();
+        }
+
+        public TeamPermission? GetTeamPermission(Guid repositoryId, Guid id)
+        {
+            return _context.TeamPermissions
+            .FirstOrDefault(tp => tp.RepositoryId == repositoryId && tp.TeamId == id);
+
         }
     }
 }

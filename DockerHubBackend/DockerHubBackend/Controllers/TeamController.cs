@@ -25,14 +25,14 @@ namespace DockerHubBackend.Controllers
         [HttpGet("{organizationId}")]
         public async Task<IActionResult> GetTeamsByOrganizationId([FromRoute] Guid organizationId)
         {
-            ICollection<TeamResponseDto> teams = await _teamService.GetTeams(organizationId);
+            ICollection<TeamDto> teams = await _teamService.GetTeams(organizationId);
             return Ok(teams);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TeamRequestDto teamDto)
+        public async Task<IActionResult> Create([FromBody] TeamDto teamDto)
         {
-            TeamResponseDto team = await _teamService.Create(teamDto);
+            TeamDto team = await _teamService.Create(teamDto);
             return Ok(team);
         }
 
@@ -40,6 +40,13 @@ namespace DockerHubBackend.Controllers
         public async Task<IActionResult> UpdateMembers([FromBody] ICollection<MemberDto> memberDtos, [FromRoute] Guid id)
         {
             var result = await _teamService.AddMembers(id, memberDtos);
+            return Ok(result);
+        }
+
+        [HttpPost("permission")]
+        public async Task<IActionResult> AddPermission([FromBody] TeamPermissionRequestDto tpRequestDto)
+        {
+            var result = await _teamService.AddPermissions(tpRequestDto);
             return Ok(result);
         }
 

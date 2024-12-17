@@ -6,13 +6,13 @@ namespace DockerHubBackend.Services.Interface
 {
     public interface ITeamService
     {
-        public Task<ICollection<TeamResponseDto>?> GetTeams(Guid organizationId);
+        public Task<ICollection<TeamDto>?> GetTeams(Guid organizationId);
 
-        public Task<TeamResponseDto> Create(TeamRequestDto teamDto);
+        public Task<TeamDto> Create(TeamDto teamDto);
 
-        public Task<TeamResponseDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos);
+        public Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos);
 
-        public Task<Team> ChangePersmissions(Guid teamId, PermissionType permissionType);
+        public Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto);
 
         public Task<Team> Update(Team team);
         

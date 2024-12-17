@@ -60,6 +60,20 @@ namespace DockerHubBackend.Data
 
                 await context.SaveChangesAsync();
             }
+
+            if (!context.DockerRepositories.Any())
+            {
+                context.DockerRepositories.AddRange(
+                    new DockerRepository
+                    {
+                        Name = "My First Repository",
+                        Description = "This is an example of some description.",
+                        Teams = context.Teams.OrderBy(o => o.Id).ToList(),
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

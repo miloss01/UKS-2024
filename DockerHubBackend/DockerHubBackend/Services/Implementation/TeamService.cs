@@ -1,5 +1,6 @@
 ﻿using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
@@ -11,19 +12,22 @@ namespace DockerHubBackend.Services.Implementation
         private readonly ITeamRepository _repository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUserRepository _userRepository;
-        public TeamService(ITeamRepository repository, IOrganizationRepository organizationRepository, IUserRepository userRepository) 
+        private readonly IDockerRepositoryRepository _dockerRepositoryRepository;
+        public TeamService(ITeamRepository repository, IOrganizationRepository organizationRepository,
+            IUserRepository userRepository, IDockerRepositoryRepository dockerRepositoryRepository) 
         {
             _repository = repository;
             _organizationRepository = organizationRepository;
             _userRepository = userRepository;
+            _dockerRepositoryRepository = dockerRepositoryRepository;
         }
 
-        public async Task<ICollection<TeamResponseDto>?> GetTeams(Guid organizationId)
+        public async Task<ICollection<TeamDto>?> GetTeams(Guid organizationId)
         {
             return await _repository.GetByOrganizationId(organizationId);
         }
 
-        public async Task<TeamResponseDto> Create(TeamRequestDto teamDto)
+        public async Task<TeamDto> Create(TeamDto teamDto)
         {
             Organization? organization = await _organizationRepository.Get(teamDto.OrganizationId);
             Team team = teamDto.ToTeam(organization);
@@ -34,22 +38,36 @@ namespace DockerHubBackend.Services.Implementation
             ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
             foreach (StandardUser user in team.Members) { memberDtos.Add(user.ToMemberDto()); }
            
-            return new TeamResponseDto(returnedTeam.Name, returnedTeam.Description, memberDtos);
+            return new TeamDto(returnedTeam.Name, returnedTeam.Description, memberDtos);
             
         }
 
-        public async Task<TeamResponseDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
+        public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
         {
             Team? team = await _repository.Get(teamId);
             team.Members = await toStandardUsers(memberDtos);
             Team? updatedTeam = await _repository.Update(team);
 
-            return new TeamResponseDto(updatedTeam);
+            return new TeamDto(updatedTeam);
         }
 
-        public Task<Team> ChangePersmissions(Guid teamId, PermissionType permissionType)
+        public async Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto)
         {
-            throw new NotImplementedException();
+            TeamPermission? teamPerm = _repository.GetTeamPermission(teamPermissionDto.RepositoryId, teamPermissionDto.TeamId);
+            if (teamPerm != null) { throw new BadRequestException("Team Permission already exists."); }
+            DockerRepository? dr = await _dockerRepositoryRepository.Get(teamPermissionDto.RepositoryId);
+            Team? t = await _repository.Get(teamPermissionDto.TeamId);
+            TeamPermission tp = new TeamPermission
+            {
+                TeamId = teamPermissionDto.TeamId,
+                RepositoryId = teamPermissionDto.RepositoryId,
+                Team = t,
+                Repository = dr,
+                permission = toPermissionType(teamPermissionDto.Permission),
+            };
+            _repository.AddPermissions(tp);
+
+            return new TeamPermissionResponseDto(tp);
         }
 
         public async Task<Team> Update(Team team)
@@ -67,6 +85,18 @@ namespace DockerHubBackend.Services.Implementation
                 members.Add(user);
             }
             return members;
+        }
+
+        private PermissionType toPermissionType(string input)
+        {
+            if (Enum.TryParse<PermissionType>(input, true, out PermissionType permissionType))
+            {
+                return permissionType;
+            }
+            else
+            {
+                throw new NotFoundException("Chosen permission type not found.");
+            }
         }
 
     }
