@@ -6,6 +6,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OrganizationService } from 'app/services/organization.service';
 import { AuthService } from 'app/services/auth.service';
+import { ImageService } from 'app/services/image.service';
 
 @Component({
   selector: 'app-add-organization',
@@ -23,6 +24,7 @@ export class AddOrganizationComponent {
   constructor(private dialogRef: MatDialogRef<AddOrganizationComponent>, 
     private snackBar: MatSnackBar,
     private organizationService: OrganizationService,
+    private imgService: ImageService,
     private authService: AuthService) 
   {}
 
@@ -53,6 +55,7 @@ export class AddOrganizationComponent {
     console.log(newOrganization)
     this.organizationService.addOrganization(newOrganization).subscribe({
       next: (response) => {
+        this.saveImage()
         console.log('Organizacija sacuvana!', response);
         this.snackBar.open('Successfully created an organization', 'Close', { duration: 3000 });
         this.dialogRef.close(true);
@@ -63,5 +66,22 @@ export class AddOrganizationComponent {
         this.dialogRef.close(false);
       }
     });
+  }
+
+  saveImage(): void {
+    if(this.imagePreview != null && this.imageFile != null) 
+    {
+      let fileName = this.authService.userData?.userEmail+"/"+this.organizationName+"/"+this.imageFile.name
+      console.log(fileName)
+      console.log(this.imageFile)
+      this.imgService.uploadImage(fileName, this.imageFile).subscribe({
+        next: (response) => {
+          console.log('Slika je upload-ovana!', response);
+        },
+        error: (error) => {
+          console.error('Greška prilikom cuvanja slidze!', error);
+        }
+      });
+    }
   }
 }

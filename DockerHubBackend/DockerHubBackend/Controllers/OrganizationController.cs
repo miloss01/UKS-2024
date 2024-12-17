@@ -27,7 +27,6 @@ namespace DockerHubBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> AddOrganization([FromBody] AddOrganizationDto dto)
         {
-            Console.WriteLine("TU SMOOOOOOOOOOOOOOOOOOO");
             if (dto == null)
             {
                 return BadRequest("Invalid dto");

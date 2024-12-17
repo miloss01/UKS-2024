@@ -18,33 +18,30 @@ namespace DockerHubBackend.Services.Implementation
     public class ImageService : IImageService
     {
         private readonly IAmazonS3 _s3Client;
-        private readonly string _bucketName = "uks-2024"; 
-        private readonly string _username = "examplegmail.com";   
+        private readonly string _bucketName = "uks-2024";    
      
         public ImageService(IOptions<AwsSettings> awsSettings)
         {
             var awsConfig = awsSettings.Value;
 
-            // Inicijalizacija AWS S3 klijenta
+            // int AWS client
             var credentials = new BasicAWSCredentials(awsConfig.AccessKey, awsConfig.SecretKey);
-            _s3Client = new AmazonS3Client(credentials, RegionEndpoint.GetBySystemName(awsConfig.Region)); // Region "eu-central-1"
+            _s3Client = new AmazonS3Client(credentials, RegionEndpoint.GetBySystemName(awsConfig.Region));
         }
 
-        // Metod za generisanje URL-a slike sa S3
+        // get image from s3
         public async Task<string> GetImageUrlAsync(string fileName)
         {
             try
             {
-                // Proveravamo da li je u imenu fajla & - treba da podelimo ime i folder
-                if (fileName.Contains("&"))
-                {
-                    var tokens = fileName.Split('&');
-                    var folder = tokens[0];
-                    var file = tokens[1];
-                    fileName = $"{folder}/{file}";
-                }
+                //if (fileName.Contains("&"))
+                //{
+                //    var tokens = fileName.Split('&');
+                //    var folder = tokens[0];
+                //    var file = tokens[1];
+                //    fileName = $"{folder}/{file}";
+                //}
 
-                // Sastavljamo URL
                 var request = new GetObjectRequest
                 {
                     BucketName = _bucketName,
@@ -62,25 +59,16 @@ namespace DockerHubBackend.Services.Implementation
             }
         }
 
-        // Metod za upload fajla na S3
+        // upload file in s3
         public async Task UploadImageAsync(string estateName, Stream fileStream)
         {
             try
             {
-                // Provera da li folder za korisnika postoji, ako ne, kreiraj ga
-                bool folderExists = await DoesFolderExistAsync(_username);
-                if (!folderExists)
-                {
-                    await CreateFolderAsync(_username);
-                }
-
-                if (estateName.Contains("&"))
-                {
-                    var tokens = estateName.Split('&');
-                    var folder = tokens[0];
-                    var file = tokens[1];
-                    estateName = $"{folder}/{file}";
-                }
+                //bool folderExists = await DoesFolderExistAsync(_username);
+                //if (!folderExists)
+                //{
+                //    await CreateFolderAsync(_username);
+                //}
 
                 var transferUtility = new TransferUtility(_s3Client);
                 await transferUtility.UploadAsync(fileStream, _bucketName, estateName);
@@ -92,13 +80,12 @@ namespace DockerHubBackend.Services.Implementation
             }
         }
 
-        // Proverava da li postoji folder u S3
         private async Task<bool> DoesFolderExistAsync(string folderName)
         {
             var request = new ListObjectsV2Request
             {
                 BucketName = _bucketName,
-                Prefix = $"{folderName}/",  // S3 koristi prefixe za simulaciju foldera
+                Prefix = $"{folderName}/",  
                 Delimiter = "/"
             };
 
@@ -106,14 +93,13 @@ namespace DockerHubBackend.Services.Implementation
             return response.S3Objects.Count > 0;
         }
 
-        // Kreira folder u S3 (simulacija foldera)
         private async Task CreateFolderAsync(string folderName)
         {
             var request = new PutObjectRequest
             {
                 BucketName = _bucketName,
-                Key = $"{folderName}/",  // Ime foldera sa "/"
-                ContentBody = ""         // Prazan sadržaj
+                Key = $"{folderName}/",  
+                ContentBody = ""         
             };
 
             await _s3Client.PutObjectAsync(request);

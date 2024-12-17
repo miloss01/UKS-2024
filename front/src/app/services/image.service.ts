@@ -18,12 +18,12 @@ export class ImageService {
   }
 
   // Metod za upload slike
-  uploadImage(estateName: string, file: File): Observable<any> {
+  uploadImage(filePath: string, file: File): Observable<any> {
     const formData = new FormData();
-    formData.append('file', file); // 'file' je ključ koji backend očekuje
-    formData.append('estateName', estateName);
+    formData.append('file', file); 
+    formData.append('filePath', filePath);
 
-    const url = `${this.apiUrl}/upload-images`;
-    return this.http.post(url, formData);
+    const url = `${this.apiUrl}/upload-image`;
+    return this.http.post(url, formData, { responseType: 'text' });
   }
 }

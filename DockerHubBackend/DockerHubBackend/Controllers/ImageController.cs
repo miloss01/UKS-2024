@@ -24,7 +24,6 @@ namespace DockerHubBackend.Controllers
             _imageService = imageService;
         }
 
-        // Endpoint za generisanje URL-a za sliku
         [HttpGet("get-image-url")]
         public async Task<IActionResult> GetImageUrl([FromQuery] string fileName)
         {
@@ -42,19 +41,17 @@ namespace DockerHubBackend.Controllers
             return Ok(new { ImageUrl = url });
         }
 
-        // Endpoint za upload slike na S3
         [HttpPost("upload-image")]
-        public async Task<IActionResult> UploadImage([FromQuery] string estateName, IFormFile file)
+        public async Task<IActionResult> UploadImage([FromForm] string filePath, [FromForm] IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
 
-            // Preuzimanje fajla kao stream
             using (var stream = file.OpenReadStream())
             {
-                await _imageService.UploadImageAsync(estateName, stream);
+                await _imageService.UploadImageAsync(filePath, stream);
             }
 
             return Ok("Image uploaded successfully.");
