@@ -24,7 +24,14 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
-            StandardUser standardUser = new StandardUser { Email = user.Email, IsVerified = user.IsVerified, Password = user.Password };
+            var standardUser = user as StandardUser;
+            if (standardUser == null)
+            {
+                Console.WriteLine("PROOOOBLEEEEEM");
+                return null;
+            }
+
+            //StandardUser standardUser = new StandardUser { Email = user.Email, IsVerified = user.IsVerified, Password = user.Password };
 
             var organization = new Organization
             {
@@ -43,5 +50,21 @@ namespace DockerHubBackend.Repository.Implementation
             await _context.SaveChangesAsync();
             return organization;        
         }
+
+        public async Task<List<Organization>?> GetUserOrganizations(string email)
+        {
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return await _context.Organizations
+                     .Where(o => !o.IsDeleted &&
+                                 (o.OwnerId == user.Id ||
+                                  o.Members.Any(m => m.Id == user.Id)))
+                     .ToListAsync();
+        }
+
     }
 }
