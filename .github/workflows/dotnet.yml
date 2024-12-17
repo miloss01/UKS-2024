@@ -49,5 +49,22 @@ jobs:
       run: dotnet restore ./DockerHubBackend/DockerHubBackend.Tests
     - name: Build default project
       run: dotnet build ./DockerHubBackend/DockerHubBackend --no-restore
-    - name: Test
-      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests --verbosity normal
+    - name: Run tests
+      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests --verbosity normal --logger "trx;LogFileName=TestResults.trx"
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: TestResults
+        path: "**/*.trx"
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+    - name: Generate HTML report
+      run: reportgenerator -reports:**/*.trx -targetdir:TestReport
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v3
+      with:
+        name: TestReport
+        path: TestReport        
+
+
+      
