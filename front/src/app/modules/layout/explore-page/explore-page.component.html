@@ -26,7 +26,7 @@
   <div class="image-list-container">
     <div class="pagination-container">
         <button mat-raised-button color="primary" class="pag-btn" (click)="onPageChange(-1)">Previous</button>
-        <label class="page-counter-label">{{ page }} / {{ totalNumberOfPages }}</label>
+        <label class="page-counter-label">{{ page }} of {{ totalNumberOfPages }}</label>
         <button mat-raised-button color="primary" class="pag-btn" (click)="onPageChange(1)">Next</button>
 
         <label class="page-size-label">Page Size:</label>
@@ -41,7 +41,7 @@
     <div class="image-list">
       <div *ngFor="let image of dockerImages" class="image-item">
         <div class="image-header">
-          <div class="repo-name">{{ image.repositoryName }}<span class="image-id">#{{ image.imageId }}</span>
+          <div class="repo-name" [routerLink]="['/explore/repository', image.repositoryId]">{{ image.repositoryName }}<span class="image-id">#{{ image.imageId }}</span>
           </div>
           <div class="badge" [ngClass]="image.badge">{{ image.badge }}</div>
         </div>

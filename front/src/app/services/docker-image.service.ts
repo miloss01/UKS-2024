@@ -12,6 +12,6 @@ export class DockerImageService {
   constructor(private http: HttpClient) { }
 
   getDockerImages(page: number, pageSize: number, searchTerm: string, badges: string): Observable<PageDTO<DockerImageDTO>>{
-      return this.http.get<PageDTO<DockerImageDTO>>(`${environment.apiHost}dockerImages?page=${page}&pageSize=${pageSize}&searchTerm=${searchTerm}&badges=${badges}`);
-    }
+    return this.http.get<PageDTO<DockerImageDTO>>(`${environment.apiHost}dockerImages?page=${page}&pageSize=${pageSize}&searchTerm=${searchTerm}&badges=${badges}`);
+  }
 }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Repository.Implementation
 {
-    public class DockerImageRepository : CrudRepository<DockerRepository>, IDockerImageRepository
+    public class DockerImageRepository : CrudRepository<DockerImage>, IDockerImageRepository
     {
         public DockerImageRepository(DataContext context) : base(context) { }
 
@@ -28,6 +28,7 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(img => img.Repository)
                     .ThenInclude(repo => repo.OrganizationOwner)
                 .Where(img => !img.IsDeleted)
+                .Where(img => img.Repository.IsPublic)
                 .Where(img => !badgeList.Any() ||
                               badgeList.Contains(img.Repository.Badge))
                 .Where(img => img.Repository.Name.Contains(searchTerm) ||

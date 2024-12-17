@@ -35,7 +35,7 @@ namespace DockerHubBackend.Controllers
                                     Badge = img.Repository.Badge.ToString(),
                                     Description = img.Repository.Description,
                                     CreatedAt = img.CreatedAt.ToString(),
-                                    LastPush = img.LastPush == null ? "nema lastpush" : img.LastPush.ToString(),
+                                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
                                     ImageId = img.Id.ToString(),
                                     StarCount = img.Repository.StarCount,
                                     Tags = img.Tags,

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DockerImageDTO, PageDTO } from 'app/models/models';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DockerImageService } from 'app/services/docker-image.service';
+import { RouterModule } from '@angular/router';
 
 interface BadgeHelper {
   name: string;
@@ -13,11 +14,16 @@ interface BadgeHelper {
 @Component({
   selector: 'app-explore-page',
   standalone: true,
-  imports: [MaterialModule, FormsModule, CommonModule],
+  imports: [
+    MaterialModule, 
+    FormsModule, 
+    CommonModule, 
+    RouterModule
+  ],
   templateUrl: './explore-page.component.html',
   styleUrl: './explore-page.component.css'
 })
-export class ExplorePageComponent {
+export class ExplorePageComponent implements OnInit {
   dockerImages: DockerImageDTO[] = [];
   badges: BadgeHelper[] = [
     { name: 'DockerOfficialImage', selected: false },
