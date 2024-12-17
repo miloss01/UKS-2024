@@ -15,3 +15,8 @@ export enum UserRole{
   Admin = "Admin",
   SuperAdmin = "SuperAdmin"
 }
+
+export interface ChangePasswordDto{
+  newPassword: string,
+  token: string
+}

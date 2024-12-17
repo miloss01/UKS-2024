@@ -49,7 +49,11 @@ export class LoginPageComponent {
       },
       error: (error) => {
         if(error instanceof HttpErrorResponse){
-          this.errorMessage = error.error.message;
+          if(error.error.verificationToken){
+            this.router.navigate(["/password/change"], {queryParams: {token: error.error.verificationToken}});
+          }else{
+            this.errorMessage = error.error.message;
+          }
         }else{
           this.errorMessage = "Something went wrong"
         }
