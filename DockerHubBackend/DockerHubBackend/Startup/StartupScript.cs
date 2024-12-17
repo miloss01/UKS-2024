@@ -28,17 +28,20 @@ namespace DockerHubBackend.Startup
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            var keysToExtract = new List<string> { "generatePassword", "email"};
-            LoadConfigFileData();
-            if (!_generatePassword)
+            using (var scope = _serviceProvider.CreateScope())
             {
+                var keysToExtract = new List<string> { "generatePassword", "email"};
+                LoadConfigFileData();
+                if (!_generatePassword)
+                {
+                    return Task.CompletedTask;
+                }
+                _superAdminPassword = _serviceProvider.GetRequiredService<IRandomTokenGenerator>().GenerateRandomPassword(16);
+                SetPassword();
+                CreateSuperAdminAccount();
+                UpdateGeneratePassword();
                 return Task.CompletedTask;
             }
-            _superAdminPassword = PasswordGenerator.GenerateRandomPassword(16);
-            SetPassword();
-            CreateSuperAdminAccount();
-            UpdateGeneratePassword();
-            return Task.CompletedTask;
         }
 
         Task IHostedService.StopAsync(CancellationToken cancellationToken)
