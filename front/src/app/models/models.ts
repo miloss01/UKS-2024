@@ -32,3 +32,15 @@ export interface PageDTO<T> {
   data: T[];
   totalNumberOfElements: number;
 }
+
+export interface DockerRepositoryDTO {
+  id: string;
+  name: string;
+  description: string;
+  isPublic: boolean;
+  starCount: number;
+  badge: string;
+  images: DockerImageDTO[];
+  owner: string;
+  createdAt: string;
+}
