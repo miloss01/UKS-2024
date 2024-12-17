@@ -1,6 +1,7 @@
 using Amazon.S3.Model;
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
@@ -30,8 +31,6 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
-            //StandardUser standardUser = new StandardUser { Email = user.Email, IsVerified = user.IsVerified, Password = user.Password };
-
             var organization = new Organization
             {
                 Name = dto.Name,
@@ -50,7 +49,7 @@ namespace DockerHubBackend.Repository.Implementation
             return organization;        
         }
 
-        public async Task<List<Organization>?> GetUserOrganizations(string email)
+        public async Task<List<OrganizationOwnershipDto>?> GetUserOrganizations(string email)
         {
             var user = await _userRepository.GetUserByEmail(email);
             if (user == null)
@@ -58,12 +57,23 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
-            return await _context.Organizations
-                     .Where(o => !o.IsDeleted &&
-                                 (o.OwnerId == user.Id ||
-                                  o.Members.Any(m => m.Id == user.Id)))
-                     .ToListAsync();
-        }
+            var organizations = await _context.Organizations
+                .Where(o => !o.IsDeleted &&
+                    (o.OwnerId == user.Id ||
+                     o.Members.Any(m => m.Id == user.Id)))
+                .Select(o => new OrganizationOwnershipDto
+                {
+                    Id = o.Id,
+                    Name = o.Name,
+                    Description = o.Description,
+                    ImageLocation = o.ImageLocation,
+                    CreatedAt = o.CreatedAt,
+                    IsOwner = o.OwnerId == user.Id 
+                })
+                .ToListAsync();
+
+            return organizations;
+            }
 
     }
 }

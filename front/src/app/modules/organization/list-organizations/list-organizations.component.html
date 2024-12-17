@@ -47,11 +47,19 @@
           alt="Organization Image"
           width="300"
         />
-        <p *ngIf="!org.imageUrl">Loading image...</p>
+        <img
+          *ngIf="!org.imageUrl"
+          src="images/loading.png"
+          alt="Organization Image"
+          width="300"
+        />
       </div>
   
       <div class="details">
-        <h3>{{ org.name }}</h3>
+        <h3>
+          {{ org.name }}
+          <span *ngIf="org.isOwner" class="owner-icon">👑</span>
+        </h3>
         <p class="publisher">Created {{ org.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
         <p>{{ org.description }}</p>
       </div>

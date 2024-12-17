@@ -1,4 +1,5 @@
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
@@ -20,7 +21,7 @@ namespace DockerHubBackend.Services.Implementation
             return await _orgRepository.AddOrganization(organization);
         }
 
-        public async Task<List<Organization>?> GetOrganizations(string email)
+        public async Task<List<OrganizationOwnershipDto>?> GetOrganizations(string email)
         {
             return await _orgRepository.GetUserOrganizations(email);
         }
