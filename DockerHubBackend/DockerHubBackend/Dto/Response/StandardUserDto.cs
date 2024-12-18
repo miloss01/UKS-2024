@@ -3,15 +3,15 @@ using System.Text.Json;
 
 namespace DockerHubBackend.Dto.Response
 {
-    public class CreatedUserDto
+    public class StandardUserDto
     {
         public string Id { get; set; }
         public string Email { get; set; }
         public string? Location { get; set; }
-        public string Username { get; set; }
+        public string Username { get; set; }        
 
-        public CreatedUserDto() { }
-        public CreatedUserDto(BaseUser user)
+        public StandardUserDto() { }
+        public StandardUserDto(StandardUser user)
         {
             Id = user.Id.ToString();
             Email = user.Email;

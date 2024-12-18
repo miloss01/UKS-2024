@@ -35,8 +35,7 @@ export class LoginPageComponent {
     if(this.loginForm.valid){
       const credentials:LoginCredentials = {
         email: this.loginForm.controls['email'].value,
-        password: this.loginForm.controls['password'].value,
-        withCredentials: true
+        password: this.loginForm.controls['password'].value
       }
       this.login(credentials);
     }
@@ -48,6 +47,7 @@ export class LoginPageComponent {
         this.router.navigate(["/home"]);
       },
       error: (error) => {
+        console.log(error);
         if(error instanceof HttpErrorResponse){
           if(error.error.verificationToken){
             this.router.navigate(["/password/change"], {queryParams: {token: error.error.verificationToken}});

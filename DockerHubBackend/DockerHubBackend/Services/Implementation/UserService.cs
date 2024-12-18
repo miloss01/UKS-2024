@@ -35,7 +35,7 @@ namespace DockerHubBackend.Services.Implementation
             await _userRepository.Update(token.User);
         }
 
-        public async Task<CreatedUserDto> RegisterStandardUser(RegisterUserDto registerUserDto)
+        public async Task<StandardUserDto> RegisterStandardUser(RegisterUserDto registerUserDto)
         {
             if(await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
             {
@@ -53,9 +53,9 @@ namespace DockerHubBackend.Services.Implementation
                 Password = hashedPassword,
                 Location = registerUserDto.Location
             };
-            BaseUser savedUser = await _userRepository.Create(user);
+            StandardUser savedUser = (StandardUser) await _userRepository.Create(user);
 
-            return new CreatedUserDto(savedUser);
+            return new StandardUserDto(savedUser);
         }
     }
 }
