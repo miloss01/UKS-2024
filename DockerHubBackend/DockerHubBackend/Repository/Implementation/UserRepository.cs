@@ -10,9 +10,14 @@ namespace DockerHubBackend.Repository.Implementation
     {
         public UserRepository(DataContext context) : base(context) {}
 
+        public async override Task<BaseUser?> Get(Guid id)
+        {
+            return await _entities.Include(u => u.VerificationToken).FirstOrDefaultAsync(u => u.Id == id);
+        }
+
         public async Task<BaseUser?> GetUserByEmail(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
+            return await _context.Users.Include(u => u.VerificationToken).FirstOrDefaultAsync(user => user.Email == email);
         }
     }
 }

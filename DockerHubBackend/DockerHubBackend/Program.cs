@@ -5,6 +5,7 @@ using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
+using DockerHubBackend.Startup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -74,12 +75,14 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
 builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<IRandomTokenGenerator, RandomTokenGenerator>();
 builder.Services.AddScoped<IDockerImageService, DockerImageService>();
 builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 
@@ -91,6 +94,8 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionHandler>();
 });
+
+builder.Services.AddHostedService<StartupScript>();
 
 var app = builder.Build();
 

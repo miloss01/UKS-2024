@@ -6,13 +6,19 @@ export interface LoginCredentials {
 export interface UserData{
   userId: string,
   userEmail: string,
-  userRole: UserRole
+  userRole: UserRole,
+  isVerified: boolean
 }
 
 export enum UserRole{
   StandardUser = "StandardUser",
   Admin = "Admin",
   SuperAdmin = "SuperAdmin"
+}
+
+export interface ChangePasswordDto{
+  newPassword: string,
+  token: string
 }
 
 export interface DockerImageDTO {

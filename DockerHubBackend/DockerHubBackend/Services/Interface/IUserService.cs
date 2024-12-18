@@ -1,6 +1,9 @@
-﻿namespace DockerHubBackend.Services.Interface
+﻿using DockerHubBackend.Dto.Request;
+
+namespace DockerHubBackend.Services.Interface
 {
     public interface IUserService
     {
+        Task ChangePassword(ChangePasswordDto changePasswordDto);
     }
 }
