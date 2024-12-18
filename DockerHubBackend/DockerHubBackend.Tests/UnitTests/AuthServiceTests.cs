@@ -57,7 +57,7 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var credentials = new LoginCredentialsDto { Email = "notfound@example.com", Password = "password123" };
 
-            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync((BaseUser)null);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync((BaseUser?)null);
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _service.Login(credentials));
             Assert.Equal("Wrong email or password", exception.Message);
