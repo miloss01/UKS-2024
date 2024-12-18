@@ -17,7 +17,17 @@ namespace DockerHubBackend.Repository.Implementation
 
         public async Task<BaseUser?> GetUserByEmail(string email)
         {
+            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
+        }
+
+        public async Task<BaseUser?> GetUserWithTokenByEmail(string email)
+        {
             return await _context.Users.Include(u => u.VerificationToken).FirstOrDefaultAsync(user => user.Email == email);
+        }
+
+        public async Task<BaseUser?> GetUserByUsername(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
         }
     }
 }
