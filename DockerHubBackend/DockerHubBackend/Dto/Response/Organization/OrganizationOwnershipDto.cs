@@ -12,7 +12,7 @@ namespace DockerHubBackend.Dto.Response.Organization
         public string? Description { get; set; }
         public string ImageLocation { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Guid OwnerId { get; set; }
+        public string OwnerEmail { get; set; }
         public bool IsOwner { get; set; }
 
         public override string ToString()

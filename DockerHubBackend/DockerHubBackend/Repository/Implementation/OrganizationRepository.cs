@@ -69,6 +69,10 @@ namespace DockerHubBackend.Repository.Implementation
                     Description = o.Description,
                     ImageLocation = o.ImageLocation,
                     CreatedAt = o.CreatedAt,
+                    OwnerEmail = _context.Users
+                                    .Where(u => u.Id == o.OwnerId)
+                                    .Select(u => u.Email)
+                                    .FirstOrDefault(),
                     IsOwner = o.OwnerId == user.Id 
                 })
                 .ToListAsync();

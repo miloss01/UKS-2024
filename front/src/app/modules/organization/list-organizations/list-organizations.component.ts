@@ -36,9 +36,8 @@ export class ListOrganizationsComponent implements OnInit {
 
   setImages() {
     this.organizations.forEach((org) => {
-      console.log(org)
-      console.log(this.authService.userData?.userEmail+"/"+org.Id+"/"+org.imageLocation)
-      this.imageService.getImageUrl(this.authService.userData?.userEmail+"/"+org.id+"/"+org.imageLocation).subscribe({
+      console.log(org.ownerEmail+"/"+org.id+"/"+org.imageLocation)
+      this.imageService.getImageUrl(org.ownerEmail+"/"+org.id+"/"+org.imageLocation).subscribe({
         next: (response) => {
           org.imageUrl = response.imageUrl; 
         },
