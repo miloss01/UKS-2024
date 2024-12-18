@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { OrganizationService } from 'app/services/organization.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-details',
@@ -32,27 +34,19 @@ export class DetailsComponent implements OnInit {
   pageSizeMembers: number = 2;
   currentPageMembers: number = 1;
 
-  constructor(private route: ActivatedRoute, private location: Location, private orgService: OrganizationService) {
+  constructor(private dialog: MatDialog, private route: ActivatedRoute, private location: Location, private orgService: OrganizationService) {
   }
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id');
-    console.log('Dobijeni GUID iz URL-a:', this.id);
 
     this.route.queryParams.subscribe(params => {
       this.name = params['name'];
       this.isOwner = params['isOwner'] === 'true';
     });
 
-    console.log('ID:', this.id);
-    console.log('Name:', this.name);
-
-    // if(this.id != null)
-    //   this.fetchOrganization(this.id);
-
     if(this.id != null)
       this.fetchMembers(this.id)
-    // this.members = this.getMembers();
   }
 
   fetchMembers(id: string): void {
@@ -75,40 +69,6 @@ export class DetailsComponent implements OnInit {
         console.log(err)
       }
     });
-  }
-
-  // fetchOrganization(id: string): void {
-  //   this.orgService.getOrganizationById(id).subscribe({
-  //     next: (data) => {
-  //       this.organization = data;
-  //       console.log(data)
-  //       console.log("ok")
-  //     },
-  //     error: (err) => {
-  //       this.organization = null;
-  //       console.log(err)
-  //     }
-  //   });
-  // }
-
-  getAllUsers() {
-    return [
-        { firstName: 'Marko', lastName: 'Marković', email: 'marko@example.com', image: 'images/user.png' },
-    { firstName: 'Ivana', lastName: 'Ivić', email: 'ivana@example.com', image: 'images/user.png' },
-    { firstName: 'Marko', lastName: 'Marković', email: 'marko@example.com', image: 'images/user.png' },
-    { firstName: 'Ivana', lastName: 'Ivić', email: 'ivana@example.com', image: 'images/user.png' },
-    { firstName: 'Marko', lastName: 'Marković', email: 'marko@example.com', image: 'images/user.png' },
-    { firstName: 'Ivana', lastName: 'Ivić', email: 'ivana@example.com', image: 'images/user.png' },
-    ];
-  }
-
-  getMembers() {
-    return [
-      { firstName: 'Petar', lastName: 'Petrović', email: 'petar@example.com' },
-      { firstName: 'Ana', lastName: 'Anić', email: 'ana@example.com' },
-      { firstName: 'Ana', lastName: 'Anić', email: 'ana@example.com' },
-      { firstName: 'Ana', lastName: 'Anić', email: 'ana@example.com' },
-    ]
   }
 
   updateSearch() {
@@ -159,10 +119,21 @@ export class DetailsComponent implements OnInit {
   }
 
   addUser(user: any) {
-    console.log('Adding user:', user);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: { userEmail: user.email }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // this.addMemberToOrganization(user);
+      } else {
+        console.log('User addition was canceled');
+      }
+    });
   }
 
   goBack(): void {
-    this.location.back(); // Vraća na prethodnu stranicu
+    this.location.back(); 
   }
 }
