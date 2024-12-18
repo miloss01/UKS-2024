@@ -154,3 +154,24 @@
     box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
     cursor: pointer;
   }
+
+  .owner-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 8px;
+    margin-right: 25px;
+  }
+  
+  .edit-btn {
+    margin-bottom: 8px; 
+  }
+  
+  .deactivate-icon {
+    cursor: pointer;
+  }  
+  
+  .deactivate-icon:hover {
+    transform: scale(1.1);
+  }
+  

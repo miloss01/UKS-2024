@@ -119,4 +119,17 @@ export class ListOrganizationsComponent implements OnInit {
       // location.reload();
     });
   }
+
+  editOrganization(orgId: number, event: MouseEvent) {
+    event.stopPropagation();
+    console.log(`Editing organization with ID: ${orgId}`);
+    // Ovde implementiraj otvaranje dijaloga ili preusmerenje
+  }
+  
+  deactivateOrganization(orgId: number, event: MouseEvent) {
+    event.stopPropagation();
+    console.log(`Deactivating organization with ID: ${orgId}`);
+    // Ovde implementiraj logiku za deaktivaciju organizacije
+  }
+  
 }

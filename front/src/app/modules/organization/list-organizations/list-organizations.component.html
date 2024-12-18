@@ -67,6 +67,26 @@
         <p class="publisher">Created {{ org.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
         <p>{{ org.description }}</p>
       </div>
+
+       <!-- Buttons for owner -->
+       <div *ngIf="org.isOwner" class="owner-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="editOrganization(org.id, $event)" 
+          class="edit-btn">
+          Edit
+        </button>
+        <img 
+          src="images/deactivate.png" 
+          alt="Deactivate Organization" 
+          width="24" 
+          height="24" 
+          class="deactivate-icon" 
+          title="Deactivate this organization"
+          (click)="deactivateOrganization(org.id, $event)"
+        />
+      </div>
     </div>
   </div>
   
