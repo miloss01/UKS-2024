@@ -46,6 +46,8 @@ export class TeamDetailsComponent implements OnInit {
       if (result && this.team != undefined) {
         this.team.name = result.name;
         this.team.description = result.description;
+        this.teamService.update(this.team).subscribe((team) => {
+        });
       }
     });
   }

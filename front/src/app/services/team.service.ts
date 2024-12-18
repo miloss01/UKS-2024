@@ -22,4 +22,9 @@ export class TeamService {
   deleteTeam(id: string): Observable<TeamsData> {
     return this.http.delete<TeamsData>(`${environment.apiHost}team/${id}`);
   }
+
+  update(team: TeamsData): Observable<TeamsData> {
+    console.log(team);
+    return this.http.put<TeamsData>(`${environment.apiHost}team/${team.id}`, {"Name": team.name, "Description": team.description});
+  }
 }
