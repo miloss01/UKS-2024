@@ -10,6 +10,7 @@ import { AuthService } from 'app/services/auth.service';
 import { OrganizationService } from 'app/services/organization.service';
 import { ImageService } from 'app/services/image.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { EditOrganizationComponent } from '../edit-organization/edit-organization.component';
 
 @Component({
   selector: 'app-list-organizations',
@@ -121,10 +122,18 @@ export class ListOrganizationsComponent implements OnInit {
     });
   }
 
-  editOrganization(orgId: number, event: MouseEvent) {
+  editOrganization(orgId: string, name: string, desc: string, imageUrl: string, event: MouseEvent) {
     event.stopPropagation();
-    console.log(`Editing organization with ID: ${orgId}`);
-    // Ovde implementiraj otvaranje dijaloga ili preusmerenje
+    const dialogRef = this.dialog.open(EditOrganizationComponent, {
+      data: { orgId, name, desc, imageUrl },
+    });
+  
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('Updated organization:', result);
+        // Pozovi API za ažuriranje organizacije
+      }
+    });
   }
   
   deactivateOrganization(orgName: string, event: MouseEvent) {
