@@ -106,7 +106,7 @@ export class ListOrganizationsComponent implements OnInit {
 
   goToDetails(id: number, name:string, isOwner: boolean): void {
     this.router.navigate(['/org-details', id], {
-      queryParams: { name: name }
+      queryParams: { name: name, isOwner: isOwner }
     });
   }
 

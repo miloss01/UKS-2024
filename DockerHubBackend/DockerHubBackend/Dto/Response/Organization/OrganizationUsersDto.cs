@@ -3,16 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DockerHubBackend.Dto.Response
+namespace DockerHubBackend.Dto.Response.Organization
 {
-    public class MemberDto
+    public class OrganizationUsersDto
     {
-        public Guid Id { get; set; }
+        public List<MemberDto> Members { get; set; }
 
-        //public string Name { get; set; }
-
-        public string Email { get; set; }
-        public bool IsOwner { get; set; }
+        public List<MemberDto> OtherUsers { get; set; }
 
         public override string ToString()
         {

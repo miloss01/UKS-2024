@@ -9,6 +9,10 @@
     width: 48%;
   }
 
+  .center-card {
+    justify-content: center;
+  }
+
   .org-title {
     margin-left: 20px;
   }

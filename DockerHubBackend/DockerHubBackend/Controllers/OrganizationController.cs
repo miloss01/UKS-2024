@@ -1,5 +1,5 @@
 using DockerHubBackend.Dto.Request;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
@@ -62,16 +62,16 @@ namespace DockerHubBackend.Controllers
         }
 
         [HttpGet("{organizationId}/members")]
-        public async Task<ActionResult<List<MemberDto>>> GetMembers(Guid organizationId)
+        public async Task<ActionResult<OrganizationUsersDto>> GetMembers(Guid organizationId)
         {
-            var members = await _orgService.GetMembersByOrganizationIdAsync(organizationId);
+            var users = await _orgService.GetListUsersByOrganizationId(organizationId);
 
-            if (members == null || members.Count == 0)
+            if (users == null)
             {
                 return NotFound("No members.");
             }
 
-            return Ok(members);
+            return Ok(users);
         }
 
         //[HttpGet("details/{id}")]

@@ -1,7 +1,7 @@
 using Amazon.S3.Model;
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
@@ -81,7 +81,7 @@ namespace DockerHubBackend.Repository.Implementation
             return await _context.Organizations.FindAsync(id);
         }
 
-        public async Task<List<MemberDto>> GetMembersByOrganizationIdAsync(Guid organizationId)
+        public async Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId)
         {
             var organization = await _context.Organizations
                 .Where(o => o.Id == organizationId)
@@ -93,6 +93,8 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
+            var allUsers = await _context.Users.ToListAsync();
+
             var membersDto = organization.Members.Select(m => new MemberDto
             {
                 Id = m.Id,
@@ -100,7 +102,20 @@ namespace DockerHubBackend.Repository.Implementation
                 IsOwner = m.MemberOrganizations.Any(o => o.OwnerId == m.Id)
             }).ToList();
 
-            return membersDto;
+            var otherUsersDto = allUsers
+               .Where(u => !organization.Members.Any(m => m.Id == u.Id))
+               .Select(u => new MemberDto
+               {
+                   Id = u.Id,
+                   Email = u.Email,
+                   IsOwner = false
+               }).ToList();
+
+            return new OrganizationUsersDto
+            {
+                Members = membersDto,
+                OtherUsers = otherUsersDto
+            };
         }
     }
 }

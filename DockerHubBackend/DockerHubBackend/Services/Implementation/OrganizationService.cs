@@ -1,5 +1,5 @@
 using DockerHubBackend.Dto.Request;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
@@ -31,9 +31,9 @@ namespace DockerHubBackend.Services.Implementation
             return await _orgRepository.GetOrganizationById(id);
         }
 
-        public async Task<List<MemberDto>> GetMembersByOrganizationIdAsync(Guid organizationId)
+        public async Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId)
         {
-            return await _orgRepository.GetMembersByOrganizationIdAsync(organizationId);
+            return await _orgRepository.GetListUsersByOrganizationId(organizationId);
         }
     }
 }

@@ -1,5 +1,5 @@
 using DockerHubBackend.Dto.Request;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Services.Interface
@@ -9,6 +9,6 @@ namespace DockerHubBackend.Services.Interface
         Task<Guid?> AddOrganization(AddOrganizationDto organization);
         Task<List<OrganizationOwnershipDto>?> GetOrganizations(string email);
         Task<Organization?> GetOrganizationById(Guid id);
-        Task<List<MemberDto>> GetMembersByOrganizationIdAsync(Guid organizationId);
+        Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId);
     }
 }

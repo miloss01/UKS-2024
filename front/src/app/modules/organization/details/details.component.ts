@@ -41,6 +41,7 @@ export class DetailsComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.name = params['name'];
+      this.isOwner = params['isOwner'] === 'true';
     });
 
     console.log('ID:', this.id);
@@ -48,10 +49,6 @@ export class DetailsComponent implements OnInit {
 
     // if(this.id != null)
     //   this.fetchOrganization(this.id);
-
-    this.users = this.getAllUsers();
-    this.filteredUsers = [...this.users];
-    this.updateDisplayedUsers();
 
     if(this.id != null)
       this.fetchMembers(this.id)
@@ -61,9 +58,15 @@ export class DetailsComponent implements OnInit {
   fetchMembers(id: string): void {
     this.orgService.getMembersByOrganizationId(id).subscribe({
       next: (data) => {
-        this.members = data;
+        console.log(data)
+        this.members = data.members;
         this.displayedMembers = [...this.members];
         this.updateDisplayedMembers();
+
+        this.users = data.otherUsers;
+        this.filteredUsers = [...this.users];
+        this.updateDisplayedUsers();
+
         console.log(data)
         console.log("ok")
       },
