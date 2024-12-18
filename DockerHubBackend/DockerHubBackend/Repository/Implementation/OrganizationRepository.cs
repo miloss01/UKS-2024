@@ -7,6 +7,7 @@ using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Repository.Implementation
@@ -78,6 +79,28 @@ namespace DockerHubBackend.Repository.Implementation
         public async Task<Organization?> GetOrganizationById(Guid id)
         {
             return await _context.Organizations.FindAsync(id);
+        }
+
+        public async Task<List<MemberDto>> GetMembersByOrganizationIdAsync(Guid organizationId)
+        {
+            var organization = await _context.Organizations
+                .Where(o => o.Id == organizationId)
+                .Include(o => o.Members) 
+                .FirstOrDefaultAsync();
+
+            if (organization == null)
+            {
+                return null;
+            }
+
+            var membersDto = organization.Members.Select(m => new MemberDto
+            {
+                Id = m.Id,
+                Email = m.Email,
+                IsOwner = m.MemberOrganizations.Any(o => o.OwnerId == m.Id)
+            }).ToList();
+
+            return membersDto;
         }
     }
 }

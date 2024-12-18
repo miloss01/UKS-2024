@@ -20,7 +20,11 @@ export class OrganizationService {
     return this.http.get<any[]>(`${this.apiUrl}/${email}`);
   }
 
-  getOrganizationById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/details/${id}`);
+  getMembersByOrganizationId(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/members`);
   }
+
+  // getOrganizationById(id: string): Observable<any> {
+  //   return this.http.get<any>(`${this.apiUrl}/details/${id}`);
+  // }
 }

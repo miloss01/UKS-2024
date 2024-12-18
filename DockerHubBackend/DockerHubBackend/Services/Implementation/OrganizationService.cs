@@ -30,5 +30,10 @@ namespace DockerHubBackend.Services.Implementation
         {
             return await _orgRepository.GetOrganizationById(id);
         }
+
+        public async Task<List<MemberDto>> GetMembersByOrganizationIdAsync(Guid organizationId)
+        {
+            return await _orgRepository.GetMembersByOrganizationIdAsync(organizationId);
+        }
     }
 }

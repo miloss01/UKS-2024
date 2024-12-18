@@ -104,8 +104,10 @@ export class ListOrganizationsComponent implements OnInit {
     this.updateTotalPages();
   }  
 
-  goToDetails(id: number): void {
-    this.router.navigate(['/org-details', id]);
+  goToDetails(id: number, name:string, isOwner: boolean): void {
+    this.router.navigate(['/org-details', id], {
+      queryParams: { name: name }
+    });
   }
 
   openDialog() {

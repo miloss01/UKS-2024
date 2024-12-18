@@ -1,4 +1,5 @@
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
@@ -60,17 +61,30 @@ namespace DockerHubBackend.Controllers
             }
         }
 
-        [HttpGet("details/{id}")]
-        public async Task<IActionResult> GetOrganizationById(Guid id)
+        [HttpGet("{organizationId}/members")]
+        public async Task<ActionResult<List<MemberDto>>> GetMembers(Guid organizationId)
         {
-            var organization = await _orgService.GetOrganizationById(id);
+            var members = await _orgService.GetMembersByOrganizationIdAsync(organizationId);
 
-            if (organization == null)
+            if (members == null || members.Count == 0)
             {
-                return NotFound(new { message = "Organization not found" });
+                return NotFound("No members.");
             }
 
-            return Ok(organization);
+            return Ok(members);
         }
+
+        //[HttpGet("details/{id}")]
+        //public async Task<IActionResult> GetOrganizationById(Guid id)
+        //{
+        //    var organization = await _orgService.GetOrganizationById(id);
+
+        //    if (organization == null)
+        //    {
+        //        return NotFound(new { message = "Organization not found" });
+        //    }
+
+        //    return Ok(organization);
+        //}
     }
 }

@@ -42,7 +42,7 @@
     <div 
       class="extension-card" 
       *ngFor="let org of paginatedExtensions"
-      (click)="goToDetails(org.id)">
+      (click)="goToDetails(org.id, org.name, org.isOwner)">
 
       <div class="icon">
         <img
