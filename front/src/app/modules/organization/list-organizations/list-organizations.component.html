@@ -1,5 +1,5 @@
 <div class="search-container">
-    <div class="search-input">
+    <div class="search-input" *ngIf="paginatedExtensions.length > 0">
       <span class="search-icon"> 🔍 </span>
       <input 
         type="text" 
@@ -9,8 +9,12 @@
     </div>
     <button mat-raised-button color="primary" class="create-btn" (click)="openDialog()">Create an organization</button>
   </div>
+
+  <div *ngIf="paginatedExtensions.length === 0" class="no-organizations">
+    <p>You currently do not have an organization!</p>
+  </div>
   
-<div class="pagination-container">
+<div class="pagination-container" *ngIf="paginatedExtensions.length > 0">
     <button mat-raised-button color="primary" (click)="changePage(-1)" [disabled]="currentPage === 1" class="pagination-btn">
       Previous
     </button>
@@ -34,7 +38,7 @@
   </div>
 
 <!-- List of organizations -->
-<div class="extensions-container">
+<div class="extensions-container" *ngIf="paginatedExtensions.length > 0">
     <div 
       class="extension-card" 
       *ngFor="let org of paginatedExtensions"

@@ -16,7 +16,7 @@ namespace DockerHubBackend.Services.Implementation
             _orgRepository = organizationRepository;
         }
 
-        public async Task<Organization?> AddOrganization(AddOrganizationDto organization)
+        public async Task<Guid?> AddOrganization(AddOrganizationDto organization)
         {
             return await _orgRepository.AddOrganization(organization);
         }

@@ -36,9 +36,10 @@ export class ListOrganizationsComponent implements OnInit {
 
   setImages() {
     this.organizations.forEach((org) => {
-      this.imageService.getImageUrl(org.imageLocation).subscribe({
+      console.log(org)
+      console.log(this.authService.userData?.userEmail+"/"+org.Id+"/"+org.imageLocation)
+      this.imageService.getImageUrl(this.authService.userData?.userEmail+"/"+org.id+"/"+org.imageLocation).subscribe({
         next: (response) => {
-          console.log(response.imageUrl)
           org.imageUrl = response.imageUrl; 
         },
         error: (error) => {
@@ -54,7 +55,7 @@ export class ListOrganizationsComponent implements OnInit {
     if (email) {
       this.orgService.getOrganizations(email).subscribe({
         next: (data) => {
-          this.organizations = data;  
+          this.organizations = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());;  
           console.log(data)
           this.filteredOrganizations = data;  
           this.updatePagination();
@@ -97,7 +98,7 @@ export class ListOrganizationsComponent implements OnInit {
   }
 
   changePageSize(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value; // Kastovanje
+    const newSize = (event.target as HTMLSelectElement).value;
     this.pageSize = +newSize; 
     this.currentPage = 1; 
     this.updateTotalPages();
@@ -109,10 +110,12 @@ export class ListOrganizationsComponent implements OnInit {
 
   openDialog() {
     const dialogRef = this.dialog.open(AddOrganizationComponent, {
-      width: '400px', // Možete odrediti širinu dijaloga
+      width: '400px', 
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      this.fetchUserOrganizations();
+      // location.reload();
     });
   }
 }

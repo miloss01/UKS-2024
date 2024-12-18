@@ -19,7 +19,8 @@ export class AddOrganizationComponent {
   organizationName: string = '';
   organizationDescription: string = '';
   imageFile: File | null = null;
-  imagePreview: string | null = null; // URL za pregled slike
+  imagePreview: string | null = null;
+  isUploading: boolean = false;
 
   constructor(private dialogRef: MatDialogRef<AddOrganizationComponent>, 
     private snackBar: MatSnackBar,
@@ -50,39 +51,41 @@ export class AddOrganizationComponent {
     const newOrganization = {
       name: this.organizationName,
       description: this.organizationDescription,
-      imageLocation: this.authService.userData?.userEmail+"/"+this.organizationName+"/"+this.imageFile?.name,
+      imageLocation: this.imageFile?.name,
       ownerEmail: this.authService.userData?.userEmail
     };
-    console.log(newOrganization)
+
+    this.isUploading = true; 
+
     this.organizationService.addOrganization(newOrganization).subscribe({
       next: (response) => {
-        this.saveImage()
-        console.log('Organizacija sacuvana!', response);
-        this.snackBar.open('Successfully created an organization', 'Close', { duration: 3000 });
-        this.dialogRef.close(true);
+
+         if(this.imagePreview != null && this.imageFile != null) 
+          {
+            let fileName = this.authService.userData?.userEmail+"/"+response+"/"+this.imageFile.name
+            console.log(fileName)
+            console.log(this.imageFile)
+            this.imgService.uploadImage(fileName, this.imageFile).subscribe({
+              next: (response) => {
+                console.log('Slika je upload-ovana!', response);
+                console.log('Organizacija sacuvana!', response);
+                this.snackBar.open('Successfully created an organization', 'Close', { duration: 3000 });
+                this.isUploading = false;
+                this.dialogRef.close(true);
+              },
+              error: (error) => {
+                console.error('Greška prilikom cuvanja slidze!', error);
+                this.isUploading = false; 
+              }
+            });
+          }
       },
       error: (error) => {
+        this.isUploading = false; 
         console.error('Greška prilikom cuvanja organizacije!', error);
         this.snackBar.open('Error while creating an organization', 'Close', { duration: 3000 });
         this.dialogRef.close(false);
       }
     });
-  }
-
-  saveImage(): void {
-    if(this.imagePreview != null && this.imageFile != null) 
-    {
-      let fileName = this.authService.userData?.userEmail+"/"+this.organizationName+"/"+this.imageFile.name
-      console.log(fileName)
-      console.log(this.imageFile)
-      this.imgService.uploadImage(fileName, this.imageFile).subscribe({
-        next: (response) => {
-          console.log('Slika je upload-ovana!', response);
-        },
-        error: (error) => {
-          console.error('Greška prilikom cuvanja slidze!', error);
-        }
-      });
-    }
   }
 }

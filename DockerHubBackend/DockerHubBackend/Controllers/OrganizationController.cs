@@ -37,7 +37,7 @@ namespace DockerHubBackend.Controllers
                 return BadRequest("Error database saving");
             }
 
-            return Ok();
+            return Ok(addedOrganization);
         }
 
         [HttpGet("{email}")]

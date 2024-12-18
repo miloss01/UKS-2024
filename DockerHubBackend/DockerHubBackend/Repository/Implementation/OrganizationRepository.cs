@@ -18,7 +18,7 @@ namespace DockerHubBackend.Repository.Implementation
             this._userRepository = userRepository;
         }
 
-        public async Task<Organization?> AddOrganization(AddOrganizationDto dto)
+        public async Task<Guid?> AddOrganization(AddOrganizationDto dto)
         {
             var user = await _userRepository.GetUserByEmail(dto.OwnerEmail);
             if (user == null) {
@@ -46,7 +46,7 @@ namespace DockerHubBackend.Repository.Implementation
 
             _context.Organizations.Add(organization);
             await _context.SaveChangesAsync();
-            return organization;        
+            return organization.Id;        
         }
 
         public async Task<List<OrganizationOwnershipDto>?> GetUserOrganizations(string email)
