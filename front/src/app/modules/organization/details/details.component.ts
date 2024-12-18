@@ -121,7 +121,7 @@ export class DetailsComponent implements OnInit {
   addUser(user: any) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
-      data: { userEmail: user.email }
+      data: { action: 'add new member', userEmail: user.email }
     });
   
     dialogRef.afterClosed().subscribe(result => {

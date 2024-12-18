@@ -10,7 +10,7 @@ import { MaterialModule } from 'app/infrastructure/material/material.module';
   styleUrl: './confirm-dialog.component.css'
 })
 export class ConfirmDialogComponent {
-  constructor(public dialogRef: MatDialogRef<ConfirmDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: { userEmail: string }) {}
+  constructor(public dialogRef: MatDialogRef<ConfirmDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: { action: string; itemName?: string | null; userEmail?: string }) {}
 
   onCancel(): void {
     this.dialogRef.close(false);  

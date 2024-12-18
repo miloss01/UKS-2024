@@ -9,6 +9,7 @@ import { AddOrganizationComponent } from '../add-organization/add-organization.c
 import { AuthService } from 'app/services/auth.service';
 import { OrganizationService } from 'app/services/organization.service';
 import { ImageService } from 'app/services/image.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-list-organizations',
@@ -126,10 +127,21 @@ export class ListOrganizationsComponent implements OnInit {
     // Ovde implementiraj otvaranje dijaloga ili preusmerenje
   }
   
-  deactivateOrganization(orgId: number, event: MouseEvent) {
+  deactivateOrganization(orgName: string, event: MouseEvent) {
     event.stopPropagation();
-    console.log(`Deactivating organization with ID: ${orgId}`);
-    // Ovde implementiraj logiku za deaktivaciju organizacije
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        action: 'deactivate organization',
+        itemName: `${orgName}`, 
+      },
+    });
+  
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        console.log(`Organization ${orgName} deactivated.`);
+        // Ovde pozovi API ili obradi deaktivaciju
+      }
+    });
   }
   
 }
