@@ -73,7 +73,11 @@ namespace DockerHubBackend.Repository.Implementation
                 .ToListAsync();
 
             return organizations;
-            }
+        }
 
+        public async Task<Organization?> GetOrganizationById(Guid id)
+        {
+            return await _context.Organizations.FindAsync(id);
+        }
     }
 }

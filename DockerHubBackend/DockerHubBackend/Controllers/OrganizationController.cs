@@ -59,5 +59,18 @@ namespace DockerHubBackend.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> GetOrganizationById(Guid id)
+        {
+            var organization = await _orgService.GetOrganizationById(id);
+
+            if (organization == null)
+            {
+                return NotFound(new { message = "Organization not found" });
+            }
+
+            return Ok(organization);
+        }
     }
 }

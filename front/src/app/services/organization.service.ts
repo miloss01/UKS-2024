@@ -19,4 +19,8 @@ export class OrganizationService {
   getOrganizations(email: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${email}`);
   }
+
+  getOrganizationById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/details/${id}`);
+  }
 }

@@ -53,6 +53,11 @@
     padding: 16px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
+
+  .extension-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+    transform: translateY(-5px); 
+  }
   
   .icon img {
     width: 100px;

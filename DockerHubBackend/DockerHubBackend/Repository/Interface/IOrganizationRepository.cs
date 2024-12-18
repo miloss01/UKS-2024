@@ -9,5 +9,6 @@ namespace DockerHubBackend.Repository.Interface
     {
         Task<Guid?> AddOrganization(AddOrganizationDto organization);
         Task<List<OrganizationOwnershipDto>?> GetUserOrganizations(string email);
+        Task<Organization?> GetOrganizationById(Guid id);
     }
 }

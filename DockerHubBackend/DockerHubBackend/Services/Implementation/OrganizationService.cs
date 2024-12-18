@@ -25,5 +25,10 @@ namespace DockerHubBackend.Services.Implementation
         {
             return await _orgRepository.GetUserOrganizations(email);
         }
+
+        public async Task<Organization?> GetOrganizationById(Guid id)
+        {
+            return await _orgRepository.GetOrganizationById(id);
+        }
     }
 }
