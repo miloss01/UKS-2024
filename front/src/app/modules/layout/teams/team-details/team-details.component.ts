@@ -19,7 +19,11 @@ import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dia
 export class TeamDetailsComponent implements OnInit {
   team: TeamsData | undefined;
 
-  constructor(private route: ActivatedRoute, private teamService: TeamService, private dialog: MatDialog) {}
+  constructor(
+    private route: ActivatedRoute,
+    private teamService: TeamService, 
+    private dialog: MatDialog,
+    private router: Router) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -48,15 +52,20 @@ export class TeamDetailsComponent implements OnInit {
 
   openDeleteDialog(): void {
     if (this.team != undefined) {
+      let id = this.team.id; // because there will be errors withoud this (team could be undefiend)
       const dialogRef = this.dialog.open(DeleteTeamDialogComponent, {
         width: '300px',
-        data: { name: this.team.name },
+        data: { name: this.team.name},
       });
 
       dialogRef.afterClosed().subscribe((confirmed) => {
         if (confirmed) {
-          console.log('Team deleted: ', this.team?.id);
-          // TODO: call service method
+          console.log('Team deleted: ', id);
+          this.teamService.deleteTeam(id).subscribe((res) => {
+            if (res != null) {
+              this.router.navigate(['teams']);
+            }
+          });
         }
       });
     }

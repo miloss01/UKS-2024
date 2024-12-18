@@ -67,5 +67,11 @@ namespace DockerHubBackend.Controllers
             return Ok(result);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            TeamDto team = await _teamService.Delete(id);
+            return Ok(team);
+        }
     }
 }

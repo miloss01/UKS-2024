@@ -6,6 +6,7 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -87,6 +88,13 @@ namespace DockerHubBackend.Services.Implementation
             team.Description = teamDto.Description;
             team = await _repository.Update(team);
             if (team == null) { throw new NotFoundException("Team not found. Update aborted."); }
+            return new TeamDto(team);
+        }
+
+        public async Task<TeamDto> Delete(Guid id)
+        {
+            Team? team = await _repository.Delete(id);
+            if (team == null) { throw new NotFoundException("Team not found."); }
             return new TeamDto(team);
         }
 

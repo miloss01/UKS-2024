@@ -18,4 +18,8 @@ export class TeamService {
   getTeam(id: string): Observable<TeamsData> {
     return this.http.get<TeamsData>(`${environment.apiHost}team/${id}`);
   }
+
+  deleteTeam(id: string): Observable<TeamsData> {
+    return this.http.delete<TeamsData>(`${environment.apiHost}team/${id}`);
+  }
 }
