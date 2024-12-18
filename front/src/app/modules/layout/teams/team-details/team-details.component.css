@@ -1,0 +1,13 @@
+.team-details-container {
+    padding: 20px;
+  }
+  
+  mat-card {
+    margin-top: 20px;
+    padding: 20px;
+  }
+  
+  mat-card-content {
+    font-size: 16px;
+  }
+  

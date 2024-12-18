@@ -5,6 +5,8 @@ import { TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
 import { CreateTeamDialogComponent } from '../create-team-dialog/create-team-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { state } from '@angular/animations';
 
 @Component({
   selector: 'app-teams',
@@ -17,8 +19,8 @@ export class TeamsComponent {
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
 
-  constructor(private teamService: TeamService, private dialog: MatDialog) {
-    this.getTeams("4e543f2d-799e-4538-a739-fbf5882761b6");
+  constructor(private teamService: TeamService, private dialog: MatDialog, private router: Router) {
+    this.getTeams("4e543f2d-799e-4538-a739-fbf5882761b6");  // mocked organization id
   }
 
   async getTeams(organizationId: string) {
@@ -36,6 +38,7 @@ export class TeamsComponent {
 
   onRowClick(row: any) {
     console.log(row);
+    this.router.navigate(['/team-details', row.id]);
   }
 
   openCreateTeamForm(): void {

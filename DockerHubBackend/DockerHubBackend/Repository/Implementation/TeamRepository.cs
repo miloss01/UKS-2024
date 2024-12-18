@@ -37,6 +37,15 @@ namespace DockerHubBackend.Repository.Implementation
 
         }
 
+        override public async Task<Team?> Get(Guid id)
+        {
+            var team = await _context.Teams
+                .Where(team => team.Id == id)
+                .Include(team => team.Members)
+                .FirstOrDefaultAsync();
+            return team;
+        }
+
         public async Task<Team> GetByName(string name)
         {
             return await _context.Teams.FirstOrDefaultAsync(team => team.Name == name);

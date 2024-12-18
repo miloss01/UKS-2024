@@ -22,7 +22,7 @@ namespace DockerHubBackend.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet("{organizationId}")]
+        [HttpGet("org/{organizationId}")]
         public async Task<IActionResult> GetTeamsByOrganizationId([FromRoute] Guid organizationId)
         {
             ICollection<TeamDto>? teams = await _teamService.GetTeams(organizationId);
@@ -34,6 +34,14 @@ namespace DockerHubBackend.Controllers
         public async Task<IActionResult> Create([FromBody] TeamDto teamDto)
         {
             TeamDto team = await _teamService.Create(teamDto);
+            return Ok(team);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromRoute] Guid id)
+        {
+            TeamDto? team = await _teamService.Get(id);
+            if (team == null) { return NotFound("Team not found."); }
             return Ok(team);
         }
 

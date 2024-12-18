@@ -10,6 +10,8 @@ namespace DockerHubBackend.Services.Interface
 
         public Task<TeamDto> Create(TeamDto teamDto);
 
+        public Task<TeamDto?> Get(Guid id);
+
         public Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos);
 
         public Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto);

@@ -12,6 +12,10 @@ export class TeamService {
   constructor(private http: HttpClient) { }
 
   getTeams(id: string): Observable<TeamsData[]>{
-    return this.http.get<TeamsData[]>(`${environment.apiHost}team/${id}`);
+    return this.http.get<TeamsData[]>(`${environment.apiHost}team/org/${id}`);
+  }
+
+  getTeam(id: string): Observable<TeamsData> {
+    return this.http.get<TeamsData>(`${environment.apiHost}team/${id}`);
   }
 }

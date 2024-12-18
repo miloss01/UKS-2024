@@ -1,0 +1,18 @@
+<div class="team-details-container">
+    <h2>Team Details</h2>
+  
+    <mat-card>
+      <mat-card-content>
+        <p><strong>ID:</strong> {{ team?.id }}</p>
+        <p><strong>Name:</strong> {{ team?.name }}</p>
+        <p><strong>Description:</strong> {{ team?.description }}</p>
+        <p><strong>Organization ID:</strong> {{ team?.organizationId }}</p>
+  
+        <h3>Members</h3>
+        <ul>
+          <li *ngFor="let member of team?.members">{{ member.email }}</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+</div>
+  

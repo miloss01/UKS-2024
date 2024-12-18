@@ -1,4 +1,5 @@
-﻿using DockerHubBackend.Dto.Request;
+﻿using System.ComponentModel;
+using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
@@ -26,6 +27,13 @@ namespace DockerHubBackend.Services.Implementation
         public async Task<ICollection<TeamDto>?> GetTeams(Guid organizationId)
         {
             return await _repository.GetByOrganizationId(organizationId);
+        }
+
+        public async Task<TeamDto?> Get(Guid id)
+        {
+            Team? team = await _repository.Get(id);
+            if (team == null) { throw new NotFoundException("Team not found."); }
+            return new TeamDto(team);
         }
 
         public async Task<TeamDto> Create(TeamDto teamDto)
