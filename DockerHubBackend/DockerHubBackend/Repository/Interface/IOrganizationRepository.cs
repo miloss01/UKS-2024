@@ -11,5 +11,6 @@ namespace DockerHubBackend.Repository.Interface
         Task<List<OrganizationOwnershipDto>?> GetUserOrganizations(string email);
         Task<Organization?> GetOrganizationById(Guid id);
         Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId);
+        Task<string> AddMemberToOrganization(Guid organizationId, Guid userId);
     }
 }

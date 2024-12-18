@@ -117,5 +117,41 @@ namespace DockerHubBackend.Repository.Implementation
                 OtherUsers = otherUsersDto
             };
         }
+
+        public async Task<string> AddMemberToOrganization(Guid organizationId, Guid userId)
+        {
+            // check organization exist
+            var organization = await _context.Organizations
+                .Include(o => o.Members)
+                .FirstOrDefaultAsync(o => o.Id == organizationId);
+            if (organization == null)
+            {
+                return "Organization not found.";
+            }
+
+            // check user exist
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return "User not found.";
+            }
+
+            var standardUser = user as StandardUser;
+            if (standardUser == null)
+            {
+                return "Not standard user.";
+            }
+
+            // add member
+            if (!organization.Members.Contains(user))
+            {
+                organization.Members.Add(standardUser);
+                await _context.SaveChangesAsync();
+                return "User added to organization successfully.";
+            }
+
+            return "User is already a member of the organization.";
+        }
     }
 }

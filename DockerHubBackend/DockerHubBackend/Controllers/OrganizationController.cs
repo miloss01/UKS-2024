@@ -74,17 +74,22 @@ namespace DockerHubBackend.Controllers
             return Ok(users);
         }
 
-        //[HttpGet("details/{id}")]
-        //public async Task<IActionResult> GetOrganizationById(Guid id)
-        //{
-        //    var organization = await _orgService.GetOrganizationById(id);
+        [HttpPost("add-member")]
+        public async Task<IActionResult> AddMemberToOrganization([FromBody] AddMemberDto request)
+        {
+            var result = await _orgService.AddMemberToOrganization(request.OrganizationId, request.UserId);
 
-        //    if (organization == null)
-        //    {
-        //        return NotFound(new { message = "Organization not found" });
-        //    }
+            if (result == "Organization not found.")
+            {
+                return NotFound(result);
+            }
 
-        //    return Ok(organization);
-        //}
+            if (result == "User not found.")
+            {
+                return NotFound(result);
+            }
+
+            return Ok();
+        }
     }
 }

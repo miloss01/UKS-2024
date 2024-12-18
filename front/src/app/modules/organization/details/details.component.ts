@@ -126,11 +126,31 @@ export class DetailsComponent implements OnInit {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // this.addMemberToOrganization(user);
+        this.addMember(user.id);
       } else {
         console.log('User addition was canceled');
       }
     });
+  }
+
+  addMember(userId: string) {
+    if (this.id) {
+      this.orgService.addMemberToOrganization(this.id, userId)
+        .subscribe(
+          (response) => {
+            console.log(response)
+            console.log('User added to organization successfully.')
+            if (this.id)
+              this.fetchMembers(this.id);
+          },
+          (error) => {
+            console.log('Error: ' + error.error)
+            console.log(error)
+          }
+        );
+    } else {
+      console.log('Please provide valid organization and user IDs.')
+    }
   }
 
   goBack(): void {

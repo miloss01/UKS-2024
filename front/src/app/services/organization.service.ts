@@ -24,6 +24,15 @@ export class OrganizationService {
     return this.http.get<any>(`${this.apiUrl}/${id}/members`);
   }
 
+  addMemberToOrganization(organizationId: string, userId: string): Observable<any> {
+    const body = {
+      OrganizationId: organizationId,
+      UserId: userId,
+    };
+
+    return this.http.post(`${this.apiUrl}/add-member`, body);
+  }
+
   // getOrganizationById(id: string): Observable<any> {
   //   return this.http.get<any>(`${this.apiUrl}/details/${id}`);
   // }
