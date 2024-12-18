@@ -34,9 +34,9 @@ namespace DockerHubBackend.Tests.UnitTests
         {
 
             var credentials = new LoginCredentialsDto { Email = "test@example.com", Password = "password123" };
-            var user = new StandardUser { Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow };
+            var user = new StandardUser {Username = "username", Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow };
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync(user);
 
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                       .Returns(PasswordVerificationResult.Success);
@@ -57,7 +57,7 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var credentials = new LoginCredentialsDto { Email = "notfound@example.com", Password = "password123" };
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync((BaseUser)null);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync((BaseUser)null);
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _service.Login(credentials));
             Assert.Equal("Wrong email or password", exception.Message);
@@ -67,9 +67,9 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Login_InvalidPassword_ThrowsBadRequestException()
         {
             var credentials = new LoginCredentialsDto { Email = "test@example.com", Password = "wrongPassword" };
-            var user = new StandardUser { Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow};
+            var user = new StandardUser { Username = "username", Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow};
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync(user);
 
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                       .Returns(PasswordVerificationResult.Failed);
@@ -82,11 +82,11 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Login_UnverifiedSuperAdmin_ThrowsAccountVerificationRequiredException()
         {
             var credentials = new LoginCredentialsDto { Email = "test@example.com", Password = "password123" };
-            var user = new SuperAdmin { Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
+            var user = new SuperAdmin { Username = "username", Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
             string token = "randomToken";
             VerificationToken tokenObj = new VerificationToken { Token = token, User = user, UserId = user.Id, ValidUntil = DateTime.UtcNow };
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync(user);
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                         .Returns(PasswordVerificationResult.Success);
             _mockRandomTokenGenerator.Setup(generator => generator.GenerateVerificationToken(It.IsAny<int>()))
@@ -104,14 +104,14 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Login_UnverifiedSuperAdmin_UpdatesVerificationToken()
         {
             var credentials = new LoginCredentialsDto { Email = "test@example.com", Password = "password123" };
-            var user = new SuperAdmin { Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
+            var user = new SuperAdmin { Username = "username", Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
             string newToken = "newToken";
             var oldCreatedAt = DateTime.UtcNow.AddHours(-2);
             var oldValidUntil = DateTime.UtcNow.AddHours(-1);
             VerificationToken tokenObj = new VerificationToken { Token = "oldToken", User = user, UserId = user.Id, ValidUntil = oldValidUntil, CreatedAt = oldCreatedAt };
             user.VerificationToken = tokenObj;
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync(user);
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                         .Returns(PasswordVerificationResult.Success);
             _mockRandomTokenGenerator.Setup(generator => generator.GenerateVerificationToken(It.IsAny<int>()))
@@ -133,17 +133,17 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Login_UnverifiedSuperAdmin_CreatesVerificationToken()
         {
             var credentials = new LoginCredentialsDto { Email = "test@example.com", Password = "password123" };
-            var user = new SuperAdmin { Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
+            var user = new SuperAdmin { Username = "username", Id = Guid.NewGuid(), Email = credentials.Email, Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
             string newToken = "newToken";
             VerificationToken? tokenObj = new VerificationToken { Token = newToken, User = user, UserId = user.Id, ValidUntil = DateTime.UtcNow.AddHours(-1), CreatedAt = DateTime.UtcNow.AddHours(-2) };
 
-            _mockUserRepository.Setup(repo => repo.GetUserByEmail(credentials.Email)).ReturnsAsync(user);
+            _mockUserRepository.Setup(repo => repo.GetUserWithTokenByEmail(credentials.Email)).ReturnsAsync(user);
             _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(It.IsAny<string>(), user.Password, credentials.Password))
                         .Returns(PasswordVerificationResult.Success);
             _mockRandomTokenGenerator.Setup(generator => generator.GenerateVerificationToken(It.IsAny<int>()))
                 .Returns(newToken);
             _mockVerificationTokenRepository.Setup(repo => repo.Update(It.IsAny<VerificationToken>()))
-                .Returns(Task.FromResult(tokenObj));
+                .Returns(Task.FromResult<VerificationToken?>(tokenObj));
             _mockVerificationTokenRepository.Setup(repo => repo.Create(It.IsAny<VerificationToken>()))
                 .Returns(Task.FromResult(tokenObj));
 
