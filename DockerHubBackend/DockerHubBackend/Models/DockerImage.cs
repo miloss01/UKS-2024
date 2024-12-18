@@ -8,7 +8,7 @@ namespace DockerHubBackend.Models
 
         [ForeignKey(nameof(DockerRepositoryId))]
         public required DockerRepository Repository { get; set; }
-        public DateTime? LastPush;
+        public DateTime? LastPush { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
     }
 }
