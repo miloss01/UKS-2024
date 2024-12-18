@@ -12,6 +12,8 @@
         <ul>
           <li *ngFor="let member of team?.members">{{ member.email }}</li>
         </ul>
+
+        <button mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
       </mat-card-content>
     </mat-card>
 </div>
