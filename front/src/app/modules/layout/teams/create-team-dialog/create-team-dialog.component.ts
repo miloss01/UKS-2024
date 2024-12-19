@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { CommonModule } from '@angular/common';
+import { TeamService } from 'app/services/team.service';
 
 @Component({
   selector: 'app-create-team-dialog',
@@ -14,10 +15,8 @@ import { CommonModule } from '@angular/common';
 export class CreateTeamDialogComponent {
   teamForm: FormGroup;
   members = [
-    { email: 'user1@example.com' },
-    { email: 'user2@example.com' },
-    { email: 'user3@example.com' },
-    { email: 'user4@example.com' },
+    { email: 'user1@email.com' },
+    { email: 'user2@email.com' },
   ]; 
 
   constructor(

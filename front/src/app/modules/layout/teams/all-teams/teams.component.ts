@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { TeamsData } from 'app/models/models';
+import { Member, TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
 import { CreateTeamDialogComponent } from '../create-team-dialog/create-team-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { state } from '@angular/animations';
 
 @Component({
   selector: 'app-teams',
@@ -16,11 +15,13 @@ import { state } from '@angular/animations';
   styleUrl: './teams.component.css'
 })
 export class TeamsComponent {
+  organizationId : string = "4f757233-917c-4422-85b4-6bac71520057";  // mocked organization id
+
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
 
   constructor(private teamService: TeamService, private dialog: MatDialog, private router: Router) {
-    this.getTeams("4e543f2d-799e-4538-a739-fbf5882761b6");  // mocked organization id
+    this.getTeams(this.organizationId);
   }
 
   async getTeams(organizationId: string) {
@@ -46,9 +47,24 @@ export class TeamsComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Team created:', result);
+        result.organizationId = this.organizationId;
+        result.members = this.parseMembersList(result.members);
+        this.teamService.createTeam(result).subscribe((team) => {
+          this.teams.push(team);
+          this.teams = [...this.teams];  // update table
+        });
       }
     });
+  }
+
+  parseMembersList(list: string[]) : Member[] {
+    let members : Member[] = [];
+    list.forEach(member => {
+      let m = {"email": member};
+      members.push(m);
+    });
+
+    return members;
   }
 
 }

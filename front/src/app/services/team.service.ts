@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'app/env/environment';
-import { TeamsData } from 'app/models/models';
-import { Observable } from 'rxjs';
+import { Member, TeamsData } from 'app/models/models';
+import { Observable, ObservedValueOf } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,10 @@ export class TeamService {
   }
 
   update(team: TeamsData): Observable<TeamsData> {
-    console.log(team);
     return this.http.put<TeamsData>(`${environment.apiHost}team/${team.id}`, {"Name": team.name, "Description": team.description});
+  }
+
+  createTeam(team: TeamsData): Observable<TeamsData> {
+    return this.http.post<TeamsData>(`${environment.apiHost}team`, team);
   }
 }
