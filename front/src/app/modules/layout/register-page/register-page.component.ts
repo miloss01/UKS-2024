@@ -36,7 +36,7 @@ export class RegisterPageComponent {
   errorMessage: string = "";
   registerForm:FormGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    username: new FormControl('', [Validators.required]),
+    username: new FormControl('', [Validators.required, this.usernameValidator()]),
     location: new FormControl(),
     password: new FormControl('', [Validators.required, this.passwordValidator()]),
     confirmPassword: new FormControl('', [Validators.required], [this.confirmPasswordValidator()]),
@@ -71,6 +71,17 @@ export class RegisterPageComponent {
         }
       }
     });
+  }
+  private usernameValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if(control.value.length < 4){
+        return {minLength:{value:control.value}};
+      }
+      if(control.value.length > 20){
+        return {maxLength:{value:control.value}};
+      }
+      return null;
+    };
   }
 
   private passwordValidator(): ValidatorFn {
