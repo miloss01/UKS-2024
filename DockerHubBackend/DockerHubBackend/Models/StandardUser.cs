@@ -1,4 +1,6 @@
-﻿
+using System.Text.Json.Serialization;
+using DockerHubBackend.Dto.Response;
+
 namespace DockerHubBackend.Models
 {
     public class StandardUser : BaseUser
@@ -10,6 +12,10 @@ namespace DockerHubBackend.Models
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
 
-        
+        public MemberDto ToMemberDto()
+        {
+            return new MemberDto { Email = Email };
+        }
+
     }
 }

@@ -84,6 +84,7 @@ builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -93,6 +94,7 @@ builder.Services.AddScoped<IDockerImageService, DockerImageService>();
 builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

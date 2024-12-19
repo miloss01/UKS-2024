@@ -8,6 +8,8 @@ import { PublicRepositoryOverviewComponent } from './modules/layout/public-repos
 import {RegisterPageComponent} from "./modules/layout/register-page/register-page.component";
 import { ListOrganizationsComponent } from './modules/organization/list-organizations/list-organizations.component';
 import { DetailsComponent } from './modules/organization/details/details.component';
+import { TeamsComponent } from './modules/layout/teams/all-teams/teams.component';
+import { TeamDetailsComponent } from './modules/layout/teams/team-details/team-details.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -18,5 +20,7 @@ export const routes: Routes = [
   { path: 'sign-up', component: RegisterPageComponent },
   { path: 'organizations', component: ListOrganizationsComponent },
   { path: 'org-details/:id', component: DetailsComponent },
-  { path: '**', component: LandingPageComponent },
+  { path: 'teams', component: TeamsComponent },
+  { path: 'team-details/:id', component: TeamDetailsComponent },
+  { path: '**', component: LandingPageComponent }
 ];
