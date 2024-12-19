@@ -1,19 +1,51 @@
 <div class="team-details-container">
-    <h2>Team Details</h2>
-  
-    <mat-card>
-      <mat-card-content>
-        <p><strong>Name:</strong> {{ team?.name }}</p>
-        <p><strong>Description:</strong> {{ team?.description }}</p>
-  
-        <h3>Members</h3>
-        <ul>
-          <li *ngFor="let member of team?.members">{{ member.email }}</li>
-        </ul>
+  <!-- Team Details Section -->
+   <h1>Team Details</h1>
+  <div class="team-details">
+    <div class="left">
+      <h2>{{ team?.name }}</h2>
+      <p><strong>Description:</strong> {{ team?.description }}</p>
+    </div>
+    <div class="right">
+      <h3>Members</h3>
+      <ul>
+        <li *ngFor="let member of team?.members">{{ member.email }}</li>
+      </ul>
+    </div>
+    <div class="buttons">
+      <button mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
+      <button mat-raised-button color="warn" (click)="openDeleteDialog()">Delete Team</button>
+    </div>
+  </div>
 
-        <button mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
-        <button mat-raised-button color="warn" id="delete-btn" (click)="openDeleteDialog()">Delete Team</button>
-      </mat-card-content>
-    </mat-card>
+  <!-- Repositories Section -->
+  <div class="repos">
+    <h3>Repositories</h3>
+    <div class="repo-cards">
+      <mat-card
+        class="repo-card flip-card"
+        *ngFor="let repo of repositories"
+        (click)="flipCard(repo.id)"
+        [class.flipped]="flippedCardId === repo.id"
+      >
+        <div class="flip-card-inner">
+          <!-- Front Side -->
+          <div class="flip-card-front">
+            <mat-card-content>
+              <p><strong>Name: </strong>{{ repo.name }}</p>
+              <p><strong>Namespace: </strong>{{ repo.namespace }}</p>
+              <p><strong>Visibility: </strong>{{ repo.visibility }}</p>
+            </mat-card-content>
+          </div>
+          <!-- Back Side -->
+          <div class="flip-card-back">
+            <mat-card-content>
+              <p>{{ repo.description }}</p>
+              
+            </mat-card-content>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
 </div>
-  

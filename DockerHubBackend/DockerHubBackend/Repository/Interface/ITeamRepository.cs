@@ -22,5 +22,7 @@ namespace DockerHubBackend.Repository.Interface
         void AddPermissions(TeamPermission teamPermission);
 
         TeamPermission? GetTeamPermission(Guid repositoryId, Guid id);
+
+        Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id);
     }
 }

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { TeamsData } from 'app/models/models';
+import RepositoryCreation, { TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
 import { EditTeamDialogComponent } from '../edit-team-dialog/edit-team-dialog.component';
 import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dialog.component';
@@ -17,6 +17,30 @@ import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dia
   styleUrl: './team-details.component.css'
 })
 export class TeamDetailsComponent implements OnInit {
+  repositories: RepositoryCreation[] = [
+    {
+      id: '2',
+      name: 'Repo 1',
+      namespace: 'Namespace 1',
+      description: 'Description of Repo 1',
+      visibility: 'Public',
+    },
+    {
+      id: '1',
+      name: 'Repo 2',
+      namespace: 'Namespace 2',
+      description: 'Description of Repo 2',
+      visibility: 'Private',
+    },
+    {
+      id: '3',
+      name: 'Repo 2',
+      namespace: 'Namespace 2',
+      description: 'Description of Repo 2',
+      visibility: 'Private',
+    },
+  ];
+
   team: TeamsData | undefined;
 
   constructor(
@@ -71,6 +95,12 @@ export class TeamDetailsComponent implements OnInit {
         }
       });
     }
+  }
+
+  flippedCardId: string | null = null;
+
+  flipCard(id: string): void {
+    this.flippedCardId = this.flippedCardId === id ? null : id; // Toggle the flipped card
   }
 
 }

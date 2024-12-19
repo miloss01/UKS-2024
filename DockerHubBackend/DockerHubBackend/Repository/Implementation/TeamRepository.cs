@@ -78,5 +78,10 @@ namespace DockerHubBackend.Repository.Implementation
             .FirstOrDefault(tp => tp.RepositoryId == repositoryId && tp.TeamId == id);
 
         }
+
+        public async Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id)
+        {
+            return await _context.TeamPermissions.Where(tp => tp.TeamId == id).ToListAsync();
+        }
     }
 }

@@ -1,3 +1,11 @@
+export default interface RepositoryCreation {
+  id: string,
+  name:string
+  namespace:string
+  description:string
+  visibility:string
+}
+
 export interface LoginCredentials {
   email: string,
   password: string,
@@ -19,6 +27,15 @@ export interface TeamsData {
 
 export interface Member {
   email: string
+}
+
+export interface TeamRepoPerm {
+  id: string,
+  permission: number,
+  teamId: string,
+  team: TeamsData,
+  repositoryId: string,
+  repository: RepositoryCreation
 }
 
 export enum UserRole{

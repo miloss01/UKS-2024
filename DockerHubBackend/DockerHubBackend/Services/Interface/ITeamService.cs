@@ -19,6 +19,8 @@ namespace DockerHubBackend.Services.Interface
         public Task<TeamDto> Update(TeamDto teamDto, Guid id);
 
         public Task<TeamDto> Delete(Guid id);
+
+        public Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id);
         
     }
 }

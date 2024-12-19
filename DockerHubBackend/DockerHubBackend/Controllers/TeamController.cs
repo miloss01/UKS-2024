@@ -73,5 +73,12 @@ namespace DockerHubBackend.Controllers
             TeamDto team = await _teamService.Delete(id);
             return Ok(team);
         }
+
+        [HttpGet("repositories/{id}")]
+        public async Task<IActionResult> GetRepositories([FromRoute] Guid id)
+        {
+            ICollection<TeamPermission> res = await _teamService.GetTeamPermissions(id);
+            return Ok(res);
+        }
     }
 }

@@ -98,6 +98,11 @@ namespace DockerHubBackend.Services.Implementation
             return new TeamDto(team);
         }
 
+        public async Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id)
+        {
+            return await _repository.GetTeamPermissions(id);
+        }
+
         private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
             ICollection<StandardUser?> members = new HashSet<StandardUser?>();
