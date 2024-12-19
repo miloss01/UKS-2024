@@ -17,25 +17,26 @@ import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dia
   styleUrl: './team-details.component.css'
 })
 export class TeamDetailsComponent implements OnInit {
+  displayedColumns: string[] = ['name', 'namespace', 'visibility'];
   repositories: RepositoryCreation[] = [
     {
       id: '2',
       name: 'Repo 1',
-      namespace: 'Namespace 1',
+      namespace: 'somenamespace',
       description: 'Description of Repo 1',
       visibility: 'Public',
     },
     {
       id: '1',
       name: 'Repo 2',
-      namespace: 'Namespace 2',
+      namespace: 'sms',
       description: 'Description of Repo 2',
       visibility: 'Private',
     },
     {
       id: '3',
       name: 'Repo 2',
-      namespace: 'Namespace 2',
+      namespace: 'blaa',
       description: 'Description of Repo 2',
       visibility: 'Private',
     },

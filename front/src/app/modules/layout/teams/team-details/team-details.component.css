@@ -1,16 +1,12 @@
-/* Container styles */
-* {
-  margin-left: 2%;
-  margin-right: 2%;
-}
 .team-details-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 20px;
+  width: 55%;
+  margin: auto;
 }
 
-/* Team details section */
 .team-details {
   display: flex;
   justify-content: space-between;
@@ -35,57 +31,6 @@
   list-style-type: none;
 }
 
-h3 {
-  margin-left: 10px;
-}
-
-.repos .repo-cards {
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: -20px;
-  gap: 10px;
-}
-
-.repo-card {
-  flex: 1 1 calc(33% - 25px);
-  max-width: calc(33%);
-  width: 33%;
-  min-width: 200px;
-  perspective: 1000px;
-  cursor: pointer;
-  height: 150px;
-}
-
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  margin-top: -20px;
-}
-
-.repo-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-.flip-card-back {
-  transform: rotateY(180deg);
-  background-color: #f5f5f5;
-}
-
 .team-details .buttons {
   display: flex;
   flex-direction: column;
@@ -95,4 +40,8 @@ h3 {
 
 .team-details .buttons button {
   width: 100%;
+}
+
+#table-container {
+  width: 99%;
 }

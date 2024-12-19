@@ -18,34 +18,31 @@
     </div>
   </div>
 
-  <!-- Repositories Section -->
-  <div class="repos">
-    <h3>Repositories</h3>
-    <div class="repo-cards">
-      <mat-card
-        class="repo-card flip-card"
-        *ngFor="let repo of repositories"
-        (click)="flipCard(repo.id)"
-        [class.flipped]="flippedCardId === repo.id"
-      >
-        <div class="flip-card-inner">
-          <!-- Front Side -->
-          <div class="flip-card-front">
-            <mat-card-content>
-              <p><strong>Name: </strong>{{ repo.name }}</p>
-              <p><strong>Namespace: </strong>{{ repo.namespace }}</p>
-              <p><strong>Visibility: </strong>{{ repo.visibility }}</p>
-            </mat-card-content>
-          </div>
-          <!-- Back Side -->
-          <div class="flip-card-back">
-            <mat-card-content>
-              <p>{{ repo.description }}</p>
-              
-            </mat-card-content>
-          </div>
-        </div>
-      </mat-card>
-    </div>
+  <h3>Repositories</h3>
+  <div id="table-container">
+    <table mat-table [dataSource]="repositories" class="mat-elevation-z8">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Repo Name </th>
+        <td mat-cell *matCellDef="let repo">{{ repo.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="namespace">
+        <th mat-header-cell *matHeaderCellDef> Namespace </th>
+        <td mat-cell *matCellDef="let repo">{{ repo.namespace }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let repo">{{ repo.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="visibility">
+        <th mat-header-cell *matHeaderCellDef> Visibility </th>
+        <td mat-cell *matCellDef="let repo">{{ repo.visibility }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
   </div>
 </div>
