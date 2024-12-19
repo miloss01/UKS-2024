@@ -5,7 +5,7 @@ using DockerHubBackend.Repository.Utils;
 
 namespace DockerHubBackend.Repository.Interface
 {
-    public interface IOrganizationRepository : ICrudRepository<BaseUser>
+    public interface IOrganizationRepository : ICrudRepository<Organization>
     {
         Task<Guid?> AddOrganization(AddOrganizationDto organization);
         Task<List<OrganizationOwnershipDto>?> GetUserOrganizations(string email);

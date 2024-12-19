@@ -49,14 +49,14 @@ namespace DockerHubBackend.Services.Implementation
             await _repository.Create(team);
             
             Team returnedTeam = await _repository.GetByName(teamDto.Name);
-            ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
+            ICollection<EmailDto> memberDtos = new HashSet<EmailDto>();
             foreach (StandardUser user in team.Members) { memberDtos.Add(user.ToMemberDto()); }
            
             return new TeamDto(returnedTeam.Id, returnedTeam.Name, returnedTeam.Description, memberDtos);
             
         }
 
-        public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
+        public async Task<TeamDto> AddMembers(Guid teamId, ICollection<EmailDto> memberDtos)
         {
             Team? team = await _repository.Get(teamId);
             if (team == null) { throw new NotFoundException("Team does not exist."); }
@@ -110,10 +110,10 @@ namespace DockerHubBackend.Services.Implementation
             return await _repository.GetTeamPermissions(id);
         }
 
-        private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
+        private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<EmailDto> memberDtos)
         {
             ICollection<StandardUser?> members = new HashSet<StandardUser?>();
-            foreach (MemberDto memberDto in memberDtos)
+            foreach (EmailDto memberDto in memberDtos)
             {
                 BaseUser? baseUser = await _userRepository.GetUserByEmail(memberDto.Email);
                 StandardUser user = (StandardUser)baseUser;

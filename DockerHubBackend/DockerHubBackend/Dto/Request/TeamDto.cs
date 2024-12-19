@@ -11,7 +11,7 @@ namespace DockerHubBackend.Dto.Request
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public ICollection<MemberDto>? Members { get; set; }
+        public ICollection<EmailDto>? Members { get; set; }
         public Guid OrganizationId { get; set; }
 
         [SetsRequiredMembers]
@@ -21,7 +21,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(string name, string desription, ICollection<MemberDto> members, Guid organizationId)
+        public TeamDto(string name, string desription, ICollection<EmailDto> members, Guid organizationId)
         {
             Name = name;
             Members = members;
@@ -30,7 +30,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(string name, string desription, ICollection<MemberDto> members)
+        public TeamDto(string name, string desription, ICollection<EmailDto> members)
         {
             Name = name;
             Members = members;
@@ -38,7 +38,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(Guid id, string name, string desription, ICollection<MemberDto> members)
+        public TeamDto(Guid id, string name, string desription, ICollection<EmailDto> members)
         {
             Id = id;
             Name = name;
@@ -49,8 +49,8 @@ namespace DockerHubBackend.Dto.Request
         [SetsRequiredMembers]
         public TeamDto(Team team)
         {
-            ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
-            foreach (StandardUser user in team.Members) memberDtos.Add(new MemberDto { Email = user.Email });
+            ICollection<EmailDto> memberDtos = new HashSet<EmailDto>();
+            foreach (StandardUser user in team.Members) memberDtos.Add(new EmailDto { Email = user.Email });
             Id = team.Id;
             Name = team.Name;
             Members = memberDtos;

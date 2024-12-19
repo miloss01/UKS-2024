@@ -28,7 +28,7 @@ namespace DockerHubBackend.Repository.Implementation
                     team.Id,
                     team.Name,
                     team.Description,
-                    team.Members.Select(member => new MemberDto
+                    team.Members.Select(member => new EmailDto
                     {
                         Email = member.Email,
                     }).ToList()

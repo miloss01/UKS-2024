@@ -12,9 +12,9 @@ namespace DockerHubBackend.Models
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
 
-        public MemberDto ToMemberDto()
+        public EmailDto ToMemberDto()
         {
-            return new MemberDto { Email = Email };
+            return new EmailDto { Email = Email };
         }
 
     }

@@ -2,7 +2,7 @@
 
 namespace DockerHubBackend.Dto.Response
 {
-    public class MemberDto
+    public class EmailDto
     {
         public required string Email { get; set; }
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Repository.Implementation
 {
-    public class OrganizationRepository : CrudRepository<BaseUser>, IOrganizationRepository
+    public class OrganizationRepository : CrudRepository<Organization>, IOrganizationRepository
     {
         private IUserRepository _userRepository;
         public OrganizationRepository(DataContext context, IUserRepository userRepository) : base(context) {

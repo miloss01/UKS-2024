@@ -83,7 +83,6 @@ builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenReposi
 builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
-
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 
 // Services
