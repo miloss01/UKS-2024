@@ -3,12 +3,12 @@
   <form class="organization-form">
     <mat-form-field appearance="outline" class="full-width first-field">
       <mat-label>Organization name</mat-label>
-      <input matInput placeholder="Input organization name" [(ngModel)]="organizationName" name="organizationName" />
+      <input matInput required placeholder="Input organization name" [(ngModel)]="organizationName" name="organizationName" maxlength="30"/>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput placeholder="Input organization description" [(ngModel)]="organizationDescription" name="organizationDescription"></textarea>
+      <textarea matInput placeholder="Input organization description" [(ngModel)]="organizationDescription" name="organizationDescription" maxlength="100"></textarea>
     </mat-form-field>
 
     <div class="upload-container">
@@ -16,6 +16,7 @@
       <input
         id="fileInput"
         type="file"
+        required
         (change)="onFileSelected($event)"
         accept="image/*"
       />
@@ -28,6 +29,6 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isUploading">
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isUploading || !organizationName || !imagePreview">
     {{ isUploading ? 'Creating...' : 'Save' }}</button>
 </mat-dialog-actions>
