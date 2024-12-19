@@ -7,6 +7,7 @@ using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 
@@ -82,6 +83,12 @@ namespace DockerHubBackend.Repository.Implementation
         public async Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id)
         {
             return await _context.TeamPermissions.Where(tp => tp.TeamId == id).Include(tp => tp.Team).Include(tp => tp.Repository).ToListAsync();
+        }
+
+        public async Task<Team?> GetByOrgIdAndTeamName(Guid orgId, string teamName)
+        {
+            return await _context.Teams.Include(team => team.Organization)
+                .FirstOrDefaultAsync(team => team.Name == teamName && team.Organization.Id == orgId);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace DockerHubBackend.Services.Implementation
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUserRepository _userRepository;
         private readonly IDockerRepositoryRepository _dockerRepositoryRepository;
+        
         public TeamService(ITeamRepository repository, IOrganizationRepository organizationRepository,
             IUserRepository userRepository, IDockerRepositoryRepository dockerRepositoryRepository) 
         {
@@ -38,8 +39,11 @@ namespace DockerHubBackend.Services.Implementation
         }
 
         public async Task<TeamDto> Create(TeamDto teamDto)
-        {
+        {   
             Organization? organization = await _organizationRepository.Get(teamDto.OrganizationId);
+            if (organization == null) { throw new NotFoundException("Organization does not exist."); }
+            Team? t = await _repository.GetByOrgIdAndTeamName(organization.Id, teamDto.Name);
+            if (t != null) throw new BadRequestException("Team with chosen name already exists."); 
             Team team = teamDto.ToTeam(organization);
             team.Members = await toStandardUsers(teamDto.Members);
             await _repository.Create(team);
@@ -55,18 +59,21 @@ namespace DockerHubBackend.Services.Implementation
         public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
         {
             Team? team = await _repository.Get(teamId);
-            team.Members = await toStandardUsers(memberDtos);
+            if (team == null) { throw new NotFoundException("Team does not exist."); }
+            team.Members = await toStandardUsers(memberDtos);  // TODO: add check for members (this should be done after organization merge)
             Team? updatedTeam = await _repository.Update(team);
-
+            if (updatedTeam == null) { throw new BadRequestException("Error occured while adding members. Addition aborted."); }
             return new TeamDto(updatedTeam);
         }
 
         public async Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto)
         {
             TeamPermission? teamPerm = _repository.GetTeamPermission(teamPermissionDto.RepositoryId, teamPermissionDto.TeamId);
-            if (teamPerm != null) { throw new BadRequestException("Team Permission already exists."); }
+            if (teamPerm != null) { throw new BadRequestException("Team-Permission already exists."); }
             DockerRepository? dr = await _dockerRepositoryRepository.Get(teamPermissionDto.RepositoryId);
+            if (dr == null) { throw new NotFoundException("Repositoy not found."); }
             Team? t = await _repository.Get(teamPermissionDto.TeamId);
+            if (t == null) { throw new NotFoundException("Team not found."); }
             TeamPermission tp = new TeamPermission
             {
                 TeamId = teamPermissionDto.TeamId,

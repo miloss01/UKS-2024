@@ -24,5 +24,7 @@ namespace DockerHubBackend.Repository.Interface
         TeamPermission? GetTeamPermission(Guid repositoryId, Guid id);
 
         Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id);
+
+        Task<Team?> GetByOrgIdAndTeamName(Guid orgId, string teamName);
     }
 }
