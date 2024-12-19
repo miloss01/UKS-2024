@@ -33,7 +33,7 @@ export class ListOrganizationsComponent implements OnInit {
   {}
   
   ngOnInit() {
-    console.log(this.authService.userData?.userEmail)
+    console.log(this.authService.userData?.value?.userEmail)
     this.fetchUserOrganizations();
   }
 
@@ -52,7 +52,7 @@ export class ListOrganizationsComponent implements OnInit {
   }
 
   fetchUserOrganizations() {
-    const email = this.authService.userData?.userEmail; 
+    const email = this.authService.userData?.value?.userEmail; 
 
     if (email) {
       this.orgService.getOrganizations(email).subscribe({

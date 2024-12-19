@@ -52,7 +52,7 @@ export class AddOrganizationComponent {
       name: this.organizationName,
       description: this.organizationDescription,
       imageLocation: this.imageFile?.name,
-      ownerEmail: this.authService.userData?.userEmail
+      ownerEmail: this.authService.userData?.value?.userEmail
     };
 
     this.isUploading = true; 
@@ -62,7 +62,7 @@ export class AddOrganizationComponent {
 
          if(this.imagePreview != null && this.imageFile != null) 
           {
-            let fileName = this.authService.userData?.userEmail+"/"+response+"/"+this.imageFile.name
+            let fileName = this.authService.userData?.value?.userEmail+"/"+response+"/"+this.imageFile.name
             console.log(fileName)
             console.log(this.imageFile)
             this.imgService.uploadImage(fileName, this.imageFile).subscribe({

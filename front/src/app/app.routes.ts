@@ -16,7 +16,6 @@ export const routes: Routes = [
   { path: 'explore', component: ExplorePageComponent },
   { path: 'explore/repository/:id', component: PublicRepositoryOverviewComponent },
   { path: 'sign-up', component: RegisterPageComponent },
-  { path: '**', component: LandingPageComponent },
   { path: 'organizations', component: ListOrganizationsComponent },
   { path: 'org-details/:id', component: DetailsComponent },
   { path: '**', component: LandingPageComponent },

@@ -75,8 +75,8 @@ export class EditOrganizationComponent {
 
           if (this.oldFileName != this.fileName && this.imageFile != null) {
             const updateImageDto = {
-              oldFileName: this.authService.userData?.userEmail+"/"+this.id+"/"+this.oldFileName,  
-              newFileName: this.authService.userData?.userEmail+"/"+this.id+"/"+this.fileName  
+              oldFileName: this.authService.userData?.value?.userEmail+"/"+this.id+"/"+this.oldFileName,  
+              newFileName: this.authService.userData?.value?.userEmail+"/"+this.id+"/"+this.fileName  
             };
 
             this.imageService.updateImage(updateImageDto, this.imageFile).subscribe({
