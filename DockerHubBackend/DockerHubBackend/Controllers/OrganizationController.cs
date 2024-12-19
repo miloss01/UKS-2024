@@ -1,3 +1,4 @@
+using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
@@ -91,5 +92,24 @@ namespace DockerHubBackend.Controllers
 
             return Ok();
         }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteOrganization(Guid id)
+        {
+            try
+            {
+                await _orgService.DeleteOrganization(id);
+                return Ok(new { message = "Organization deleted successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
     }
 }

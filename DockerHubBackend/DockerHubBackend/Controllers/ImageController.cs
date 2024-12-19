@@ -32,7 +32,7 @@ namespace DockerHubBackend.Controllers
                 return BadRequest("File name is required.");
             }
 
-            var url = await _imageService.GetImageUrlAsync(dto.FileName);
+            var url = await _imageService.GetImageUrl(dto.FileName);
             if (url == null)
             {
                 return NotFound("Image not found.");
@@ -51,10 +51,25 @@ namespace DockerHubBackend.Controllers
 
             using (var stream = file.OpenReadStream())
             {
-                await _imageService.UploadImageAsync(filePath, stream);
+                await _imageService.UploadImage(filePath, stream);
             }
 
             return Ok("Image uploaded successfully.");
         }
+
+        [HttpDelete("delete-image")]
+        public async Task<IActionResult> DeleteImage([FromQuery] string path)
+        {
+            try
+            {
+                await _imageService.DeleteImage(path);
+                return Ok(new { message = "Image deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
     }
 }

@@ -5,7 +5,8 @@ namespace DockerHubBackend.Services.Interface
 {
     public interface IImageService 
     {
-        Task<string> GetImageUrlAsync(string fileName);
-        Task UploadImageAsync(string estateName, Stream fileStream);
+        Task<string> GetImageUrl(string fileName);
+        Task UploadImage(string estateName, Stream fileStream);
+        Task DeleteImage(string filePath);
     }
 }

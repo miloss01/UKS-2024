@@ -4,6 +4,7 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -39,6 +40,11 @@ namespace DockerHubBackend.Services.Implementation
         public async Task<string> AddMemberToOrganization(Guid organizationId, Guid userId)
         {
             return await _orgRepository.AddMemberToOrganization(organizationId, userId);
+        }
+
+        public async Task DeleteOrganization(Guid organizationId)
+        {
+            await _orgRepository.DeleteOrganization(organizationId);
         }
     }
 }

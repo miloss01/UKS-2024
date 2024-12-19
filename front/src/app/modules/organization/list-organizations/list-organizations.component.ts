@@ -11,6 +11,7 @@ import { OrganizationService } from 'app/services/organization.service';
 import { ImageService } from 'app/services/image.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EditOrganizationComponent } from '../edit-organization/edit-organization.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-list-organizations',
@@ -28,7 +29,7 @@ export class ListOrganizationsComponent implements OnInit {
   pageSize = 2; // number items per page
   totalPages = 1; // num pages
 
-  constructor(private router: Router, private dialog: MatDialog, private authService: AuthService, private orgService: OrganizationService, private imageService: ImageService) 
+  constructor(private snackBar: MatSnackBar, private router: Router, private dialog: MatDialog, private authService: AuthService, private orgService: OrganizationService, private imageService: ImageService) 
   {}
   
   ngOnInit() {
@@ -136,7 +137,7 @@ export class ListOrganizationsComponent implements OnInit {
     });
   }
   
-  deactivateOrganization(orgName: string, event: MouseEvent) {
+  deactivateOrganization(orgId: string, ownerEmail: string, imgLoc: string, orgName: string, event: MouseEvent) {
     event.stopPropagation();
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -144,13 +145,34 @@ export class ListOrganizationsComponent implements OnInit {
         itemName: `${orgName}`, 
       },
     });
-  
+
     dialogRef.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        console.log(`Organization ${orgName} deactivated.`);
-        // Ovde pozovi API ili obradi deaktivaciju
+        this.orgService.deleteOrganization(orgId).subscribe({
+          next: () => {
+            this.imageService.deleteImage(ownerEmail+"/"+orgId+"/"+imgLoc).subscribe({
+              next: () => {
+                this.snackBar.open('Successfully deactivated organization', 'Close', {
+                  duration: 3000,
+                });
+                this.fetchUserOrganizations();
+              },
+              error: (err) => {
+                console.error('Error deleting image:', err);
+                this.snackBar.open('Failed to deactivate organizations', 'Close', {
+                  duration: 3000,
+                });
+              },
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting organization:', err);
+            this.snackBar.open('Failed to deactivate organization', 'Close', {
+              duration: 3000,
+            });
+          },
+        });
       }
     });
   }
-  
 }

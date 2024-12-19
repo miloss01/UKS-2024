@@ -157,5 +157,20 @@ namespace DockerHubBackend.Repository.Implementation
 
             return "User is already a member of the organization.";
         }
+
+        public async Task DeleteOrganization(Guid organizationId)
+        {
+            var organization = await _context.Organizations.FirstOrDefaultAsync(o => o.Id == organizationId);
+
+            if (organization == null)
+            {
+                throw new KeyNotFoundException("Organization not found.");
+            }
+
+            organization.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

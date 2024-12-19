@@ -30,7 +30,7 @@ namespace DockerHubBackend.Services.Implementation
         }
 
         // get image from s3
-        public async Task<string> GetImageUrlAsync(string fileName)
+        public async Task<string> GetImageUrl(string fileName)
         {
             try
             {
@@ -52,16 +52,10 @@ namespace DockerHubBackend.Services.Implementation
         }
 
         // upload file in s3
-        public async Task UploadImageAsync(string estateName, Stream fileStream)
+        public async Task UploadImage(string estateName, Stream fileStream)
         {
             try
             {
-                //bool folderExists = await DoesFolderExistAsync(_username);
-                //if (!folderExists)
-                //{
-                //    await CreateFolderAsync(_username);
-                //}
-
                 var transferUtility = new TransferUtility(_s3Client);
                 await transferUtility.UploadAsync(fileStream, _bucketName, estateName);
                 Console.WriteLine("File uploaded successfully.");
@@ -72,30 +66,29 @@ namespace DockerHubBackend.Services.Implementation
             }
         }
 
-        private async Task<bool> DoesFolderExistAsync(string folderName)
+        // delete image from S3
+        public async Task DeleteImage(string filePath)
         {
-            var request = new ListObjectsV2Request
+            try
             {
-                BucketName = _bucketName,
-                Prefix = $"{folderName}/",  
-                Delimiter = "/"
-            };
+                var deleteObjectRequest = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = filePath
+                };
 
-            var response = await _s3Client.ListObjectsV2Async(request);
-            return response.S3Objects.Count > 0;
+                await _s3Client.DeleteObjectAsync(deleteObjectRequest);
+                Console.WriteLine($"File '{filePath}' deleted successfully.");
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"Amazon S3 error while deleting file: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting file: {ex.Message}");
+            }
         }
 
-        private async Task CreateFolderAsync(string folderName)
-        {
-            var request = new PutObjectRequest
-            {
-                BucketName = _bucketName,
-                Key = $"{folderName}/",  
-                ContentBody = ""         
-            };
-
-            await _s3Client.PutObjectAsync(request);
-            Console.WriteLine($"Folder {folderName} created.");
-        }
     }
 }

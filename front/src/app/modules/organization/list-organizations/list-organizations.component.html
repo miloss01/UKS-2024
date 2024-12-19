@@ -84,7 +84,7 @@
           height="24" 
           class="deactivate-icon" 
           title="Deactivate this organization"
-          (click)="deactivateOrganization(org.name, $event)"
+          (click)="deactivateOrganization(org.id, org.ownerEmail, org.imageLocation, org.name, $event)"
         />
       </div>
     </div>

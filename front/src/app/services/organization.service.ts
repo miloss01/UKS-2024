@@ -33,6 +33,11 @@ export class OrganizationService {
     return this.http.post(`${this.apiUrl}/add-member`, body);
   }
 
+  deleteOrganization(orgId: string): Observable<void> {
+    const url = `${this.apiUrl}/delete/${orgId}`;
+    return this.http.delete<void>(url);
+  }
+
   // getOrganizationById(id: string): Observable<any> {
   //   return this.http.get<any>(`${this.apiUrl}/details/${id}`);
   // }

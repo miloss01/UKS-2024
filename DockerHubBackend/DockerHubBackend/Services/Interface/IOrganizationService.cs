@@ -11,5 +11,6 @@ namespace DockerHubBackend.Services.Interface
         Task<Organization?> GetOrganizationById(Guid id);
         Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId);
         Task<string> AddMemberToOrganization(Guid organizationId, Guid userId);
+        Task DeleteOrganization(Guid organizationId);
     }
 }
