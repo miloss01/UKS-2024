@@ -1,4 +1,5 @@
 ﻿using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
@@ -45,7 +46,7 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task ChangePassword_ExpiredTokenThrowsUnauthorizedException()
         {
             var changePasswordDto = new ChangePasswordDto { NewPassword = "password", Token = "token" };
-            var user = new SuperAdmin { Id = Guid.NewGuid(), Email = "email@email.com", Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
+            var user = new SuperAdmin { Username = "SuperAdmin", Id = Guid.NewGuid(), Email = "email@email.com", Password = "hashedPassword", LastPasswordChangeDate = DateTime.UtcNow, IsVerified = false };
             var verificationToken = new VerificationToken { Token = "token", ValidUntil = DateTime.UtcNow.AddHours(-1), User = user, UserId = user.Id};
 
             _mockVerificationTokenRepository.Setup(repo => repo.GetTokenByValue(It.IsAny<string>())).ReturnsAsync(verificationToken);
@@ -58,7 +59,7 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task ChangePassword_ValidTokenUpdatesUser()
         {
             var changePasswordDto = new ChangePasswordDto { NewPassword = "newPassword", Token = "token" };
-            var user = new SuperAdmin { Id = Guid.NewGuid(), Email = "email@email.com", Password = "hashedPassword", LastPasswordChangeDate = null, IsVerified = false };
+            var user = new SuperAdmin { Username = "SuperAdmin", Id = Guid.NewGuid(), Email = "email@email.com", Password = "hashedPassword", LastPasswordChangeDate = null, IsVerified = false };
             var verificationToken = new VerificationToken { Token = "token", ValidUntil = DateTime.UtcNow.AddHours(1), User = user, UserId = user.Id };
 
             _mockVerificationTokenRepository.Setup(repo => repo.GetTokenByValue("token")).ReturnsAsync(verificationToken);
@@ -71,6 +72,95 @@ namespace DockerHubBackend.Tests.UnitTests
             Assert.True(user.IsVerified);
             Assert.True(user.LastPasswordChangeDate.HasValue);
             _mockUserRepository.Verify(repo => repo.Update(It.IsAny<BaseUser>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterUser_ExistingEmailThrowsBadRequestException()
+        {
+            RegisterUserDto registerUserDto = new RegisterUserDto
+            {
+                Email = "user@email.com",
+                Password = "password",
+                Location = "location",
+                Username = "username",
+            };
+
+            _mockUserRepository.Setup(repo => repo.GetUserByEmail(registerUserDto.Email))
+                .ReturnsAsync(new StandardUser { Email = registerUserDto.Email, Username="user123", Password="password123"});
+
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() => _service.RegisterStandardUser(registerUserDto));
+            Assert.Equal("An account with given email aready exists", exception.Message);
+        }
+
+        [Fact]
+        public async Task RegisterUser_ExistingUsernameThrowsBadRequestException()
+        {
+            RegisterUserDto registerUserDto = new RegisterUserDto
+            {
+                Email = "user@email.com",
+                Password = "password",
+                Location = "location",
+                Username = "username",
+            };
+
+            _mockUserRepository.Setup(repo => repo.GetUserByEmail(registerUserDto.Email))
+                .ReturnsAsync((BaseUser?)null);
+
+            _mockUserRepository.Setup(repo => repo.GetUserByUsername(registerUserDto.Username))
+                .ReturnsAsync(new StandardUser { Email = "user123@email.com", Username = registerUserDto.Username, Password = "password123" });
+
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() => _service.RegisterStandardUser(registerUserDto));
+            Assert.Equal("A given username is already in use", exception.Message);
+        }
+
+        [Fact]
+        public async Task RegisterUser_UniqueEmailAndUsernameCreateUser()
+        {
+            RegisterUserDto registerUserDto = new RegisterUserDto
+            {
+                Email = "user@email.com",
+                Password = "password",
+                Location = "location",
+                Username = "username",
+            };
+
+            _mockUserRepository.Setup(repo => repo.GetUserByEmail(registerUserDto.Email))
+                .ReturnsAsync((BaseUser?)null);
+
+            _mockUserRepository.Setup(repo => repo.GetUserByUsername(registerUserDto.Username))
+                .ReturnsAsync((BaseUser?)null);
+
+            _mockPasswordHasher.Setup(hasher => hasher.HashPassword(It.IsAny<string>(), registerUserDto.Password))
+                .Returns("hashedPassword");
+
+            var user = new StandardUser
+            {
+                Email = registerUserDto.Email,
+                Username = registerUserDto.Username,
+                Password = "hashedPassword",
+                Location = registerUserDto.Location
+            };
+
+            var savedUser = new StandardUser
+            {
+                Id = Guid.Parse("98828440-8780-42da-94f4-03253b2cda6b"),
+                Email = registerUserDto.Email,
+                Username = registerUserDto.Username,
+                Password = "hashedPassword",
+                Location = registerUserDto.Location
+            };
+
+            _mockUserRepository.Setup(repo => repo.Create(It.IsAny<BaseUser>()))
+                .ReturnsAsync(savedUser);
+
+            var result = await _service.RegisterStandardUser(registerUserDto);
+            var expectedResult = new StandardUserDto(savedUser);
+
+            Assert.Equal(expectedResult.Id, result.Id);
+            Assert.Equal(expectedResult.Email, result.Email);
+            Assert.Equal(expectedResult.Username, result.Username);
+            Assert.Equal(expectedResult.Location, result.Location);
+            _mockUserRepository.Verify(repo => repo.Create(It.IsAny<BaseUser>()), Times.Once);
         }
     }
 }

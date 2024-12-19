@@ -3,6 +3,7 @@ import { MaterialModule } from 'app/infrastructure/material/material.module';
 import {AuthService} from "../../../services/auth.service";
 import {Router} from "@angular/router";
 import {NgIf} from "@angular/common";
+import {UserRole} from "../../../models/models";
 
 @Component({
   selector: 'app-toolbar',
@@ -12,7 +13,16 @@ import {NgIf} from "@angular/common";
   styleUrl: './toolbar.component.css'
 })
 export class ToolbarComponent {
-  constructor(public authService: AuthService, private router: Router) {}
+  userType?: UserRole;
+  constructor(public authService: AuthService, private router: Router) {
+    this.authService.userData.subscribe(value => {
+      if(!value){
+        this.userType = undefined;
+      }else {
+        this.userType = value.userRole;
+      }
+    });
+  }
 
   logout(){
     this.authService.logout();

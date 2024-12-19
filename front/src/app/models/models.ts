@@ -1,13 +1,24 @@
 export interface LoginCredentials {
   email: string,
-  password: string,
-  withCredentials: boolean
+  password: string
 }
 export interface UserData{
   userId: string,
   userEmail: string,
-  userRole: UserRole,
-  isVerified: boolean
+  userRole: UserRole
+}
+export interface RegisterUserDto{
+  email: string,
+  username: string,
+  location?: string,
+  password: string
+}
+
+export interface StandardUser{
+  id: string,
+  email: string,
+  username: string,
+  location?: string
 }
 
 export enum UserRole{
