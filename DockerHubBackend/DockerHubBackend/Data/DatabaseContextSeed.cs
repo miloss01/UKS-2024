@@ -15,9 +15,9 @@ namespace DockerHubBackend.Data
             if (!context.Users.Any())
             {
                 context.Users.AddRange(
-                    new StandardUser { Email = "user1@email.com", Password = passwordHash },
-                    new StandardUser { Email = "user2@email.com", Password = passwordHash },
-                    new SuperAdmin { Email = "super.admin@email.com", Password = passwordHash, IsVerified = false}
+                    new StandardUser { Username = "User1", Email = "user1@email.com", Password = passwordHash },
+                    new StandardUser { Username = "User2", Email = "user2@email.com", Password = passwordHash },
+                    new SuperAdmin { Username = "SuperAdmin", Email = "super.admin@email.com", Password = passwordHash, IsVerified = false}
                 );
                 await context.SaveChangesAsync();
             }

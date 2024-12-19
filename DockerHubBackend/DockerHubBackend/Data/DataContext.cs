@@ -76,6 +76,12 @@ namespace DockerHubBackend.Data
                     .HasForeignKey("UserId")
                     .HasConstraintName("FK_Star_User"));
 
+            modelBuilder.Entity<BaseUser>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            modelBuilder.Entity<BaseUser>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
             modelBuilder.Entity<VerificationToken>()
                 .HasIndex(vt => vt.UserId)
                 .IsUnique();

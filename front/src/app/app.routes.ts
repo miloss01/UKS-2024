@@ -5,12 +5,14 @@ import {HomePageComponent} from "./modules/layout/home-page/home-page.component"
 import {ChangePasswordPageComponent} from "./modules/layout/change-password-page/change-password-page.component";
 import {ExplorePageComponent} from "./modules/layout/explore-page/explore-page.component";
 import { PublicRepositoryOverviewComponent } from './modules/layout/public-repository-overview/public-repository-overview.component';
+import {RegisterPageComponent} from "./modules/layout/register-page/register-page.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'home', component: HomePageComponent },
-  {path: 'password/change', component: ChangePasswordPageComponent},
+  { path: 'password/change', component: ChangePasswordPageComponent },
   { path: 'explore', component: ExplorePageComponent },
   { path: 'explore/repository/:id', component: PublicRepositoryOverviewComponent },
+  { path: 'sign-up', component: RegisterPageComponent },
   { path: '**', component: LandingPageComponent }
 ];

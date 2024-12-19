@@ -51,7 +51,7 @@ namespace DockerHubBackend.Services.Implementation
 
         public async Task<LoginResponse> Login(LoginCredentialsDto credentials)
         {
-            var user = await _userRepository.GetUserByEmail(credentials.Email);
+            var user = await _userRepository.GetUserWithTokenByEmail(credentials.Email);
             if (user == null)
             {
                 throw new UnauthorizedException("Wrong email or password");

@@ -95,6 +95,7 @@ namespace DockerHubBackend.Startup
                 var passwordHash = passwordHasher.HashPassword(String.Empty, _superAdminPassword);
                 SuperAdmin superAdmin = new SuperAdmin
                 {
+                    Username = "SuperAdmin",
                     Email = _superAdminEmail,
                     Password = passwordHash,
                     IsVerified = false
