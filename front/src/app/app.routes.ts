@@ -6,6 +6,8 @@ import {ChangePasswordPageComponent} from "./modules/layout/change-password-page
 import {ExplorePageComponent} from "./modules/layout/explore-page/explore-page.component";
 import { PublicRepositoryOverviewComponent } from './modules/layout/public-repository-overview/public-repository-overview.component';
 import {RegisterPageComponent} from "./modules/layout/register-page/register-page.component";
+import { ListOrganizationsComponent } from './modules/organization/list-organizations/list-organizations.component';
+import { DetailsComponent } from './modules/organization/details/details.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -14,5 +16,8 @@ export const routes: Routes = [
   { path: 'explore', component: ExplorePageComponent },
   { path: 'explore/repository/:id', component: PublicRepositoryOverviewComponent },
   { path: 'sign-up', component: RegisterPageComponent },
-  { path: '**', component: LandingPageComponent }
+  { path: '**', component: LandingPageComponent },
+  { path: 'organizations', component: ListOrganizationsComponent },
+  { path: 'org-details/:id', component: DetailsComponent },
+  { path: '**', component: LandingPageComponent },
 ];

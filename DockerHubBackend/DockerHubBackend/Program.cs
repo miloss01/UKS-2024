@@ -1,3 +1,4 @@
+using DockerHubBackend.Config;
 using DockerHubBackend.Data;
 using DockerHubBackend.Filters;
 using DockerHubBackend.Repository.Implementation;
@@ -10,10 +11,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -78,6 +82,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
 builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -85,6 +91,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IRandomTokenGenerator, RandomTokenGenerator>();
 builder.Services.AddScoped<IDockerImageService, DockerImageService>();
 builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
