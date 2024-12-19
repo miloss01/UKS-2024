@@ -81,7 +81,7 @@ namespace DockerHubBackend.Repository.Implementation
 
         public async Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id)
         {
-            return await _context.TeamPermissions.Where(tp => tp.TeamId == id).ToListAsync();
+            return await _context.TeamPermissions.Where(tp => tp.TeamId == id).Include(tp => tp.Team).Include(tp => tp.Repository).ToListAsync();
         }
     }
 }

@@ -17,30 +17,8 @@ import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dia
   styleUrl: './team-details.component.css'
 })
 export class TeamDetailsComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'namespace', 'visibility'];
-  repositories: RepositoryCreation[] = [
-    {
-      id: '2',
-      name: 'Repo 1',
-      namespace: 'somenamespace',
-      description: 'Description of Repo 1',
-      visibility: 'Public',
-    },
-    {
-      id: '1',
-      name: 'Repo 2',
-      namespace: 'sms',
-      description: 'Description of Repo 2',
-      visibility: 'Private',
-    },
-    {
-      id: '3',
-      name: 'Repo 2',
-      namespace: 'blaa',
-      description: 'Description of Repo 2',
-      visibility: 'Private',
-    },
-  ];
+  displayedColumns: string[] = ['name', 'visibility', 'permissions'];
+  repositories: any[] = [];
 
   team: TeamsData | undefined;
 
@@ -56,7 +34,15 @@ export class TeamDetailsComponent implements OnInit {
       console.log(id);
       this.teamService.getTeam(id).subscribe((team) => {
         this.team = team;
-        console.log(team);
+      });
+
+      this.teamService.getRepositories(id).subscribe((repos) => {
+        const newRepos = repos.map(repo => ({
+          name: repo.repository.name, 
+          visibility: repo.repository.isPublic, 
+          permissions: repo.permission
+        }));
+        this.repositories = [...this.repositories, ...newRepos];
       });
     }
   }
@@ -97,11 +83,4 @@ export class TeamDetailsComponent implements OnInit {
       });
     }
   }
-
-  flippedCardId: string | null = null;
-
-  flipCard(id: string): void {
-    this.flippedCardId = this.flippedCardId === id ? null : id; // Toggle the flipped card
-  }
-
 }

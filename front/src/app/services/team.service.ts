@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'app/env/environment';
-import { Member, TeamsData } from 'app/models/models';
+import { Member, TeamRepoPerm, TeamsData } from 'app/models/models';
 import { Observable, ObservedValueOf } from 'rxjs';
 
 @Injectable({
@@ -29,5 +29,9 @@ export class TeamService {
 
   createTeam(team: TeamsData): Observable<TeamsData> {
     return this.http.post<TeamsData>(`${environment.apiHost}team`, team);
+  }
+
+  getRepositories(id: string): Observable<TeamRepoPerm[]> {
+    return this.http.get<TeamRepoPerm[]>(`${environment.apiHost}team/repositories/${id}`);
   }
 }

@@ -1,9 +1,8 @@
 export default interface RepositoryCreation {
   id: string,
-  name:string
-  namespace:string
-  description:string
-  visibility:string
+  name: string,
+  description: string,
+  isPublic: boolean
 }
 
 export interface LoginCredentials {
@@ -30,7 +29,6 @@ export interface Member {
 }
 
 export interface TeamRepoPerm {
-  id: string,
   permission: number,
   teamId: string,
   team: TeamsData,
