@@ -52,12 +52,12 @@ namespace DockerHubBackend.Services.Implementation
         }
 
         // upload file in s3
-        public async Task UploadImage(string estateName, Stream fileStream)
+        public async Task UploadImage(string imageName, Stream fileStream)
         {
             try
             {
                 var transferUtility = new TransferUtility(_s3Client);
-                await transferUtility.UploadAsync(fileStream, _bucketName, estateName);
+                await transferUtility.UploadAsync(fileStream, _bucketName, imageName);
                 Console.WriteLine("File uploaded successfully.");
             }
             catch (Exception ex)

@@ -111,5 +111,23 @@ namespace DockerHubBackend.Controllers
             }
         }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateOrganization([FromBody] UpdateOrganizationDto updateDto)
+        {
+            if (updateDto == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            try
+            {
+                await _orgService.UpdateOrganization(updateDto.Id, updateDto.ImageLocation, updateDto.Description);
+                return Ok(new { message = "Organization updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }

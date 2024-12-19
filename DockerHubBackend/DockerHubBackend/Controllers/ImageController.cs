@@ -5,11 +5,13 @@ using DockerHubBackend.Security;
 using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 
 namespace DockerHubBackend.Controllers
 {
@@ -71,5 +73,23 @@ namespace DockerHubBackend.Controllers
             }
         }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateImage([FromForm] string oldFileName, [FromForm] string newFileName, [FromForm] IFormFile file)
+        {
+            try
+            {
+                await _imageService.DeleteImage(oldFileName);
+                using (var stream = file.OpenReadStream())
+                {
+                    await _imageService.UploadImage(newFileName, stream);
+                }
+
+                return Ok(new { message = "Image updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }

@@ -29,4 +29,12 @@ export class ImageService {
     const url = `${this.apiUrl}/delete-image?path=${encodeURIComponent(imagePath)}`;
     return this.http.delete<void>(url);
   }
+
+  updateImage(updateDto: { oldFileName: string, newFileName: string }, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('oldFileName', updateDto.oldFileName);
+    formData.append('newFileName', updateDto.newFileName);
+    formData.append('file', file);
+    return this.http.put(`${this.apiUrl}/update`, formData);
+  }
 }

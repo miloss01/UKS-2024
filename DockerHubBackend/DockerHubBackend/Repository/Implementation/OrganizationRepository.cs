@@ -172,5 +172,18 @@ namespace DockerHubBackend.Repository.Implementation
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateOrganization(Guid organizationId, string imageLocation, string description)
+        {
+            var organization = await _context.Organizations.FindAsync(organizationId);
+            if (organization == null)
+            {
+                throw new Exception("Organization not found");
+            }
+
+            organization.ImageLocation = imageLocation;
+            organization.Description = description;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

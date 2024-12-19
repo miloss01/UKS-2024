@@ -123,16 +123,15 @@ export class ListOrganizationsComponent implements OnInit {
     });
   }
 
-  editOrganization(orgId: string, name: string, desc: string, imageUrl: string, event: MouseEvent) {
+  editOrganization(orgId: string, name: string, desc: string, imageName: string, imageUrl: string, event: MouseEvent) {
     event.stopPropagation();
     const dialogRef = this.dialog.open(EditOrganizationComponent, {
-      data: { orgId, name, desc, imageUrl },
+      data: { orgId, name, desc, imageName, imageUrl },
     });
   
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('Updated organization:', result);
-        // Pozovi API za ažuriranje organizacije
+        this.fetchUserOrganizations();
       }
     });
   }

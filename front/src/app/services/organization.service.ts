@@ -38,6 +38,10 @@ export class OrganizationService {
     return this.http.delete<void>(url);
   }
 
+  updateOrganization(updateDto: { id: string, description: string, imageLocation: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, updateDto);
+  }
+
   // getOrganizationById(id: string): Observable<any> {
   //   return this.http.get<any>(`${this.apiUrl}/details/${id}`);
   // }

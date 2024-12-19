@@ -46,5 +46,10 @@ namespace DockerHubBackend.Services.Implementation
         {
             await _orgRepository.DeleteOrganization(organizationId);
         }
+
+        public async Task UpdateOrganization(Guid organizationId, string imageLocation, string description)
+        { 
+            await _orgRepository.UpdateOrganization(organizationId, imageLocation, description);
+        }
     }
 }
