@@ -6,11 +6,13 @@
         <mat-label>Team Name</mat-label>
         <input matInput formControlName="name" required />
         <mat-error *ngIf="teamForm.get('name')?.hasError('required')">Name is required</mat-error>
+        <mat-error *ngIf="teamForm.get('name')?.hasError('maxlength')">Name must not exceed 20 characters</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
         <mat-label>Description</mat-label>
         <textarea matInput formControlName="description"> </textarea>
+        <mat-error *ngIf="teamForm.get('name')?.hasError('maxlength')">Description must not exceed 200 characters</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">

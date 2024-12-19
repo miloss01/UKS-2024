@@ -20,8 +20,8 @@ export class EditTeamDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { name: string; description: string }
   ) {
     this.editTeamForm = this.fb.group({
-      name: [data.name, [Validators.required]],
-      description: [data.description],
+      name: [data.name, [Validators.required, Validators.maxLength(20)]],
+      description: [data.description, Validators.maxLength(200)],
     });
   }
 

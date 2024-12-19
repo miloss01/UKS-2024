@@ -20,6 +20,8 @@
     margin: auto;
     width: 90%;
     max-height: 95%;
+    overflow-y: auto;
+    
 }
 
 tr {
@@ -28,6 +30,12 @@ tr {
 
 .row:hover {
     background-color: #cccccc;
+}
+
+.description {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
 }
 
 #create-team-btn {
