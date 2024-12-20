@@ -29,5 +29,20 @@ namespace DockerHubBackend.Repository.Implementation
         {
             return await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
         }
+
+        public List<StandardUser> GetAllStandardUsers()
+        {
+            return _context.Users
+                .OfType<StandardUser>()
+                .Where(user => !user.IsDeleted)
+                .ToList();
+        }
+
+        public void ChangeUserBadge(Badge badge, Guid userId)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            user.Badge = badge;
+            _context.SaveChanges();
+        }
     }
 }

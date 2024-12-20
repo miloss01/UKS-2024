@@ -58,5 +58,15 @@ namespace DockerHubBackend.Services.Implementation
 
             return new StandardUserDto(savedUser);
         }
+
+        public List<StandardUser> GetAllStandardUsers()
+        {
+            return _userRepository.GetAllStandardUsers();
+        }
+
+        public void ChangeUserBadge(Badge badge, Guid userId)
+        {
+            _userRepository.ChangeUserBadge(badge, userId);
+        }
     }
 }
