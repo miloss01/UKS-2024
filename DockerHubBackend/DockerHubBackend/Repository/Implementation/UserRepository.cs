@@ -43,6 +43,21 @@ namespace DockerHubBackend.Repository.Implementation
             var user = _context.Users.SingleOrDefault(u => u.Id == userId);
             user.Badge = badge;
             _context.SaveChanges();
+
+            var userRepositories = _context.DockerRepositories
+                .Include(dockerRepository => dockerRepository.UserOwner)
+                .Include(dockerRepository => dockerRepository.OrganizationOwner)
+                    .ThenInclude(organization => organization.Owner)
+                .Where(dockerRepository => dockerRepository.UserOwnerId == userId ||
+                                           dockerRepository.OrganizationOwner.OwnerId == userId)
+                .ToList();
+
+            foreach (var repository in userRepositories)
+            {
+                repository.Badge = badge;
+            }
+
+            _context.SaveChanges();
         }
     }
 }
