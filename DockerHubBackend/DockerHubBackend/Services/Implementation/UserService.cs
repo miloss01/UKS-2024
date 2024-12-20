@@ -51,7 +51,8 @@ namespace DockerHubBackend.Services.Implementation
                 Email = registerUserDto.Email,
                 Username = registerUserDto.Username,
                 Password = hashedPassword,
-                Location = registerUserDto.Location
+                Location = registerUserDto.Location,
+                Badge = Badge.NoBadge
             };
             StandardUser savedUser = (StandardUser) await _userRepository.Create(user);
 
