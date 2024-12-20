@@ -40,6 +40,7 @@ namespace DockerHubBackend.Repository.Implementation
                              .OrderByDescending(img => img.Repository.Badge == Badge.DockerOfficialImage)
                              .ThenByDescending(img => img.Repository.Badge == Badge.VefifiedPublisher)
                              .ThenByDescending(img => img.Repository.Badge == Badge.SponsoredOSS)
+                             .ThenByDescending(img => img.Repository.Badge == Badge.NoBadge)
                              .ThenByDescending(img => img.Repository.StarCount)
                              .Skip((page - 1) * pageSize)
                              .Take(pageSize)

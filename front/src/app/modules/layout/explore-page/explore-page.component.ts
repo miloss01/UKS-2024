@@ -26,6 +26,7 @@ interface BadgeHelper {
 export class ExplorePageComponent implements OnInit {
   dockerImages: DockerImageDTO[] = [];
   badges: BadgeHelper[] = [
+    { name: 'NoBadge', selected: false },
     { name: 'DockerOfficialImage', selected: false },
     { name: 'VefifiedPublisher', selected: false },
     { name: 'SponsoredOSS', selected: false },
@@ -83,6 +84,7 @@ export class ExplorePageComponent implements OnInit {
         this.dockerImages = res.data;
         this.totalNumberOfElements = res.totalNumberOfElements;
         this.totalNumberOfPages = Math.ceil(this.totalNumberOfElements / this.pageSize);
+        this.page = this.totalNumberOfElements != 0 ? this.page : 0
       },
       error: (err: any) => {
         console.log(err);
