@@ -162,5 +162,38 @@ namespace DockerHubBackend.Tests.UnitTests
             Assert.Equal(expectedResult.Location, result.Location);
             _mockUserRepository.Verify(repo => repo.Create(It.IsAny<BaseUser>()), Times.Once);
         }
+
+        [Fact]
+        public void GetAllStandardUsers_GetOnlyStandardUsers_ReturnsAllStandardUsers()
+        {
+            var standardUser1 = new StandardUser { Id = Guid.NewGuid(), Username = "User1", Password = "pass1", Email = "user1@email.com" };
+            var standardUser2 = new StandardUser { Id = Guid.NewGuid(), Username = "User2", Password = "pass2", Email = "user2@email.com" };
+
+            var standardUsers = new List<StandardUser>();
+            standardUsers.Add(standardUser1);
+            standardUsers.Add(standardUser2);
+
+            _mockUserRepository.Setup(userRepository => userRepository.GetAllStandardUsers()).Returns(standardUsers);
+
+            var result = _service.GetAllStandardUsers();
+
+            Assert.Equal(standardUsers, result);
+        }
+
+        [Fact]
+        public void ChangeUserBadge_ChangeSpecificUserBadgeToProvidedBadge_ReturnsNothing()
+        {
+            var standardUser = new StandardUser { Id = Guid.NewGuid(), Username = "User1", Password = "pass1", Email = "user1@email.com", Badge = Badge.NoBadge };
+            var newBadge = Badge.VerifiedPublisher;
+
+            _mockUserRepository.Setup(userRepository => userRepository.ChangeUserBadge(newBadge, standardUser.Id)).Verifiable();
+
+            _service.ChangeUserBadge(newBadge, standardUser.Id);
+
+            _mockUserRepository.Verify(
+                userRepository => userRepository.ChangeUserBadge(newBadge, standardUser.Id),
+                Times.Once
+            );
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {ChangePasswordDto, LoginCredentials, RegisterUserDto, StandardUser} from "../models/models";
+import {ChangePasswordDto, LoginCredentials, MinifiedStandardUserDTO, NewBadgeDTO, RegisterUserDto, StandardUser} from "../models/models";
 import {Observable, tap} from "rxjs";
 import {environment} from "../env/environment";
 
@@ -16,5 +16,13 @@ export class UserService {
   }
   registerUser(registerUserDto: RegisterUserDto): Observable<StandardUser>{
     return this.http.post<StandardUser>(`${environment.apiHost}user`, registerUserDto);
+  }
+
+  getAllStandardUsers(): Observable<MinifiedStandardUserDTO[]> {
+    return this.http.get<MinifiedStandardUserDTO[]>(`${environment.apiHost}user`);
+  }
+  
+  changeBadge(userId: string, newBadgeDTO: NewBadgeDTO): Observable<void>{
+    return this.http.patch<void>(`${environment.apiHost}user/${userId}/badge/change`, newBadgeDTO);
   }
 }

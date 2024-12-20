@@ -77,7 +77,7 @@ namespace DockerHubBackend.Tests.UnitTests
         public void GetDockerImages_BadgesNotEmpty_ReturnsDockerImagesWhichRepositoryHasProvidedBadge()
         {
             var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo1", Badge = Badge.DockerOfficialImage } };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VefifiedPublisher } };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VerifiedPublisher } };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);
@@ -88,7 +88,7 @@ namespace DockerHubBackend.Tests.UnitTests
             var page = 1;
             var pageSize = 100;
             var searchTerm = "";
-            var badges = "DockerOfficialImage,VefifiedPublisher";
+            var badges = "DockerOfficialImage,VerifiedPublisher";
 
             _mockDockerImageRepository.Setup(dockerImageRepository => dockerImageRepository.GetDockerImages(page, pageSize, searchTerm, badges)).Returns(pageDto);
 
