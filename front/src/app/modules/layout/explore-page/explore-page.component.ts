@@ -28,7 +28,7 @@ export class ExplorePageComponent implements OnInit {
   badges: BadgeHelper[] = [
     { name: 'NoBadge', selected: false },
     { name: 'DockerOfficialImage', selected: false },
-    { name: 'VefifiedPublisher', selected: false },
+    { name: 'VerifiedPublisher', selected: false },
     { name: 'SponsoredOSS', selected: false },
   ];
   totalNumberOfElements: number = 0;

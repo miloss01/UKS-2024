@@ -18,18 +18,15 @@ import { UserService } from 'app/services/user.service';
 export class UserBadgesComponent implements OnInit {
 
   users: MinifiedStandardUserDTO[] = [];
-  // selectedUser: string = "Choose user";
-  // selectedBadge: string = "Choose badge";
 
   displayedColumns: string[] = ['username', 'badge', 'actions'];
-  badges: string[] = ['NoBadge', 'VefifiedPublisher', 'SponsoredOSS'];
+  badges: string[] = ['NoBadge', 'VerifiedPublisher', 'SponsoredOSS'];
 
   constructor(private userService: UserService, private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.userService.getAllStandardUsers().subscribe({
       next: (res: MinifiedStandardUserDTO[]) => {
-        console.log(res);
         this.users = res;
       },
       error: (err: any) => {
