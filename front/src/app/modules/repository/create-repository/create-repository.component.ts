@@ -13,34 +13,24 @@ import RepositoryCreation from 'app/models/models';
 export class CreateRepositoryComponent {
   namespaces: string[] = ['namespace1', 'namespace2', 'namespace3'];
   repository: RepositoryCreation = {
-    name: '',
-    namespace: '',
-    description: '',
-    visibility: 'public'
+    name: "sss",
+    owner: 'dd',
+    description: 'ddd',
+    isPublic: true
+  }
+  repositoryForm: FormGroup<{ namespace: FormControl<string | null>; name: FormControl<string | null>; description: FormControl<string | null>; visibility: FormControl<boolean | null>; }>;
+
+  constructor(private fb: FormBuilder,
+    // private repositoryService: RepositoryService
+  ) {
+    this.repositoryForm = this.fb.group({
+      namespace: [this.repository.owner, Validators.required],
+      name: [this.repository.name, [Validators.required]],
+      description: [this.repository.description],
+      visibility: [this.repository.isPublic, Validators.required], // Default to "public"
+    });
   }
 
-  repositoryForm: FormGroup = new FormGroup({
-    name: new FormControl(this.repository.name, [
-      Validators.required,
-      Validators.minLength(4),
-      // forbiddenNameValidator(/bob/i), // <-- Here's how you pass in the custom validator.
-    ]),
-    namespace: new FormControl(this.repository.name, [
-      Validators.required,
-    ]),
-    description: new FormControl(this.repository.description),
-    visibility: new FormControl(this.repository.visibility, Validators.required),
-  });
-  
-
-  constructor(private fb: FormBuilder) {
-    // this.repositoryForm = this.fb.group({
-    //   namespace: [this.repository.namespace, Validators.required],
-    //   name: [this.repository.name, [Validators.required, Validators.minLength(3)]],
-    //   description: [this.repository.description],
-    //   visibility: [this.repository.visibility, Validators.required], // Default to "public"
-    // });
-  }
 
   onCreate(): void {
     console.log('Namespace:', this.repositoryForm.get('namespace')?.value);

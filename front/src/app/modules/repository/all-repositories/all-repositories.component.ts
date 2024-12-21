@@ -27,9 +27,9 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       lastPushed: '2023-11-01T12:00:00Z',
       createdAt: '2023-01-01T10:00:00Z',
       name: 'repository-one',
-      namespace: 'user1',
+      owner: 'user1',
       description: 'This is the first repository.',
-      visibility: 'public'
+      isPublic: true
     },
     {
       id: 2,
@@ -41,9 +41,9 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       lastPushed: '2023-11-05T08:30:00Z',
       createdAt: '2023-02-01T15:45:00Z',
       name: 'repository-two',
-      namespace: 'teamA',
+      owner: 'teamA',
       description: 'This is the second repository.',
-      visibility: 'private'
+      isPublic: false
     },
     {
       id: 3,
@@ -51,9 +51,9 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       lastPushed: '2023-10-20T14:15:00Z',
       createdAt: '2023-03-01T20:00:00Z',
       name: 'repository-three',
-      namespace: 'projectX',
+      owner: 'projectX',
       description: 'This is the third repository.',
-      visibility: 'public'
+      isPublic: true
     }
   ]
   

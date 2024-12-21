@@ -18,9 +18,9 @@ export class SingeRepositoryComponent {
     images: [],
     lastPushed: '12,23,32',
     name: 'lalala',
-    namespace: 'selena',
+    owner: 'selena',
     description: 'fdvdvd',
-    visibility: 'public',
+    isPublic: true,
     createdAt: '1.1.235',
     id: 0
   }

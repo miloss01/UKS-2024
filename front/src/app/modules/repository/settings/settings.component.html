@@ -1,16 +1,16 @@
 <div class="bordered-container">
     <h3>Visibility settings
-        @if (repository.visibility == 'private') {
-            <mat-icon aria-hidden="false" aria-label="Lock icon">lock</mat-icon>
-        } @else {
+        @if (repository.isPublic) {
             <mat-icon aria-hidden="false" aria-label="Public">public</mat-icon>
+        } @else {
+            <mat-icon aria-hidden="false" aria-label="Lock icon">lock</mat-icon>
         }
     </h3>
     
-    <p class="add-a-description">This repository is {{repository.visibility}}</p>
+    <p class="add-a-description">This repository is {{ repository.isPublic ? 'public' : 'private' }}</p>
     <p class="margin-top-bottom">Public repositories are available to anyone. Private repositories are only available to you.</p>
     
-    <button mat-raised-button color="primary" (click)="onVisibilityChange()">Make {{ repository.visibility === 'public' ? 'private' : 'public' }}</button>  
+    <button mat-raised-button color="primary" (click)="onVisibilityChange()">Make {{ repository.isPublic ? 'private' : 'public' }}</button>  
 </div>
 
 <div class="bordered-container">

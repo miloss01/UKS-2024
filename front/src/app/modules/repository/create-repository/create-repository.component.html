@@ -30,13 +30,13 @@
                 <h4>Visibility</h4>
                 <mat-radio-group aria-label="Select an option" formControlName="visibility" class="radio-container">
                     <div class="radio-item">
-                        <mat-radio-button value="public">
+                        <mat-radio-button value=true>
                             Public <mat-icon>public</mat-icon>
                         </mat-radio-button>
                         <span class="description">Appears in Docker Hub search results</span>
                     </div>
                     <div class="radio-item">
-                        <mat-radio-button value="private">
+                        <mat-radio-button value=false>
                             Private <mat-icon aria-hidden="false" aria-label="Lock icon">lock</mat-icon>
                           </mat-radio-button>                          
                         <span class="description">Only visible to you</span>

@@ -1,8 +1,8 @@
-<h2>{{repository.namespace}}/{{repository.name}}
-    @if (repository.visibility == 'private') {
-        <mat-icon aria-hidden="false" aria-label="Lock icon">lock</mat-icon>
-    } @else {
+<h2>{{repository.owner}}/{{repository.name}}
+    @if (repository.isPublic) {
         <mat-icon aria-hidden="false" aria-label="Public">public</mat-icon>
+    } @else {
+        <mat-icon aria-hidden="false" aria-label="Lock icon">lock</mat-icon>
     }
 </h2>
 <p class="add-a-description">Created at {{repository.createdAt}}</p>
@@ -34,7 +34,7 @@
 
 <h3>Docker commands</h3>
 <p>To push a new tag to this repository:</p>
-<p class="code-block">docker push {{repository.namespace}}/{{repository.name}}:tagname</p>
+<p class="code-block">docker push {{repository.owner}}/{{repository.name}}:tagname</p>
 
 <h3 class="margin-top">Tags</h3>
 @if (repository.images.length) {

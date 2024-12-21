@@ -1,8 +1,8 @@
 export default interface RepositoryCreation {
     name:string
-    namespace:string
+    owner:string
     description:string
-    visibility:string
+    isPublic: boolean
 }
 
 export interface Repository extends RepositoryCreation {

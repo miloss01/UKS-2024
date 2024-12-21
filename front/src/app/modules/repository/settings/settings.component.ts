@@ -21,9 +21,9 @@ export class SettingsComponent {
     lastPushed: '',
     createdAt: '',
     name: '',
-    namespace: '',
+    owner: '',
     description: '',
-    visibility: ''
+    isPublic: true
   }
   readonly dialog = inject(MatDialog);
 

@@ -15,9 +15,9 @@ export class GeneralOverviewComponent {
     images: [],
     lastPushed: '',
     name: '',
-    namespace: '',
+    owner: '',
     description: '',
-    visibility: '',
+    isPublic: true,
     createdAt: '',
     id: 0
   }

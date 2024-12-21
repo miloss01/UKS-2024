@@ -1,6 +1,6 @@
 <div class="container">
     <h3>Visibility Settings</h3>
-    <p>Change {{repository.namespace}}/{{repository.name}} to {{ repository.visibility === 'public' ? 'private' : 'public' }}</p>
+    <p>Change {{repository.owner}}/{{repository.name}} to {{ repository.isPublic ? 'private' : 'public' }}</p>
     <p>Type {{repository.name}} to continue</p>
     <mat-form-field>
         <!-- <mat-label>What's your name?</mat-label> -->
@@ -13,7 +13,7 @@
             color="primary" 
             (click)="onChange()" 
             [disabled]="userInput() !== repository.name">
-            Make {{ repository.visibility === 'public' ? 'private' : 'public' }}
+            Make {{ repository.isPublic ? 'private' : 'public' }}
         </button>    
 </div>    
 </div>
