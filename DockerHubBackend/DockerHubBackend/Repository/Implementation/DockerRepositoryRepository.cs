@@ -38,5 +38,20 @@ namespace DockerHubBackend.Repository.Implementation
                 .StarredRepositories
                 .ToList();
         }
+
+        public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId)
+        {
+            return _context.DockerRepositories
+                .AsQueryable()
+                .Include(dockerRepository => dockerRepository.UserOwner)
+                .Include(dockerRepository => dockerRepository.OrganizationOwner)
+                    .ThenInclude(organization => organization.Owner)
+                .Include(dockerRepository => dockerRepository.Images)
+                .Where(dockerRepository => !dockerRepository.IsDeleted)
+                .Where(dockerRepository => dockerRepository.UserOwnerId == userId ||
+                                           dockerRepository.OrganizationOwner.OwnerId == userId)
+                .Where(dockerRepository => !dockerRepository.IsPublic)
+                .ToList();
+        }
     }
 }

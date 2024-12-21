@@ -105,5 +105,45 @@ namespace DockerHubBackend.Controllers
 
             return Ok(starRepositoriesDto);
         }
+
+        [HttpGet("private/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetPrivateRepositoriesForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var privateRepositories = _dockerRepositoryService.GetPrivateRepositoriesForUser(userId);
+            var privateRepositoriesDto = privateRepositories.Select(privateRepository => new DockerRepositoryDTO
+            {
+                Id = privateRepository.Id.ToString(),
+                Name = privateRepository.Name,
+                Description = privateRepository.Description,
+                Badge = privateRepository.Badge.ToString(),
+                CreatedAt = privateRepository.CreatedAt.ToString(),
+                IsPublic = privateRepository.IsPublic,
+                StarCount = privateRepository.StarCount,
+                Owner = privateRepository.OrganizationOwner == null ? privateRepository.UserOwner.Email : privateRepository.OrganizationOwner.Name,
+                Images = privateRepository.Images.Select(img => new DockerImageDTO
+                {
+                    RepositoryName = img.Repository.Name,
+                    RepositoryId = img.Repository.Id.ToString(),
+                    Badge = img.Repository.Badge.ToString(),
+                    Description = img.Repository.Description,
+                    CreatedAt = img.CreatedAt.ToString(),
+                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
+                    ImageId = img.Id.ToString(),
+                    StarCount = img.Repository.StarCount,
+                    Tags = img.Tags,
+                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
+                }).ToList()
+            });
+
+            return Ok(privateRepositoriesDto);
+        }
     }
 }

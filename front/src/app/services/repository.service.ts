@@ -18,4 +18,8 @@ export class RepositoryService {
   getStarDockerRepositoriesForUser(userId: string) : Observable<DockerRepositoryDTO[]> {
     return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/star/${userId}`);
   }
+
+  getPrivateDockerRepositoriesForUser(userId: string) : Observable<DockerRepositoryDTO[]> {
+    return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/private/${userId}`);
+  }
 }

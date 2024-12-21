@@ -8,5 +8,6 @@ namespace DockerHubBackend.Services.Interface
     {
         public DockerRepository GetDockerRepositoryById(Guid id);
         public List<DockerRepository> GetStarRepositoriesForUser(Guid userId);
+        public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId);
     }
 }

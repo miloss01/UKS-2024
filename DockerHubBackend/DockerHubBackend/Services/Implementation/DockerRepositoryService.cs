@@ -34,5 +34,10 @@ namespace DockerHubBackend.Services.Implementation
         {
             return _dockerRepositoryRepository.GetStarRepositoriesForUser(userId);
         }
+
+        public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetPrivateRepositoriesForUser(userId);
+        }
     }
 }
