@@ -15,6 +15,7 @@ namespace DockerHubBackend.Data
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamPermission> TeamPermissions { get; set; }
+        public DbSet<VerificationToken> VerificationTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -74,6 +75,23 @@ namespace DockerHubBackend.Data
                     .WithMany()
                     .HasForeignKey("UserId")
                     .HasConstraintName("FK_Star_User"));
+
+            modelBuilder.Entity<BaseUser>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            modelBuilder.Entity<BaseUser>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+            modelBuilder.Entity<VerificationToken>()
+                .HasIndex(vt => vt.UserId)
+                .IsUnique();
+            modelBuilder.Entity<VerificationToken>()
+                .HasIndex(vt => vt.Token)
+                .IsUnique();
+            modelBuilder.Entity<VerificationToken>()
+                .HasOne<BaseUser>(vt => vt.User)
+                .WithOne(u => u.VerificationToken)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<DockerImage>()
                 .Property(p => p.Tags)

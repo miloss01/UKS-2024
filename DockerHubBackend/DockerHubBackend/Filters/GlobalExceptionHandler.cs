@@ -15,19 +15,28 @@ namespace DockerHubBackend.Filters
                 BadRequestException => StatusCodes.Status400BadRequest,
                 ForbiddenException => StatusCodes.Status403Forbidden,
                 UnauthorizedException => StatusCodes.Status401Unauthorized,
+                AccountVerificationRequiredException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var response = new
+            dynamic response = context.Exception switch
             {
-                message = context.Exception.Message              
+                AccountVerificationRequiredException => new
+                {
+                    message = context.Exception.Message,
+                    verificationToken = ((AccountVerificationRequiredException)(context.Exception)).VerificationToken
+                },
+                _ => new
+                {
+                    message = context.Exception.Message
+                }
             };
 
             context.HttpContext.Response.StatusCode = statusCode;
             context.HttpContext.Response.ContentType = "application/json";
 
             
-            var jsonResponse = JsonSerializer.Serialize(response);
+            var jsonResponse =  (string)JsonSerializer.Serialize(response);
             context.HttpContext.Response.WriteAsync(jsonResponse).ConfigureAwait(false);
 
             context.ExceptionHandled = true;

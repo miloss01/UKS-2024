@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {LoginCredentials, UserData, UserRole} from "../models/models";
-import {Observable, tap} from "rxjs";
+import {BehaviorSubject, Observable, tap} from "rxjs";
 import {environment} from "../env/environment";
 import {JwtHelperService} from "@auth0/angular-jwt";
 
@@ -10,7 +10,7 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 })
 export class AuthService {
 
-  public userData?: UserData;
+  userData: BehaviorSubject<UserData | undefined> = new BehaviorSubject<UserData | undefined>(undefined);
   private static tokenStorageName: string = "token";
 
   constructor(private http: HttpClient) {
@@ -27,11 +27,11 @@ export class AuthService {
     const id:string = decodedToken.nameid;
     const email:string = decodedToken.email;
     const role:UserRole = decodedToken.role as UserRole;
-    this.userData = {
+    this.userData.next({
       userId: id,
       userEmail: email,
-      userRole: role
-    };
+      userRole: role,
+    });
   }
 
   login(credentials: LoginCredentials): Observable<{accessToken: string}>{
@@ -49,6 +49,7 @@ export class AuthService {
 
   logout(){
     localStorage.removeItem(AuthService.tokenStorageName);
+    this.userData.next(undefined);
   }
 
   getAccessToken(): string | null{

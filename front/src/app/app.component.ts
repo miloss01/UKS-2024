@@ -14,16 +14,7 @@ import {NgIf} from "@angular/common";
 export class AppComponent {
   title = 'front';
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor() {
   }
 
-  showToolbar(): boolean {
-    let currentPath = this.route.snapshot.url.map(segment => segment.path).join('/');
-
-    if (!currentPath) {
-      currentPath = this.router.url.split('?')[0];
-    }
-
-    return currentPath !== "/login" && currentPath !== "/registration";
-  }
 }

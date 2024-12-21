@@ -20,19 +20,56 @@ export interface Image {
 
 export interface LoginCredentials {
   email: string,
-  password: string,
-  withCredentials: boolean
+  password: string
 }
 export interface UserData{
   userId: string,
   userEmail: string,
   userRole: UserRole
 }
+export interface RegisterUserDto{
+  email: string,
+  username: string,
+  location?: string,
+  password: string
+}
+
+export interface StandardUser{
+  id: string,
+  email: string,
+  username: string,
+  location?: string
+}
+
+export interface TeamsData {
+  id: string,
+  name: string,
+  description: string
+  members: Member[],
+  organizationId: string
+}
+
+export interface Member {
+  email: string
+}
+
+export interface TeamRepoPerm {
+  permission: number,
+  teamId: string,
+  team: TeamsData,
+  repositoryId: string,
+  repository: RepositoryCreation
+}
 
 export enum UserRole{
   StandardUser = "StandardUser",
   Admin = "Admin",
   SuperAdmin = "SuperAdmin"
+}
+
+export interface ChangePasswordDto{
+  newPassword: string,
+  token: string
 }
 
 export interface DockerImageDTO {

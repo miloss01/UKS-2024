@@ -7,6 +7,8 @@ namespace DockerHubBackend.Models
         public required string Email { get; set; }
         public required string Password { get; set; }
         public DateTime? LastPasswordChangeDate { get; set; }
-        public required bool IsVerified { get; set; }
+        public VerificationToken? VerificationToken { get; set; }
+        public required string Username { get; set; }
+        public string? Location { get; set; }
     }
 }
