@@ -141,6 +141,17 @@ namespace DockerHubBackend.Services.Implementation
             return dockerRepository;
         }
 
-		
+		public async Task<List<DockerRepositoryDTO>> GetRepositoriesByUserId(Guid id)
+		{
+			var repositories = await _dockerRepositoryRepository.GetRepositoriesByUserOwnerId(id);
+
+			if (repositories == null)
+				return new List<DockerRepositoryDTO> { };
+
+			return repositories.Select(repo => new DockerRepositoryDTO(repo)).ToList();
+		}
+
+
+
 	}
 }

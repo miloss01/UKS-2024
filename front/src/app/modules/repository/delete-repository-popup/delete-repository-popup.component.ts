@@ -1,10 +1,11 @@
-import { Component, Inject, signal } from '@angular/core';
+import { Component, inject, Inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DockerRepositoryDTO } from 'app/models/models';
 import { ChangeVisibilityPopupComponent } from '../change-visibility-popup/change-visibility-popup.component';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 import { RepositoryService } from '../services/repository.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delete-repository-popup',
@@ -16,6 +17,8 @@ import { RepositoryService } from '../services/repository.service';
 export class DeleteRepositoryPopupComponent {
   repository: DockerRepositoryDTO;
   userInput = signal("")
+  router = inject(Router)
+  
 
   // Inject MAT_DIALOG_DATA and MatDialogRef
   constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: DockerRepositoryDTO }, 
@@ -36,7 +39,7 @@ export class DeleteRepositoryPopupComponent {
           next: (response: DockerRepositoryDTO) => {
             console.log('Deleted:', response);
             this.dialogRef.close();
-  
+            this.router.navigate(["/all-user-repo"])
           },
           error: (error) => {
             console.error('Error creating repository:', error);

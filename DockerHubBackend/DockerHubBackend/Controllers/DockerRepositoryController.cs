@@ -43,6 +43,27 @@ namespace DockerHubBackend.Controllers
             return Ok(dockerRepositoryDto);
         }
 
+		[HttpGet("all/{id}")]
+		public async Task<IActionResult> GetAllUserRepositories(string id)
+		{
+			var parsed = Guid.TryParse(id, out var userId);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("User not found. Bad User id.");
+			}
+			try
+			{
+				var repositories = await _dockerRepositoryService.GetRepositoriesByUserId(userId);
+				return Ok(repositories);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { Message = "An error occurred while getting the repositories.", Details = ex.Message });
+			}
+		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> CreateRepository([FromBody] CreateRepositoryDto dto)
 		{
@@ -103,7 +124,7 @@ namespace DockerHubBackend.Controllers
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new { Message = "An error occurred while updating the repository description.", Details = ex.Message });
+				return StatusCode(500, new { Message = "An error occurred while updating the repository visibility.", Details = ex.Message });
 			}
 		}
 

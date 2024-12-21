@@ -17,6 +17,13 @@ namespace DockerHubBackend.Repository.Implementation
 			return await _context.DockerRepositories.FirstOrDefaultAsync(repo => repo.Id == id);
 		}
 
+        public async Task<List<DockerRepository>?> GetRepositoriesByUserOwnerId(Guid id)
+        { 
+            return await _context.DockerRepositories
+				                 .Where(repo => repo.UserOwnerId == id)
+						         .ToListAsync();
+		}
+
 		public DockerRepository GetFullDockerRepositoryById(Guid id)
         {
             return _context.DockerRepositories

@@ -7,6 +7,9 @@ namespace DockerHubBackend.Repository.Interface
     public interface IDockerRepositoryRepository : ICrudRepository<DockerRepository>
     {
         Task<DockerRepository?> GetDockerRepositoryById(Guid id);
-        public DockerRepository GetFullDockerRepositoryById(Guid id);
+
+        Task<List<DockerRepository>?> GetRepositoriesByUserOwnerId(Guid id);
+
+		public DockerRepository GetFullDockerRepositoryById(Guid id);
     }
 }

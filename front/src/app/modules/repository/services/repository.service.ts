@@ -11,29 +11,30 @@ export class RepositoryService {
 
   constructor(private http: HttpClient) { }
 
-CreateRepository(requestRepo: RepositoryCreation) : Observable<DockerRepositoryDTO> {
+  GetUsersRepositories(userId: string) : Observable<DockerRepositoryDTO[]> {
+    const url = `${environment.apiHost}dockerRepositories/all/${userId}`;
+    return this.http.get<DockerRepositoryDTO[]>(url);    
+  }
+
+  CreateRepository(requestRepo: RepositoryCreation) : Observable<DockerRepositoryDTO> {
     const url = `${environment.apiHost}dockerRepositories`;
     return this.http.post<DockerRepositoryDTO>(url, requestRepo);    
   }
 
-UpdateRepositoryDescription(descritionRequest: DescriptionRequest) : Observable<DockerRepositoryDTO> {
+  UpdateRepositoryDescription(descritionRequest: DescriptionRequest) : Observable<DockerRepositoryDTO> {
     const url = `${environment.apiHost}dockerRepositories/update-description`;
     return this.http.put<DockerRepositoryDTO>(url, descritionRequest);    
   }
 
-UpdateRepositoryVisibility(visibilityRequest: VisibilityRequest) : Observable<DockerRepositoryDTO> {
+  UpdateRepositoryVisibility(visibilityRequest: VisibilityRequest) : Observable<DockerRepositoryDTO> {
   const url = `${environment.apiHost}dockerRepositories/update-visibility`;
   return this.http.put<DockerRepositoryDTO>(url, visibilityRequest);    
 }
 
-DeleteRepository(id: string) : Observable<DockerRepositoryDTO> {
+  DeleteRepository(id: string) : Observable<DockerRepositoryDTO> {
   const url = `${environment.apiHost}dockerRepositories/delete/${id}`;
   return this.http.delete<DockerRepositoryDTO>(url);    
 }
 
-// GetUsersRepositories(userId: string) : Observable<Repository> {
-//   const url = `${environment.apiHost}dockerRepositories/`;
-//   return this.http.post<Repository>(url, visibilityRequest);    
-// }
 }
 

@@ -7,6 +7,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { DockerRepositoryDTO } from 'app/models/models';
+import { RepositoryService } from '../services/repository.service';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-all-repositories',
@@ -20,44 +22,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
   categories: string[] = ["c1", "c2", "c3"]
   searchQuery: Signal<string> = signal("");
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
-  repositories: DockerRepositoryDTO[] = [
-    {
-      id: '1',
-      images: [],
-      lastPushed: '2023-11-01T12:00:00Z',
-      createdAt: '2023-01-01T10:00:00Z',
-      name: 'repository-one',
-      owner: 'user1',
-      description: 'This is the first repository.',
-      isPublic: true,
-      starCount: 0,
-      badge: ''
-    },
-    {
-      id: '2',
-      images: [],
-      lastPushed: '2023-11-05T08:30:00Z',
-      createdAt: '2023-02-01T15:45:00Z',
-      name: 'repository-two',
-      owner: 'teamA',
-      description: 'This is the second repository.',
-      isPublic: false,
-      starCount: 0,
-      badge: ''
-    },
-    {
-      id: '3',
-      images: [],
-      lastPushed: '2023-10-20T14:15:00Z',
-      createdAt: '2023-03-01T20:00:00Z',
-      name: 'repository-three',
-      owner: 'projectX',
-      description: 'This is the third repository.',
-      isPublic: true,
-      starCount: 0,
-      badge: ''
-    }
-  ]
+  repositories: DockerRepositoryDTO[] = []
   
       
   repositorySource = new MatTableDataSource(this.repositories)
@@ -70,6 +35,25 @@ export class AllRepositoriesComponent  implements AfterViewInit{
 
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
+
+  constructor(private readonly repositoryService: RepositoryService,
+              private authService: AuthService) 
+  {
+    const userId: string = this.authService.userData.value?.userId || ""
+    console.log(userId)
+    this.repositoryService.GetUsersRepositories(userId).subscribe({
+      next: (response: DockerRepositoryDTO[]) => {
+        console.log(response)
+        this.repositories = response
+        this.repositorySource = new MatTableDataSource(this.repositories)
+
+      },
+      error: (error) => {
+        console.error('Error creating repository:', error);
+      }
+    }); 
+
+  }
 
 
   ngAfterViewInit() {

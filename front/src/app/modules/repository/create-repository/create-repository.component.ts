@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import RepositoryCreation, { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 import { AuthService } from 'app/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-repository',
@@ -15,6 +16,7 @@ import { AuthService } from 'app/services/auth.service';
 export class CreateRepositoryComponent {
   namespaces: string[] = [];
 
+  router = inject(Router)
 
   repoForm:FormGroup = new FormGroup({
     namespace: new FormControl("", [Validators.required]),
@@ -45,6 +47,7 @@ export class CreateRepositoryComponent {
         this.repositoryService.CreateRepository(repository).subscribe({
           next: (response: DockerRepositoryDTO) => {
             console.log('Repository created successfully:', response);
+            this.router.navigate(["/all-user-repo"])
           },
           error: (error) => {
             console.error('Error creating repository:', error);
