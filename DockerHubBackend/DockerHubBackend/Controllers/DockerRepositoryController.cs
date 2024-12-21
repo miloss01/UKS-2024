@@ -1,6 +1,7 @@
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
+using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
@@ -63,6 +64,46 @@ namespace DockerHubBackend.Controllers
             };
 
             return Ok(dockerRepositoryDto);
+        }
+
+        [HttpGet("star/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetStarRepositoriesForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var starRepositories = _dockerRepositoryService.GetStarRepositoriesForUser(userId);
+            var starRepositoriesDto = starRepositories.Select(starRepository => new DockerRepositoryDTO
+            {
+                Id = starRepository.Id.ToString(),
+                Name = starRepository.Name,
+                Description = starRepository.Description,
+                Badge = starRepository.Badge.ToString(),
+                CreatedAt = starRepository.CreatedAt.ToString(),
+                IsPublic = starRepository.IsPublic,
+                StarCount = starRepository.StarCount,
+                Owner = starRepository.OrganizationOwner == null ? starRepository.UserOwner.Email : starRepository.OrganizationOwner.Name,
+                Images = starRepository.Images.Select(img => new DockerImageDTO
+                {
+                    RepositoryName = img.Repository.Name,
+                    RepositoryId = img.Repository.Id.ToString(),
+                    Badge = img.Repository.Badge.ToString(),
+                    Description = img.Repository.Description,
+                    CreatedAt = img.CreatedAt.ToString(),
+                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
+                    ImageId = img.Id.ToString(),
+                    StarCount = img.Repository.StarCount,
+                    Tags = img.Tags,
+                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
+                }).ToList()
+            });
+
+            return Ok(starRepositoriesDto);
         }
     }
 }

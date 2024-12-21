@@ -29,5 +29,10 @@ namespace DockerHubBackend.Services.Implementation
 
             return dockerRepository;
         }
+
+        public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetStarRepositoriesForUser(userId);
+        }
     }
 }

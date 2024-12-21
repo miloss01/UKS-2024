@@ -14,4 +14,8 @@ export class RepositoryService {
   getDockerRepositoryById(id: string) : Observable<DockerRepositoryDTO> {
     return this.http.get<DockerRepositoryDTO>(`${environment.apiHost}dockerRepositories/${id}`);
   }
+
+  getStarDockerRepositoriesForUser(userId: string) : Observable<DockerRepositoryDTO[]> {
+    return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/star/${userId}`);
+  }
 }

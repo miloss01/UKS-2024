@@ -21,5 +21,22 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(dockerRepository => dockerRepository.Images)
                 .FirstOrDefault(dockerRepository => dockerRepository.Id == id);
         }
+
+        public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
+        {
+            return _context.Users
+                .OfType<StandardUser>()
+                .Where(user => !user.IsDeleted)
+                .AsQueryable()
+                .Include(user => user.StarredRepositories)
+                    .ThenInclude(starRepository => starRepository.UserOwner)
+                .Include(user => user.StarredRepositories)
+                    .ThenInclude(starRepository => starRepository.OrganizationOwner)
+                .Include(user => user.StarredRepositories)
+                    .ThenInclude(starRepository => starRepository.Images)
+                .First(user => user.Id == userId)
+                .StarredRepositories
+                .ToList();
+        }
     }
 }
