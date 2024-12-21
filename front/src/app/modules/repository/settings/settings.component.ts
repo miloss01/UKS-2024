@@ -16,7 +16,7 @@ export class SettingsComponent {
 
 
   @Input() repository: Repository = {
-    id: 0,
+    id: "0",
     images: [],
     lastPushed: '',
     createdAt: '',

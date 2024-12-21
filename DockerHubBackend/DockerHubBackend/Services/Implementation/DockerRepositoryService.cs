@@ -5,6 +5,7 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace DockerHubBackend.Services.Implementation
@@ -14,9 +15,10 @@ namespace DockerHubBackend.Services.Implementation
         private readonly IDockerRepositoryRepository _dockerRepositoryRepository;
 		private readonly IUserRepository _userRepository;
 
-        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository)
+        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository, IUserRepository userRepository)
         {
             _dockerRepositoryRepository = dockerRepositoryRepository;
+			_userRepository = userRepository;
         }
 
 		private async Task<DockerRepository?> getRepository(Guid id)
@@ -33,6 +35,8 @@ namespace DockerHubBackend.Services.Implementation
 		public async Task<DockerRepositoryDTO> ChangeDockerRepositoryDescription(Guid id, string description)
 		{
 			DockerRepository? repository = await getRepository(id);
+
+			Console.WriteLine(repository.UserOwner);
 
 			repository.Description = description;
 
@@ -51,6 +55,9 @@ namespace DockerHubBackend.Services.Implementation
 		{
 			DockerRepository? repository = await getRepository(id);
 
+			if (repository.IsPublic == visibility)
+				throw new BadRequestException("The new visibility value is the same as the current value.");
+
 			repository.IsPublic = visibility;
 
 			// Save changes to the repository
@@ -65,18 +72,17 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<StandardUser?> getUser(string repoNamespace)
 		{
-			var user = await _userRepository.GetUserByEmail(repoNamespace);
 			try
 			{
+				var user = await _userRepository.GetUserByEmail(repoNamespace);
 				return (StandardUser?)user;
-
 			}
 			catch (Exception)
 			{
 				return null;
 			}
-
 		}
+
 
 		public Organization? getOrganization(string repoNamespace)
 		{
@@ -85,20 +91,20 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<DockerRepositoryDTO> CreateDockerRepository(CreateRepositoryDto createRepositoryDto)
 		{
+			Console.WriteLine(createRepositoryDto);
 			// Get either User or Organization
-			var userOwner = await getUser(createRepositoryDto.NamespaceR);
-			var organizationOwner = getOrganization(createRepositoryDto.NamespaceR);
-			if ((userOwner == null) ^ (organizationOwner == null))
+			var userOwner = await getUser(createRepositoryDto.Owner);
+			var organizationOwner = getOrganization(createRepositoryDto.Owner);
+			if ((userOwner == null) && (organizationOwner == null))
 			{
 				throw new ArgumentException("Invalid namespace name. It can be either an organization name or username.");
 			}
-
 			// Create the repo
 			var newRepository = new DockerRepository
 			{
 				Name = createRepositoryDto.Name,
 				Description = createRepositoryDto.Description,
-				IsPublic = createRepositoryDto.Visibility.ToLower() == "public",
+				IsPublic = createRepositoryDto.IsPublic,
 				StarCount = 0,
 				Badge = Badge.VefifiedPublisher,
 				Images = new HashSet<DockerImage>(),
@@ -134,5 +140,7 @@ namespace DockerHubBackend.Services.Implementation
 
             return dockerRepository;
         }
-    }
+
+		
+	}
 }

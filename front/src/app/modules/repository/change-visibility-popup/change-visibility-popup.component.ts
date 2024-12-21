@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { Repository } from 'app/models/models';
+import { RepositoryService } from '../services/repository.service';
 
 @Component({
   selector: 'app-change-visibility-popup',
@@ -15,7 +16,9 @@ export class ChangeVisibilityPopupComponent {
   repository: Repository;
 
   // Inject MAT_DIALOG_DATA and MatDialogRef
-  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: Repository }, private dialogRef: MatDialogRef<ChangeVisibilityPopupComponent>) {
+  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: Repository }, 
+  private dialogRef: MatDialogRef<ChangeVisibilityPopupComponent>,
+  private readonly repositoryService: RepositoryService) {
     // Extract the repository from the data
     this.repository = data.repository;
 
@@ -25,6 +28,20 @@ export class ChangeVisibilityPopupComponent {
   onChange() {
     if (this.userInput() === this.repository.name){
       console.log("super")
+      this.repositoryService.UpdateRepositoryVisibility({
+        repositoryId: this.repository.id,
+        isPublic: !this.repository.isPublic
+      }).subscribe({
+        next: (response: Repository) => {
+          this.repository.isPublic = response.isPublic
+          console.log('Visibility changed:', response);
+          this.dialogRef.close();
+
+        },
+        error: (error) => {
+          console.error('Error creating repository:', error);
+        }
+      }); 
     }
     else {
       console.log("nije super")

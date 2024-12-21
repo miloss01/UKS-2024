@@ -1,50 +1,58 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import RepositoryCreation from 'app/models/models';
+import RepositoryCreation, { Repository } from 'app/models/models';
+import { RepositoryService } from '../services/repository.service';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-create-repository',
   standalone: true,
-  imports: [ MaterialModule ],
+  imports: [ MaterialModule, ReactiveFormsModule ],
   templateUrl: './create-repository.component.html',
   styleUrl: './create-repository.component.css'
 })
 export class CreateRepositoryComponent {
-  namespaces: string[] = ['namespace1', 'namespace2', 'namespace3'];
-  repository: RepositoryCreation = {
-    name: "sss",
-    owner: 'dd',
-    description: 'ddd',
-    isPublic: true
-  }
-  repositoryForm: FormGroup<{ namespace: FormControl<string | null>; name: FormControl<string | null>; description: FormControl<string | null>; visibility: FormControl<boolean | null>; }>;
+  namespaces: string[] = [];
 
-  constructor(private fb: FormBuilder,
-    // private repositoryService: RepositoryService
+
+  repoForm:FormGroup = new FormGroup({
+    namespace: new FormControl("", [Validators.required]),
+    description: new FormControl(''),
+    visibility: new FormControl("", [Validators.required]),
+    name: new FormControl("", [Validators.required])
+  });
+
+  constructor(
+    private repositoryService: RepositoryService,
+    private authService: AuthService
   ) {
-    this.repositoryForm = this.fb.group({
-      namespace: [this.repository.owner, Validators.required],
-      name: [this.repository.name, [Validators.required]],
-      description: [this.repository.description],
-      visibility: [this.repository.isPublic, Validators.required], // Default to "public"
-    });
+    this.namespaces.push(this.authService.userData.value?.userEmail || "")
+
   }
 
 
   onCreate(): void {
-    console.log('Namespace:', this.repositoryForm.get('namespace')?.value);
-    console.log('Name:', this.repositoryForm.get('name')?.value);
-    console.log('Description:', this.repositoryForm.get('description')?.value);
-    console.log('Visibility:', this.repositoryForm.get('visibility')?.value);
-    console.log(this.repository)
-      if (this.repositoryForm.valid) {
-      const formData = this.repositoryForm.value;
-      console.log('Repository Created:', formData);
-      // Add logic to call your backend API to create the repository
-    } else {
-      console.error('Form is invalid');
-    }
+      if (this.repoForm.valid) {
+        console.log("AAAAAAAA")
+        var repository: RepositoryCreation = {
+          name: this.repoForm.controls['name'].value,
+          owner: this.repoForm.controls['namespace'].value,
+          description: this.repoForm.controls['description'].value,
+          isPublic: this.repoForm.controls['visibility'].value === 'true'
+        }
+        console.log(repository)
+        this.repositoryService.CreateRepository(repository).subscribe({
+          next: (response: Repository) => {
+            console.log('Repository created successfully:', response);
+          },
+          error: (error) => {
+            console.error('Error creating repository:', error);
+          }
+        });    
+      } else {
+        console.error('Form is invalid');
+      }
   }
 
   onCancel(): void {

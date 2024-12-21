@@ -22,7 +22,7 @@ export class SingeRepositoryComponent {
     description: 'fdvdvd',
     isPublic: true,
     createdAt: '1.1.235',
-    id: 0
+    id: "0"
   }
   route = inject(ActivatedRoute);
 

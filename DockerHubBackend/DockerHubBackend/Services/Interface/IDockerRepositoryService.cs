@@ -14,8 +14,5 @@ namespace DockerHubBackend.Services.Interface
 		public Task<DockerRepositoryDTO> ChangeDockerRepositoryVisibility(Guid id, bool visibility);
 
         public Task DeleteDockerRepository(Guid id);
-
-
-
 	}
 }

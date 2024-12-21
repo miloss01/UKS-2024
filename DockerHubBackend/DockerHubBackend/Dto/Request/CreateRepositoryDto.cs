@@ -10,23 +10,27 @@ namespace DockerHubBackend.Dto.Request
 
 		public required string Description { get; set; }
 
-		[Required(ErrorMessage = "Namespace is required.")]
-		public required string NamespaceR { get; set; }
+		[Required(ErrorMessage = "Owner is required.")]
+		public required string Owner { get; set; }
 
 		[Required(ErrorMessage = "Visibility is required.")]
-		[RegularExpression("public|private", ErrorMessage = "Visibility must be 'public' or 'private'.")]
-		public required string Visibility { get; set; }
+		public required bool IsPublic { get; set; }
 
 		public CreateRepositoryDto()
 		{
 		}
 
-		public CreateRepositoryDto(string name, string description, string namespaceR, string visibility)
+		public CreateRepositoryDto(string name, string description, string owner, bool isPublic)
 		{
 			Name = name;
 			Description = description;
-			NamespaceR = namespaceR;
-			Visibility = visibility;
+			Owner = owner;
+			IsPublic = isPublic;
+		}
+
+		public override string? ToString()
+		{
+			return $"CreateRepositoryDto {{ Name = {Name}, Description = {Description}, Owner = {Owner}, IsPublic = {IsPublic} }}";
 		}
 	}
 }

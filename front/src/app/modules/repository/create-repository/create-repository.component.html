@@ -3,6 +3,7 @@
 <div class="container">
     <div class="left">
         <div class="form-container">
+            <form [formGroup]="repoForm">
             <div class="row">
                 <mat-form-field>
                     <mat-label>namespace</mat-label>
@@ -43,6 +44,7 @@
                     </div>
                 </mat-radio-group>
             </div>
+        </form>
         </div>
     </div>
 

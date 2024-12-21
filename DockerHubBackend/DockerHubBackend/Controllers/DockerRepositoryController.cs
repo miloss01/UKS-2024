@@ -5,6 +5,7 @@ using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -43,15 +44,93 @@ namespace DockerHubBackend.Controllers
         }
 
 		[HttpPost]
-		public IActionResult CreateRepository([FromBody] CreateRepositoryDto dto)
+		public async Task<IActionResult> CreateRepository([FromBody] CreateRepositoryDto dto)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
 
-			_dockerRepositoryService.CreateDockerRepository(dto);
-			return Ok(new { Message = "Repository created successfully!" });
+			var responce = await _dockerRepositoryService.CreateDockerRepository(dto);
+			return Ok(responce);
 		}
+
+		[HttpPut("update-description")]
+		public async Task<IActionResult> UpdateRepositoryDescription([FromBody] UpdateRepositoryDescriptionDto dto)
+		{
+			var parsed = Guid.TryParse(dto.RepositoryId, out var repositoryId);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Repository not found. Bad repository id.");
+			}
+			try
+			{
+				var updatedRepository = await _dockerRepositoryService.ChangeDockerRepositoryDescription(repositoryId, dto.NewDescription);
+				return Ok(updatedRepository);
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { Message = ex.Message });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { Message = "An error occurred while updating the repository description.", Details = ex.Message });
+			}
+		}
+
+		[HttpPut("update-visibility")]
+		public async Task<IActionResult> UpdateRepositoryVisibility([FromBody] UpdateRepositoryVisibilityDto dto)
+		{
+			var parsed = Guid.TryParse(dto.RepositoryId, out var repositoryId);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Repository not found. Bad repository id.");
+			}
+			try
+			{
+				var updatedRepository = await _dockerRepositoryService.ChangeDockerRepositoryVisibility(repositoryId, dto.isPublic);
+				return Ok(updatedRepository);
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { Message = ex.Message });
+			}
+			catch (BadRequestException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { Message = "An error occurred while updating the repository description.", Details = ex.Message });
+			}
+		}
+
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteOrganization(string id)
+		{
+			var parsed = Guid.TryParse(id, out var repositoryId);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Repository not found. Bad repository id.");
+			}
+
+			try
+			{
+				await _dockerRepositoryService.DeleteDockerRepository(repositoryId);
+				return Ok(new { message = "Repository deleted successfully." });
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { error = ex.Message });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { error = ex.Message });
+			}
+		}
+
 	}
 }

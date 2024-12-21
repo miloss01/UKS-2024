@@ -6,10 +6,20 @@ export default interface RepositoryCreation {
 }
 
 export interface Repository extends RepositoryCreation {
-  id: number,
+  id: string,
   images: Image[]
   lastPushed: string
   createdAt: string
+}
+
+export interface DescriptionRequest {
+  repositoryId: string,
+  newDescription: string
+}
+
+export interface VisibilityRequest {
+  repositoryId: string,
+  isPublic: boolean
 }
 
 export interface Image {

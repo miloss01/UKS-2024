@@ -17,5 +17,20 @@ namespace DockerHubBackend.Models
         public Guid? OrganizationOwnerId { get; set; }
         [ForeignKey(nameof(OrganizationOwnerId))]
         public Organization? OrganizationOwner { get; set; }
-    }
+
+		public override string? ToString()
+		{
+			return $"Name: {Name}, " +
+		   $"Description: {Description ?? "N/A"}, " +
+		   $"IsPublic: {IsPublic}, " +
+		   $"StarCount: {StarCount}, " +
+		   $"Badge: {Badge}, " +
+		   /*$"Images: {string.Join(", ", Images.Select(img => img.ToString()))}, " +
+		   $"Teams: {string.Join(", ", Teams.Select(team => team.ToString()))}, " +*/
+		   $"UserOwnerId: {UserOwnerId?.ToString() ?? "N/A"}, " +
+		   $"UserOwner: {UserOwner?.ToString() ?? "N/A"}, ";
+		   /*$"OrganizationOwnerId: {OrganizationOwnerId?.ToString() ?? "N/A"}, " +
+		   $"OrganizationOwner: {OrganizationOwner?.ToString() ?? "N/A"}";*/
+		}
+	}
 }

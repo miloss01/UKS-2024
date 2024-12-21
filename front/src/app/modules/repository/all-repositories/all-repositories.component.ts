@@ -22,7 +22,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
   repositories: Repository[] = [
     {
-      id: 1,
+      id: '1',
       images: [],
       lastPushed: '2023-11-01T12:00:00Z',
       createdAt: '2023-01-01T10:00:00Z',
@@ -32,7 +32,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       isPublic: true
     },
     {
-      id: 2,
+      id: '2',
       images: [{
         name: '',
         tags: [],
@@ -46,7 +46,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       isPublic: false
     },
     {
-      id: 3,
+      id: '3',
       images: [],
       lastPushed: '2023-10-20T14:15:00Z',
       createdAt: '2023-03-01T20:00:00Z',
