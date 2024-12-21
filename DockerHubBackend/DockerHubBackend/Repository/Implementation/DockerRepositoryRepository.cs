@@ -53,5 +53,36 @@ namespace DockerHubBackend.Repository.Implementation
                 .Where(dockerRepository => !dockerRepository.IsPublic)
                 .ToList();
         }
+
+        public List<DockerRepository> GetOrganizationRepositoriesForUser(Guid userId)
+        {
+            return _context.Organizations
+                .Include(organization => organization.Members)
+                .Include(organization => organization.Repositories)
+                .Include(organization => organization.Owner)
+                .Where(organization => organization.Members.Any(member => member.Id == userId) ||
+                                       organization.Owner.Id == userId)
+                .SelectMany(organization => organization.Repositories)
+                .ToList();
+        }
+
+        public List<DockerRepository> GetAllRepositoriesForUser(Guid userId)
+        {
+            return _context.Users
+                .OfType<StandardUser>()
+                .Include(user => user.MyRepositories)
+                .First(user => user.Id == userId)
+                .MyRepositories
+                .ToList();
+        }
+
+        public void AddStarRepository(Guid userId, Guid repositoryId)
+        {
+            var user = _context.Users.OfType<StandardUser>().FirstOrDefault(user => user.Id == userId);
+            var repository = _context.DockerRepositories.Find(repositoryId);
+            user.StarredRepositories.Add(repository);
+            repository.StarCount += 1;
+            _context.SaveChanges();
+        }
     }
 }

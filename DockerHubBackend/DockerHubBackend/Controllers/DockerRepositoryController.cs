@@ -36,7 +36,6 @@ namespace DockerHubBackend.Controllers
             }
 
             var dockerRepository = _dockerRepositoryService.GetDockerRepositoryById(repositoryId);
-            Console.WriteLine(dockerRepository.Images == null);
 
             var dockerRepositoryDto = new DockerRepositoryDTO
             {
@@ -144,6 +143,52 @@ namespace DockerHubBackend.Controllers
             });
 
             return Ok(privateRepositoriesDto);
+        }
+
+        [HttpPatch("star/{userId}/{repositoryId}")]
+        [AllowAnonymous]
+        public IActionResult AddStarRepository(string userId, string repositoryId)
+        {
+            var parsed = Guid.TryParse(userId, out var userGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            parsed = Guid.TryParse(repositoryId, out var repositoryGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("Repository not found. Bad repository id.");
+            }
+
+            _dockerRepositoryService.AddStarRepository(userGuid, repositoryGuid);
+
+            return NoContent();
+        }
+
+        [HttpGet("star/notallowed/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetNotAllowedRepositoriesToStarForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var starRepositories = _dockerRepositoryService.GetStarRepositoriesForUser(userId);
+            var myRepositories = _dockerRepositoryService.GetAllRepositoriesForUser(userId);
+            var organizationRepositories = _dockerRepositoryService.GetOrganizationRepositoriesForUser(userId);
+            
+            var allGuids = starRepositories
+                .Concat(myRepositories)
+                .Concat(organizationRepositories)
+                .Select(repository => repository.Id.ToString());
+
+            return Ok(allGuids);
         }
     }
 }

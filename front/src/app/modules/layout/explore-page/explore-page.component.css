@@ -119,7 +119,6 @@ button:hover {
 
 .image-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   font-size: 14px;
   color: #999;
@@ -184,6 +183,20 @@ select {
 .image-id {
   font-size: 14px;
   color: #666;
+}
+
+.star-btn {
+  all: unset;
+  background: none;
+  border: none;
+  font-size: 24px;
+  margin: 0 0 5px 10px;
+  cursor: pointer;
+  color: gold;
+}
+
+.star-btn:hover {
+  background: none;
 }
 
 @media (max-width: 768px) {

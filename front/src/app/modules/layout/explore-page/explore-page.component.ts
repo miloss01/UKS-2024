@@ -5,6 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DockerImageService } from 'app/services/docker-image.service';
 import { RouterModule } from '@angular/router';
+import { RepositoryService } from 'app/services/repository.service';
+import { AuthService } from 'app/services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface BadgeHelper {
   name: string;
@@ -40,10 +43,53 @@ export class ExplorePageComponent implements OnInit {
   oldSearchTerm: string = this.searchTerm;
   oldBadges: BadgeHelper[] = [];
 
-  constructor(private dockerImageService: DockerImageService) {}
+  notAllowedToStarRepositories: string[] = [];
+  userId: string = "";
+  userRole: string = "";
+
+  constructor(private dockerImageService: DockerImageService, 
+              private dockerRepositoryService: RepositoryService,
+              private authService: AuthService,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
+    if (this.authService.userData.value) {
+      this.userId = this.authService.userData.value.userId;
+      this.userRole = this.authService.userData.value.userRole;
+    }
+    
+    if (this.showStarButton())
+      this.getNotAllowedRepositoriesToStar();
+
     this.applyFilters();
+  }
+
+  showStarButton(): boolean {
+    return this.userId != "" && this.userRole == "StandardUser";
+  }
+
+  getNotAllowedRepositoriesToStar(): void {
+    this.dockerRepositoryService.getNotAllowedToStarRepositoriesForUser(this.userId).subscribe({
+      next: (res: string[]) => {
+        this.notAllowedToStarRepositories = res;
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  starRepository(repositoryId: string): void {
+    this.dockerRepositoryService.starRepository(this.userId, repositoryId).subscribe({
+      next: () => {
+        this.snackBar.open('Successfully starred repository.', 'Close', { duration: 3000 });
+        this.getNotAllowedRepositoriesToStar();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
   }
 
   applyFilters(): void {

@@ -1,5 +1,5 @@
-<h2 class="header">Star repositories</h2>
-<div class="image-list">
+<h2 class="header" *ngIf="userRole == 'StandardUser'">Star repositories</h2>
+<div class="image-list" *ngIf="userRole == 'StandardUser'">
     <div *ngFor="let repository of starRepositories">
         <div *ngFor="let image of repository.images" class="image-item">
         <div class="image-header">

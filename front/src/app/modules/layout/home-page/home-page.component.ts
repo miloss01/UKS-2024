@@ -22,13 +22,17 @@ export class HomePageComponent implements OnInit {
   starRepositories: DockerRepositoryDTO[] = [];
   privateRepositories: DockerRepositoryDTO[] = [];
 
+  userId: string = "";
+  userRole: string = "";
+
   constructor(private dockerRepositoryService: RepositoryService, private authService: AuthService) {}
 
   ngOnInit(): void {
-    const userId: string = this.authService.userData.value?.userId!;
+    this.userId = this.authService.userData.value?.userId!;
+    this.userRole = this.authService.userData.value?.userRole!;
 
-    if (this.authService.userData.value?.userRole == "StandardUser") {
-      this.dockerRepositoryService.getStarDockerRepositoriesForUser(userId).subscribe({
+    if (this.userRole == "StandardUser") {
+      this.dockerRepositoryService.getStarDockerRepositoriesForUser(this.userId).subscribe({
         next: (res: DockerRepositoryDTO[]) => {
           this.starRepositories = res;
         },
@@ -38,7 +42,7 @@ export class HomePageComponent implements OnInit {
       })
     }
 
-    this.dockerRepositoryService.getPrivateDockerRepositoriesForUser(userId).subscribe({
+    this.dockerRepositoryService.getPrivateDockerRepositoriesForUser(this.userId).subscribe({
       next: (res: DockerRepositoryDTO[]) => {
         this.privateRepositories = res;
       },

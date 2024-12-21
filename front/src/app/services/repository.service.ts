@@ -22,4 +22,12 @@ export class RepositoryService {
   getPrivateDockerRepositoriesForUser(userId: string) : Observable<DockerRepositoryDTO[]> {
     return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/private/${userId}`);
   }
+
+  starRepository(userId: string, repositoryId: string) : Observable<void> {
+    return this.http.patch<void>(`${environment.apiHost}dockerRepositories/star/${userId}/${repositoryId}`, {});
+  }
+
+  getNotAllowedToStarRepositoriesForUser(userId: string) : Observable<string[]> {
+    return this.http.get<string[]>(`${environment.apiHost}dockerRepositories/star/notallowed/${userId}`);
+  }
 }
