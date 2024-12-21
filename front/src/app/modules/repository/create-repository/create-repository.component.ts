@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import RepositoryCreation, { Repository } from 'app/models/models';
+import RepositoryCreation, { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 import { AuthService } from 'app/services/auth.service';
 
@@ -43,7 +43,7 @@ export class CreateRepositoryComponent {
         }
         console.log(repository)
         this.repositoryService.CreateRepository(repository).subscribe({
-          next: (response: Repository) => {
+          next: (response: DockerRepositoryDTO) => {
             console.log('Repository created successfully:', response);
           },
           error: (error) => {

@@ -6,7 +6,7 @@
     </mat-tab> 
     <mat-tab label="Tags">
         <ng-template matTabContent>
-            <app-tags></app-tags>
+            <app-images-list [forDeleting]="true" [images]="repository.images"></app-images-list>
         </ng-template>   
     </mat-tab>
     <mat-tab label="Builds">

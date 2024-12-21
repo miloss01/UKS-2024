@@ -1,6 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { Repository } from 'app/models/models';
+import { DockerRepositoryDTO } from 'app/models/models';
 import { ChangeVisibilityPopupComponent } from "../change-visibility-popup/change-visibility-popup.component";
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteRepositoryPopupComponent } from '../delete-repository-popup/delete-repository-popup.component';
@@ -15,7 +15,7 @@ import { DeleteRepositoryPopupComponent } from '../delete-repository-popup/delet
 export class SettingsComponent {
 
 
-  @Input() repository: Repository = {
+  @Input() repository: DockerRepositoryDTO = {
     id: "0",
     images: [],
     lastPushed: '',
@@ -23,7 +23,9 @@ export class SettingsComponent {
     name: '',
     owner: '',
     description: '',
-    isPublic: true
+    isPublic: true,
+    starCount: 0,
+    badge: ''
   }
   readonly dialog = inject(MatDialog);
 

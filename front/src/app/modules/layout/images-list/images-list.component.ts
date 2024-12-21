@@ -19,6 +19,8 @@ export class ImagesListComponent implements OnChanges {
 
   @Input() images: DockerImageDTO[] = [];
 
+  @Input() forDeleting: boolean = false;
+
   filteredImages = [...this.images];
   sortOption = 'newest';
   filterTag = '';
@@ -90,5 +92,9 @@ export class ImagesListComponent implements OnChanges {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text);
+  }
+
+  DeleteTag(): void {
+    
   }
 }

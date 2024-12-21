@@ -1,6 +1,6 @@
 import { Component, Inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Repository } from 'app/models/models';
+import { DockerRepositoryDTO } from 'app/models/models';
 import { ChangeVisibilityPopupComponent } from '../change-visibility-popup/change-visibility-popup.component';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
@@ -14,11 +14,11 @@ import { RepositoryService } from '../services/repository.service';
   styleUrl: './delete-repository-popup.component.css'
 })
 export class DeleteRepositoryPopupComponent {
-  repository: Repository;
+  repository: DockerRepositoryDTO;
   userInput = signal("")
 
   // Inject MAT_DIALOG_DATA and MatDialogRef
-  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: Repository }, 
+  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: DockerRepositoryDTO }, 
   private dialogRef: MatDialogRef<ChangeVisibilityPopupComponent>,
   private readonly repositoryService: RepositoryService)
   {
@@ -33,7 +33,7 @@ export class DeleteRepositoryPopupComponent {
       if (this.userInput() === this.repository.name){
         console.log("super")
         this.repositoryService.DeleteRepository(this.repository.id).subscribe({
-          next: (response: Repository) => {
+          next: (response: DockerRepositoryDTO) => {
             console.log('Deleted:', response);
             this.dialogRef.close();
   

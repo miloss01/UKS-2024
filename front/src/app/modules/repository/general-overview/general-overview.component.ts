@@ -1,7 +1,7 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { Repository } from 'app/models/models';
+import { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { RepositoryService } from '../services/repository.service';
   styleUrl: './general-overview.component.css'
 })
 export class GeneralOverviewComponent {
-  @Input() repository: Repository = {
+  @Input() repository: DockerRepositoryDTO = {
     images: [],
     lastPushed: '',
     name: '',
@@ -20,7 +20,9 @@ export class GeneralOverviewComponent {
     description: '',
     isPublic: true,
     createdAt: '',
-    id: "0"
+    id: "0",
+    starCount: 0,
+    badge: ''
   }
   desctiptionEdditing: boolean = false
   descriptionFormControl = new FormControl('');
@@ -42,7 +44,7 @@ export class GeneralOverviewComponent {
       repositoryId: this.repository.id,
       newDescription: this.repository.description
     }).subscribe({
-      next: (response: Repository) => {
+      next: (response: DockerRepositoryDTO) => {
         console.log('Description changed:', response);
       },
       error: (error) => {

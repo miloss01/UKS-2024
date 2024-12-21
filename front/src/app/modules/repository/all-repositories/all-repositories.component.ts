@@ -6,7 +6,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { Repository } from 'app/models/models';
+import { DockerRepositoryDTO } from 'app/models/models';
 
 @Component({
   selector: 'app-all-repositories',
@@ -20,7 +20,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
   categories: string[] = ["c1", "c2", "c3"]
   searchQuery: Signal<string> = signal("");
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
-  repositories: Repository[] = [
+  repositories: DockerRepositoryDTO[] = [
     {
       id: '1',
       images: [],
@@ -29,21 +29,21 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       name: 'repository-one',
       owner: 'user1',
       description: 'This is the first repository.',
-      isPublic: true
+      isPublic: true,
+      starCount: 0,
+      badge: ''
     },
     {
       id: '2',
-      images: [{
-        name: '',
-        tags: [],
-        pushed: ''
-      }],
+      images: [],
       lastPushed: '2023-11-05T08:30:00Z',
       createdAt: '2023-02-01T15:45:00Z',
       name: 'repository-two',
       owner: 'teamA',
       description: 'This is the second repository.',
-      isPublic: false
+      isPublic: false,
+      starCount: 0,
+      badge: ''
     },
     {
       id: '3',
@@ -53,7 +53,9 @@ export class AllRepositoriesComponent  implements AfterViewInit{
       name: 'repository-three',
       owner: 'projectX',
       description: 'This is the third repository.',
-      isPublic: true
+      isPublic: true,
+      starCount: 0,
+      badge: ''
     }
   ]
   
@@ -92,7 +94,7 @@ export class AllRepositoriesComponent  implements AfterViewInit{
     
   }
 
-  openRepository(repository: Repository): void {
+  openRepository(repository: DockerRepositoryDTO): void {
     console.log(repository)
     this.router.navigate(["/single-repo", repository.id])
   }

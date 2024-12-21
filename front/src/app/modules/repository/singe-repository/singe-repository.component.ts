@@ -1,20 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { GeneralOverviewComponent } from '../general-overview/general-overview.component';
-import { TagsComponent } from '../tags/tags.component';
 import { SettingsComponent } from '../settings/settings.component';
-import { Repository } from 'app/models/models';
-import { ActivatedRoute, Router } from '@angular/router';
+import { DockerRepositoryDTO } from 'app/models/models';
+import { ActivatedRoute } from '@angular/router';
+import { ImagesListComponent } from 'app/modules/layout/images-list/images-list.component';
+import { RepositoryService } from 'app/services/repository.service';
 
 @Component({
   selector: 'app-singe-repository',
   standalone: true,
-  imports: [ MaterialModule, GeneralOverviewComponent, TagsComponent, SettingsComponent ],
+  imports: [ MaterialModule, GeneralOverviewComponent, ImagesListComponent, SettingsComponent ],
   templateUrl: './singe-repository.component.html',
   styleUrl: './singe-repository.component.css'
 })
 export class SingeRepositoryComponent {
-  repository: Repository = {
+  repository: DockerRepositoryDTO = {
     images: [],
     lastPushed: '12,23,32',
     name: 'lalala',
@@ -22,17 +23,20 @@ export class SingeRepositoryComponent {
     description: 'fdvdvd',
     isPublic: true,
     createdAt: '1.1.235',
-    id: "0"
+    id: "0",
+    starCount: 0,
+    badge: ''
   }
   route = inject(ActivatedRoute);
 
-  // bice da se ucita ovde
+  constructor(private readonly repositoryService: RepositoryService){}
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const id = params['id'];
-      // this.repositoryService.getRepositoryById(id).subscribe(repo => {
-      //   this.repository = repo; // Assign fetched repository details
-      // })
+      this.repositoryService.getDockerRepositoryById(id).subscribe(repo => {
+        this.repository = repo; // Assign fetched repository details
+      })
       console.log(id)
     })
   }

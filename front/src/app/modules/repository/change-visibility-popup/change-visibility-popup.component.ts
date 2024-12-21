@@ -2,7 +2,7 @@ import { Component, EventEmitter, Inject, inject, Input, Output, signal } from '
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import { Repository } from 'app/models/models';
+import { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 
 @Component({
@@ -13,10 +13,10 @@ import { RepositoryService } from '../services/repository.service';
   styleUrl: './change-visibility-popup.component.css'
 })
 export class ChangeVisibilityPopupComponent {
-  repository: Repository;
+  repository: DockerRepositoryDTO;
 
   // Inject MAT_DIALOG_DATA and MatDialogRef
-  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: Repository }, 
+  constructor(@Inject(MAT_DIALOG_DATA) private data: { repository: DockerRepositoryDTO }, 
   private dialogRef: MatDialogRef<ChangeVisibilityPopupComponent>,
   private readonly repositoryService: RepositoryService) {
     // Extract the repository from the data
@@ -32,7 +32,7 @@ export class ChangeVisibilityPopupComponent {
         repositoryId: this.repository.id,
         isPublic: !this.repository.isPublic
       }).subscribe({
-        next: (response: Repository) => {
+        next: (response: DockerRepositoryDTO) => {
           this.repository.isPublic = response.isPublic
           console.log('Visibility changed:', response);
           this.dialogRef.close();
