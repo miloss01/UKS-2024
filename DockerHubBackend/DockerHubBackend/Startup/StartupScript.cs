@@ -98,7 +98,8 @@ namespace DockerHubBackend.Startup
                     Username = "SuperAdmin",
                     Email = _superAdminEmail,
                     Password = passwordHash,
-                    IsVerified = false
+                    IsVerified = false,
+                    Badge = Badge.DockerOfficialImage
                 };
                 dbContext.Users.Add(superAdmin);
                 dbContext.SaveChanges();

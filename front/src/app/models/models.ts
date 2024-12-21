@@ -88,3 +88,13 @@ export interface DockerRepositoryDTO {
   owner: string;
   createdAt: string;
 }
+
+export interface MinifiedStandardUserDTO {
+  id: string;
+  username: string;
+  badge: string;
+}
+
+export interface NewBadgeDTO {
+  badge: string;
+}

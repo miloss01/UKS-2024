@@ -1,4 +1,7 @@
 ﻿using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Exceptions;
+using DockerHubBackend.Models;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +32,46 @@ namespace DockerHubBackend.Controllers
         {
             var response = await _userService.RegisterStandardUser(changePasswordDto);
             return Ok(response);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetAllStandardUsers()
+        {
+            var standardUsers = _userService.GetAllStandardUsers();
+            var standardUsersDtos = standardUsers.Select(standardUser => new MinifiedStandardUserDTO
+            {
+                Id = standardUser.Id.ToString(),
+                Username = standardUser.Username,
+                Badge = standardUser.Badge.ToString()
+            });
+
+            return Ok(standardUsersDtos);
+        }
+
+        [HttpPatch("{id}/badge/change")]
+        [AllowAnonymous]
+        public IActionResult ChangeUserBadge(string id, [FromBody] NewBadgeDTO newBadge)
+        {
+            var parsedId = Guid.TryParse(id, out var userId);
+
+            if (!parsedId)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            if (Enum.TryParse(typeof(Badge), newBadge.Badge, ignoreCase: true, out var parsedBadge))
+            {
+                var badge = (Badge)parsedBadge;
+                _userService.ChangeUserBadge(badge, userId);
+            }
+            else
+            {
+                throw new BadRequestException("Badge not found. Bad badge variant.");
+            }
+
+
+            return NoContent();
         }
     }
 

@@ -10,17 +10,23 @@ import { ListOrganizationsComponent } from './modules/organization/list-organiza
 import { DetailsComponent } from './modules/organization/details/details.component';
 import { TeamsComponent } from './modules/layout/teams/all-teams/teams.component';
 import { TeamDetailsComponent } from './modules/layout/teams/team-details/team-details.component';
+import { PreventAuthGuard } from './security/prevent-auth.guard';
+import { AuthGuard } from './security/auth.guard';
+import { UserRole } from './models/models';
+import { RoleGuard } from './security/role.guard';
+import { UserBadgesComponent } from './modules/layout/user-badges/user-badges.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginPageComponent },
-  { path: 'home', component: HomePageComponent },
+  { path: 'login', component: LoginPageComponent, canActivate: [PreventAuthGuard] },
+  { path: 'home', component: HomePageComponent, canActivate: [AuthGuard] },
   { path: 'password/change', component: ChangePasswordPageComponent },
   { path: 'explore', component: ExplorePageComponent },
   { path: 'explore/repository/:id', component: PublicRepositoryOverviewComponent },
-  { path: 'sign-up', component: RegisterPageComponent },
-  { path: 'organizations', component: ListOrganizationsComponent },
-  { path: 'org-details/:id', component: DetailsComponent },
-  { path: 'teams', component: TeamsComponent },
-  { path: 'team-details/:id', component: TeamDetailsComponent },
+  { path: 'sign-up', component: RegisterPageComponent, canActivate: [PreventAuthGuard] },
+  { path: 'organizations', component: ListOrganizationsComponent, canActivate: [AuthGuard] },
+  { path: 'org-details/:id', component: DetailsComponent, canActivate: [AuthGuard] },
+  { path: 'teams', component: TeamsComponent, canActivate: [AuthGuard] },
+  { path: 'team-details/:id', component: TeamDetailsComponent, canActivate: [AuthGuard] },
+  { path: 'badges', component: UserBadgesComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
   { path: '**', component: LandingPageComponent }
 ];

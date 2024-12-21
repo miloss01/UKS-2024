@@ -51,11 +51,22 @@ namespace DockerHubBackend.Services.Implementation
                 Email = registerUserDto.Email,
                 Username = registerUserDto.Username,
                 Password = hashedPassword,
-                Location = registerUserDto.Location
+                Location = registerUserDto.Location,
+                Badge = Badge.NoBadge
             };
             StandardUser savedUser = (StandardUser) await _userRepository.Create(user);
 
             return new StandardUserDto(savedUser);
+        }
+
+        public List<StandardUser> GetAllStandardUsers()
+        {
+            return _userRepository.GetAllStandardUsers();
+        }
+
+        public void ChangeUserBadge(Badge badge, Guid userId)
+        {
+            _userRepository.ChangeUserBadge(badge, userId);
         }
     }
 }
