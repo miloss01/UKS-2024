@@ -10,6 +10,8 @@ namespace DockerHubBackend.Repository.Interface
 
         Task<List<DockerRepository>?> GetRepositoriesByUserOwnerId(Guid id);
 
+        Task<List<DockerRepository>?> GetRepositoriesByOrganizationOwnerId(Guid id);
+
 		public DockerRepository GetFullDockerRepositoryById(Guid id);
     }
 }

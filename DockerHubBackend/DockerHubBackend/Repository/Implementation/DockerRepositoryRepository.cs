@@ -33,5 +33,12 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(dockerRepository => dockerRepository.Images)
                 .FirstOrDefault(dockerRepository => dockerRepository.Id == id);
         }
-    }
+
+		public async Task<List<DockerRepository>?> GetRepositoriesByOrganizationOwnerId(Guid id)
+		{
+			return await _context.DockerRepositories
+								 .Where(repo => repo.OrganizationOwnerId == id)
+								 .ToListAsync();
+		}
+	}
 }

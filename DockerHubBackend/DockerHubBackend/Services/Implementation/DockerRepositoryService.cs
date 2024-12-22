@@ -1,5 +1,6 @@
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
@@ -157,15 +158,42 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<List<DockerRepositoryDTO>> GetRepositoriesByUserId(Guid id)
 		{
+			var user = await _userRepository.GetUserById(id);
+			if (user == null)
+				throw new NotFoundException($"User with id {id.ToString()} not found.");
+
+			List<DockerRepositoryDTO> responce = new List<DockerRepositoryDTO>();
+
 			var repositories = await _dockerRepositoryRepository.GetRepositoriesByUserOwnerId(id);
 
-			if (repositories == null)
-				return new List<DockerRepositoryDTO> { };
+			if (repositories != null)
+				responce = repositories.Select(repo => new DockerRepositoryDTO(repo)).ToList();
 
-			return repositories.Select(repo => new DockerRepositoryDTO(repo)).ToList();
+
+			var organizations = await _organizationRepository.GetUserOrganizations(user.Email);
+			if (organizations != null)
+				await AddOrganizationRepositories(responce, organizations);
+
+			return responce;
 		}
 
+		private async Task AddOrganizationRepositories(List<DockerRepositoryDTO> responce, List<OrganizationOwnershipDto> organizations)
+		{
+			foreach (var organization in organizations)
+			{
+				var repositories = await _dockerRepositoryRepository.GetRepositoriesByOrganizationOwnerId(organization.Id);
+				if (repositories != null)
+				{
+					foreach (var repo in repositories)
+					{
+						var repoDto = new DockerRepositoryDTO(repo);
+						repoDto.Owner = organization.Name;
+						responce.Add(repoDto);
+					}
+				}
 
+			}
 
+		}
 	}
 }
