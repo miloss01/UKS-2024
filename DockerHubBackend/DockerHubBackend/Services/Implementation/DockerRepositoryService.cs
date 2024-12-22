@@ -24,7 +24,7 @@ namespace DockerHubBackend.Services.Implementation
 			_organizationRepository = organizationRepository;
         }
 
-		private async Task<DockerRepository?> getRepository(Guid id)
+		public async Task<DockerRepository?> getRepository(Guid id)
 		{
 			var repository = await _dockerRepositoryRepository.GetDockerRepositoryById(id);
 			if (repository == null)
@@ -75,12 +75,14 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<StandardUser?> getUser(string id)
 		{
+			// Check the correctnes of id
 			var parsed = Guid.TryParse(id, out var userId);
-
 			if (!parsed)
 			{
 				return null;
 			}
+
+			// Convert the user to standard user
 			try
 			{
 				var user = await _userRepository.GetUserById(userId);
@@ -95,12 +97,13 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<Organization?> getOrganization(string id)
 		{
+			// Check the correctnes of id
 			var parsed = Guid.TryParse(id, out var orgId);
-
 			if (!parsed)
 			{
 				return null;
 			}
+
 			return await _organizationRepository.GetOrganizationById(orgId);
 		}
 
@@ -158,18 +161,19 @@ namespace DockerHubBackend.Services.Implementation
 
 		public async Task<List<DockerRepositoryDTO>> GetRepositoriesByUserId(Guid id)
 		{
+			// get user
 			var user = await _userRepository.GetUserById(id);
 			if (user == null)
 				throw new NotFoundException($"User with id {id.ToString()} not found.");
 
 			List<DockerRepositoryDTO> responce = new List<DockerRepositoryDTO>();
 
+			// get direct user repos
 			var repositories = await _dockerRepositoryRepository.GetRepositoriesByUserOwnerId(id);
-
 			if (repositories != null)
 				responce = repositories.Select(repo => new DockerRepositoryDTO(repo)).ToList();
 
-
+			// get repos for each organization he is in
 			var organizations = await _organizationRepository.GetUserOrganizations(user.Email);
 			if (organizations != null)
 				await AddOrganizationRepositories(responce, organizations);
