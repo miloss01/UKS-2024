@@ -37,30 +37,7 @@ namespace DockerHubBackend.Controllers
 
             var dockerRepository = _dockerRepositoryService.GetDockerRepositoryById(repositoryId);
 
-            var dockerRepositoryDto = new DockerRepositoryDTO
-            {
-                Id = dockerRepository.Id.ToString(),
-                Name = dockerRepository.Name,
-                Description = dockerRepository.Description,
-                Badge = dockerRepository.Badge.ToString(),
-                CreatedAt = dockerRepository.CreatedAt.ToString(),
-                IsPublic = dockerRepository.IsPublic,
-                StarCount = dockerRepository.StarCount,
-                Owner = dockerRepository.OrganizationOwner == null ? dockerRepository.UserOwner.Email : dockerRepository.OrganizationOwner.Name,
-                Images = dockerRepository.Images.Select(img => new DockerImageDTO
-                {
-                    RepositoryName = img.Repository.Name,
-                    RepositoryId = img.Repository.Id.ToString(),
-                    Badge = img.Repository.Badge.ToString(),
-                    Description = img.Repository.Description,
-                    CreatedAt = img.CreatedAt.ToString(),
-                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
-                    ImageId = img.Id.ToString(),
-                    StarCount = img.Repository.StarCount,
-                    Tags = img.Tags,
-                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
-                }).ToList()
-            };
+            var dockerRepositoryDto = new DockerRepositoryDTO(dockerRepository);
 
             return Ok(dockerRepositoryDto);
         }
@@ -77,30 +54,7 @@ namespace DockerHubBackend.Controllers
             }
 
             var starRepositories = _dockerRepositoryService.GetStarRepositoriesForUser(userId);
-            var starRepositoriesDto = starRepositories.Select(starRepository => new DockerRepositoryDTO
-            {
-                Id = starRepository.Id.ToString(),
-                Name = starRepository.Name,
-                Description = starRepository.Description,
-                Badge = starRepository.Badge.ToString(),
-                CreatedAt = starRepository.CreatedAt.ToString(),
-                IsPublic = starRepository.IsPublic,
-                StarCount = starRepository.StarCount,
-                Owner = starRepository.OrganizationOwner == null ? starRepository.UserOwner.Email : starRepository.OrganizationOwner.Name,
-                Images = starRepository.Images.Select(img => new DockerImageDTO
-                {
-                    RepositoryName = img.Repository.Name,
-                    RepositoryId = img.Repository.Id.ToString(),
-                    Badge = img.Repository.Badge.ToString(),
-                    Description = img.Repository.Description,
-                    CreatedAt = img.CreatedAt.ToString(),
-                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
-                    ImageId = img.Id.ToString(),
-                    StarCount = img.Repository.StarCount,
-                    Tags = img.Tags,
-                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
-                }).ToList()
-            });
+            var starRepositoriesDto = starRepositories.Select(starRepository => new DockerRepositoryDTO(starRepository));
 
             return Ok(starRepositoriesDto);
         }
@@ -117,30 +71,7 @@ namespace DockerHubBackend.Controllers
             }
 
             var privateRepositories = _dockerRepositoryService.GetPrivateRepositoriesForUser(userId);
-            var privateRepositoriesDto = privateRepositories.Select(privateRepository => new DockerRepositoryDTO
-            {
-                Id = privateRepository.Id.ToString(),
-                Name = privateRepository.Name,
-                Description = privateRepository.Description,
-                Badge = privateRepository.Badge.ToString(),
-                CreatedAt = privateRepository.CreatedAt.ToString(),
-                IsPublic = privateRepository.IsPublic,
-                StarCount = privateRepository.StarCount,
-                Owner = privateRepository.OrganizationOwner == null ? privateRepository.UserOwner.Email : privateRepository.OrganizationOwner.Name,
-                Images = privateRepository.Images.Select(img => new DockerImageDTO
-                {
-                    RepositoryName = img.Repository.Name,
-                    RepositoryId = img.Repository.Id.ToString(),
-                    Badge = img.Repository.Badge.ToString(),
-                    Description = img.Repository.Description,
-                    CreatedAt = img.CreatedAt.ToString(),
-                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
-                    ImageId = img.Id.ToString(),
-                    StarCount = img.Repository.StarCount,
-                    Tags = img.Tags,
-                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
-                }).ToList()
-            });
+            var privateRepositoriesDto = privateRepositories.Select(privateRepository => new DockerRepositoryDTO(privateRepository));
 
             return Ok(privateRepositoriesDto);
         }
