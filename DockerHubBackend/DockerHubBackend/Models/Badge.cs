@@ -2,6 +2,6 @@
 {
     public enum Badge
     {
-        DockerOfficialImage, VefifiedPublisher, SponsoredOSS
+        NoBadge, DockerOfficialImage, VerifiedPublisher, SponsoredOSS
     }
 }

@@ -1,3 +1,40 @@
-<button mat-raised-button color="primary" class="create-btn" [routerLink]="['/organizations']">My Organizations</button>
-<button mat-raised-button color="primary" class="create-btn" [routerLink]="['/all-user-repo']">My Repositories</button>
+<h2 class="header" *ngIf="userRole == 'StandardUser'">Star repositories</h2>
+<div class="image-list" *ngIf="userRole == 'StandardUser'">
+    <div *ngFor="let repository of starRepositories">
+        <div *ngFor="let image of repository.images" class="image-item">
+        <div class="image-header">
+            <div class="repo-name" [routerLink]="['/explore/repository', image.repositoryId]">{{ image.repositoryName }}<span class="image-id">#{{ image.imageId }}</span>
+            </div>
+            <div class="badge" [ngClass]="image.badge">{{ image.badge }}</div>
+        </div>
+        <div class="image-description">{{ image.description }}</div>
+        <div class="image-tags">
+            <span *ngFor="let tag of image.tags" class="tag">{{ tag }}</span>
+        </div>
+        <div class="image-footer">
+            <span class="star-count">{{ image.starCount }} stars</span>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <h2 class="header">Private repositories</h2>
+  <div class="image-list">
+      <div *ngFor="let repository of privateRepositories">
+          <div *ngFor="let image of repository.images" class="image-item">
+          <div class="image-header">
+              <div class="repo-name" [routerLink]="['/explore/repository', image.repositoryId]">{{ image.repositoryName }}<span class="image-id">#{{ image.imageId }}</span>
+              </div>
+              <div class="badge" [ngClass]="image.badge">{{ image.badge }}</div>
+          </div>
+          <div class="image-description">{{ image.description }}</div>
+          <div class="image-tags">
+              <span *ngFor="let tag of image.tags" class="tag">{{ tag }}</span>
+          </div>
+          <div class="image-footer">
+              <span class="star-count">{{ image.starCount }} stars</span>
+          </div>
+          </div>
+      </div>
+    </div>
 

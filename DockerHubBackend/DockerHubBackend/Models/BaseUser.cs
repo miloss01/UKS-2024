@@ -10,5 +10,6 @@ namespace DockerHubBackend.Models
         public VerificationToken? VerificationToken { get; set; }
         public required string Username { get; set; }
         public string? Location { get; set; }
+        public Badge Badge { get; set; }
     }
 }

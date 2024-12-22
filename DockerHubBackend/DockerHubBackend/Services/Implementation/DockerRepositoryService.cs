@@ -121,7 +121,7 @@ namespace DockerHubBackend.Services.Implementation
 				Description = createRepositoryDto.Description,
 				IsPublic = createRepositoryDto.IsPublic,
 				StarCount = 0,
-				Badge = Badge.VefifiedPublisher,
+				Badge = Badge.NoBadge,
 				Images = new HashSet<DockerImage>(),
 				Teams = new HashSet<Team>(),
 				UserOwner = userOwner,
@@ -195,5 +195,34 @@ namespace DockerHubBackend.Services.Implementation
 			}
 
 		}
-	}
+        public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetStarRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetPrivateRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetOrganizationRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetOrganizationRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetAllRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetAllRepositoriesForUser(userId);
+        }
+
+        public void AddStarRepository(Guid userId, Guid repositoryId)
+        {
+            _dockerRepositoryRepository.AddStarRepository(userId, repositoryId);
+        }
+
+        public void RemoveStarRepository(Guid userId, Guid repositoryId)
+        {
+            _dockerRepositoryRepository.RemoveStarRepository(userId, repositoryId);
+        }
+    }
 }

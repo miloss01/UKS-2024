@@ -95,3 +95,13 @@ export interface DockerRepositoryDTO extends RepositoryCreation {
   createdAt: string;
   lastPushed?: string
 }
+
+export interface MinifiedStandardUserDTO {
+  id: string;
+  username: string;
+  badge: string;
+}
+
+export interface NewBadgeDTO {
+  badge: string;
+}

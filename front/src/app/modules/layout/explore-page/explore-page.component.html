@@ -51,6 +51,24 @@
         </div>
         <div class="image-footer">
           <span class="star-count">{{ image.starCount }} stars</span>
+          <button 
+            class="star-btn" 
+            *ngIf="!notAllowedToStarRepositories.includes(image.repositoryId) && 
+                   starredRepositoriesIds.includes(image.repositoryId) &&
+                   showStarButton()" 
+            (click)="removeStarRepository(image.repositoryId)"
+          >
+            ★
+          </button>
+          <button 
+            class="star-btn" 
+            *ngIf="!notAllowedToStarRepositories.includes(image.repositoryId) && 
+                   !starredRepositoriesIds.includes(image.repositoryId) &&
+                   showStarButton()" 
+            (click)="starRepository(image.repositoryId)"
+          >
+            ☆
+          </button>
         </div>
       </div>
     </div>

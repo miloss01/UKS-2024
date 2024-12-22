@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { DockerImageDTO, PageDTO } from 'app/models/models';
+import { DockerImageDTO, DockerRepositoryDTO, PageDTO } from 'app/models/models';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DockerImageService } from 'app/services/docker-image.service';
 import { RouterModule } from '@angular/router';
+import { RepositoryService } from 'app/services/repository.service';
+import { AuthService } from 'app/services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface BadgeHelper {
   name: string;
@@ -26,8 +29,9 @@ interface BadgeHelper {
 export class ExplorePageComponent implements OnInit {
   dockerImages: DockerImageDTO[] = [];
   badges: BadgeHelper[] = [
+    { name: 'NoBadge', selected: false },
     { name: 'DockerOfficialImage', selected: false },
-    { name: 'VefifiedPublisher', selected: false },
+    { name: 'VerifiedPublisher', selected: false },
     { name: 'SponsoredOSS', selected: false },
   ];
   totalNumberOfElements: number = 0;
@@ -39,10 +43,84 @@ export class ExplorePageComponent implements OnInit {
   oldSearchTerm: string = this.searchTerm;
   oldBadges: BadgeHelper[] = [];
 
-  constructor(private dockerImageService: DockerImageService) {}
+  notAllowedToStarRepositories: string[] = [];
+  starredRepositoriesIds: string[] = [];
+  userId: string = "";
+  userRole: string = "";
+
+  constructor(private dockerImageService: DockerImageService, 
+              private dockerRepositoryService: RepositoryService,
+              private authService: AuthService,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
+    if (this.authService.userData.value) {
+      this.userId = this.authService.userData.value.userId;
+      this.userRole = this.authService.userData.value.userRole;
+    }
+    
+    if (this.showStarButton()) {
+      this.getNotAllowedRepositoriesToStar();
+      this.getStarredRepositories();
+    }
+
     this.applyFilters();
+  }
+
+  showStarButton(): boolean {
+    return this.userId != "" && this.userRole == "StandardUser";
+  }
+
+  getNotAllowedRepositoriesToStar(): void {
+    this.dockerRepositoryService.getNotAllowedToStarRepositoriesForUser(this.userId).subscribe({
+      next: (res: string[]) => {
+        this.notAllowedToStarRepositories = res;
+        console.log(this.notAllowedToStarRepositories);
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  getStarredRepositories(): void {
+    this.dockerRepositoryService.getStarDockerRepositoriesForUser(this.userId).subscribe({
+      next: (res: DockerRepositoryDTO[]) => {
+        this.starredRepositoriesIds = res.map((repository: DockerRepositoryDTO) => repository.id);
+        console.log(this.starredRepositoriesIds);
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  starRepository(repositoryId: string): void {
+    this.dockerRepositoryService.starRepository(this.userId, repositoryId).subscribe({
+      next: () => {
+        this.snackBar.open('Successfully starred repository.', 'Close', { duration: 3000 });
+        this.getNotAllowedRepositoriesToStar();
+        this.getStarredRepositories();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  removeStarRepository(repositoryId: string): void {
+    this.dockerRepositoryService.removeStarRepository(this.userId, repositoryId).subscribe({
+      next: () => {
+        this.snackBar.open('Successfully removed starred repository.', 'Close', { duration: 3000 });
+        this.getNotAllowedRepositoriesToStar();
+        this.getStarredRepositories();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
   }
 
   applyFilters(): void {
@@ -83,6 +161,7 @@ export class ExplorePageComponent implements OnInit {
         this.dockerImages = res.data;
         this.totalNumberOfElements = res.totalNumberOfElements;
         this.totalNumberOfPages = Math.ceil(this.totalNumberOfElements / this.pageSize);
+        this.page = this.totalNumberOfElements != 0 ? this.page : 0
       },
       error: (err: any) => {
         console.log(err);
