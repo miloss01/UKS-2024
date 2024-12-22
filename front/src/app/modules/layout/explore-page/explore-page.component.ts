@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DockerImageDTO, PageDTO } from 'app/models/models';
+import { DockerImageDTO, DockerRepositoryDTO, PageDTO } from 'app/models/models';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -44,6 +44,7 @@ export class ExplorePageComponent implements OnInit {
   oldBadges: BadgeHelper[] = [];
 
   notAllowedToStarRepositories: string[] = [];
+  starredRepositoriesIds: string[] = [];
   userId: string = "";
   userRole: string = "";
 
@@ -58,8 +59,10 @@ export class ExplorePageComponent implements OnInit {
       this.userRole = this.authService.userData.value.userRole;
     }
     
-    if (this.showStarButton())
+    if (this.showStarButton()) {
       this.getNotAllowedRepositoriesToStar();
+      this.getStarredRepositories();
+    }
 
     this.applyFilters();
   }
@@ -72,6 +75,19 @@ export class ExplorePageComponent implements OnInit {
     this.dockerRepositoryService.getNotAllowedToStarRepositoriesForUser(this.userId).subscribe({
       next: (res: string[]) => {
         this.notAllowedToStarRepositories = res;
+        console.log(this.notAllowedToStarRepositories);
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  getStarredRepositories(): void {
+    this.dockerRepositoryService.getStarDockerRepositoriesForUser(this.userId).subscribe({
+      next: (res: DockerRepositoryDTO[]) => {
+        this.starredRepositoriesIds = res.map((repository: DockerRepositoryDTO) => repository.id);
+        console.log(this.starredRepositoriesIds);
       },
       error: (err: any) => {
         console.log(err);
@@ -84,6 +100,21 @@ export class ExplorePageComponent implements OnInit {
       next: () => {
         this.snackBar.open('Successfully starred repository.', 'Close', { duration: 3000 });
         this.getNotAllowedRepositoriesToStar();
+        this.getStarredRepositories();
+        this.applyFilters();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+  }
+
+  removeStarRepository(repositoryId: string): void {
+    this.dockerRepositoryService.removeStarRepository(this.userId, repositoryId).subscribe({
+      next: () => {
+        this.snackBar.open('Successfully removed starred repository.', 'Close', { duration: 3000 });
+        this.getNotAllowedRepositoriesToStar();
+        this.getStarredRepositories();
         this.applyFilters();
       },
       error: (err: any) => {

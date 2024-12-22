@@ -27,6 +27,10 @@ export class RepositoryService {
     return this.http.patch<void>(`${environment.apiHost}dockerRepositories/star/${userId}/${repositoryId}`, {});
   }
 
+  removeStarRepository(userId: string, repositoryId: string) : Observable<void> {
+    return this.http.patch<void>(`${environment.apiHost}dockerRepositories/star/remove/${userId}/${repositoryId}`, {});
+  }
+
   getNotAllowedToStarRepositoriesForUser(userId: string) : Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiHost}dockerRepositories/star/notallowed/${userId}`);
   }

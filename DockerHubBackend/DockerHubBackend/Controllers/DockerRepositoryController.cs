@@ -99,6 +99,29 @@ namespace DockerHubBackend.Controllers
             return NoContent();
         }
 
+        [HttpPatch("star/remove/{userId}/{repositoryId}")]
+        [AllowAnonymous]
+        public IActionResult RemoveStarRepository(string userId, string repositoryId)
+        {
+            var parsed = Guid.TryParse(userId, out var userGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            parsed = Guid.TryParse(repositoryId, out var repositoryGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("Repository not found. Bad repository id.");
+            }
+
+            _dockerRepositoryService.RemoveStarRepository(userGuid, repositoryGuid);
+
+            return NoContent();
+        }
+
         [HttpGet("star/notallowed/{id}")]
         [AllowAnonymous]
         public IActionResult GetNotAllowedRepositoriesToStarForUser(string id)
@@ -110,12 +133,10 @@ namespace DockerHubBackend.Controllers
                 throw new NotFoundException("User not found. Bad user id.");
             }
 
-            var starRepositories = _dockerRepositoryService.GetStarRepositoriesForUser(userId);
             var myRepositories = _dockerRepositoryService.GetAllRepositoriesForUser(userId);
             var organizationRepositories = _dockerRepositoryService.GetOrganizationRepositoriesForUser(userId);
             
-            var allGuids = starRepositories
-                .Concat(myRepositories)
+            var allGuids = myRepositories
                 .Concat(organizationRepositories)
                 .Select(repository => repository.Id.ToString());
 

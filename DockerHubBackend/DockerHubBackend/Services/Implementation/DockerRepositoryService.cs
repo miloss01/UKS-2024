@@ -54,5 +54,10 @@ namespace DockerHubBackend.Services.Implementation
         {
             _dockerRepositoryRepository.AddStarRepository(userId, repositoryId);
         }
+
+        public void RemoveStarRepository(Guid userId, Guid repositoryId)
+        {
+            _dockerRepositoryRepository.RemoveStarRepository(userId, repositoryId);
+        }
     }
 }

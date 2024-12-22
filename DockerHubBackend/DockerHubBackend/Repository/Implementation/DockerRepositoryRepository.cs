@@ -84,5 +84,17 @@ namespace DockerHubBackend.Repository.Implementation
             repository.StarCount += 1;
             _context.SaveChanges();
         }
+
+        public void RemoveStarRepository(Guid userId, Guid repositoryId)
+        {
+            var user = _context.Users
+                .OfType<StandardUser>()
+                .Include(user => user.StarredRepositories)
+                .FirstOrDefault(user => user.Id == userId);
+            var repository = _context.DockerRepositories.Find(repositoryId);
+            user.StarredRepositories.Remove(repository);
+            repository.StarCount -= 1;
+            _context.SaveChanges();
+        }
     }
 }

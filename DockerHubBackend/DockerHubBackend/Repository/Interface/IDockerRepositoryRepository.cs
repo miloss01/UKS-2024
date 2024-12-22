@@ -12,5 +12,6 @@ namespace DockerHubBackend.Repository.Interface
         public List<DockerRepository> GetOrganizationRepositoriesForUser(Guid userId);
         public List<DockerRepository> GetAllRepositoriesForUser(Guid userId);
         public void AddStarRepository(Guid userId, Guid repositoryId);
+        public void RemoveStarRepository(Guid userId, Guid repositoryId);
     }
 }
