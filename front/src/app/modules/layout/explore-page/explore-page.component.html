@@ -1,0 +1,76 @@
+<div class="docker-explore-container">
+  <!-- Leva strana: Search i filteri -->
+  <div class="filters">
+    <div class="search-box">
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search repositories..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="badge-filters">
+      <div *ngFor="let badge of badges">
+        <mat-checkbox [(ngModel)]="badge.selected">
+          {{ badge.name }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" (click)="applyFilters()">Apply Filters</button>
+  </div>
+
+  <!-- Desna strana: Lista slika -->
+  <div class="image-list-container">
+    <div class="pagination-container">
+        <button mat-raised-button color="primary" class="pag-btn" (click)="onPageChange(-1)">Previous</button>
+        <label class="page-counter-label">{{ page }} of {{ totalNumberOfPages }}</label>
+        <button mat-raised-button color="primary" class="pag-btn" (click)="onPageChange(1)">Next</button>
+
+        <label class="page-size-label">Page Size:</label>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+          <option [value]="2">2</option>
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+        </select>
+    </div>
+
+    <div class="image-list">
+      <div *ngFor="let image of dockerImages" class="image-item">
+        <div class="image-header">
+          <div class="repo-name" [routerLink]="['/explore/repository', image.repositoryId]">{{ image.repositoryName }}<span class="image-id">#{{ image.imageId }}</span>
+          </div>
+          <div class="badge" [ngClass]="image.badge">{{ image.badge }}</div>
+        </div>
+        <div class="image-description">{{ image.description }}</div>
+        <div class="image-tags">
+          <span *ngFor="let tag of image.tags" class="tag">{{ tag }}</span>
+        </div>
+        <div class="image-footer">
+          <span class="star-count">{{ image.starCount }} stars</span>
+          <button 
+            class="star-btn" 
+            *ngIf="!notAllowedToStarRepositories.includes(image.repositoryId) && 
+                   starredRepositoriesIds.includes(image.repositoryId) &&
+                   showStarButton()" 
+            (click)="removeStarRepository(image.repositoryId)"
+          >
+            ★
+          </button>
+          <button 
+            class="star-btn" 
+            *ngIf="!notAllowedToStarRepositories.includes(image.repositoryId) && 
+                   !starredRepositoriesIds.includes(image.repositoryId) &&
+                   showStarButton()" 
+            (click)="starRepository(image.repositoryId)"
+          >
+            ☆
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
