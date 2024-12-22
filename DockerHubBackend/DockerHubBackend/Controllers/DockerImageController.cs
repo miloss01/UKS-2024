@@ -1,7 +1,9 @@
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Exceptions;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
+using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -46,5 +48,30 @@ namespace DockerHubBackend.Controllers
 
             return Ok(pageDTO);
         }
-    }
+
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteImageById(string id)
+		{
+			var parsed = Guid.TryParse(id, out var repositoryId);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Image not found. Bad image id.");
+			}
+
+			try
+			{
+				await _dockerImageService.DeleteDockerImage(repositoryId);
+				return Ok(new { message = "Image deleted successfully." });
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { error = ex.Message });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { error = ex.Message });
+			}
+		}
+	}
 }

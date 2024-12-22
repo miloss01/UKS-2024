@@ -6,6 +6,12 @@ namespace DockerHubBackend.Repository.Interface
 {
     public interface IDockerRepositoryRepository : ICrudRepository<DockerRepository>
     {
+        Task<DockerRepository?> GetDockerRepositoryById(Guid id);
+
+        Task<List<DockerRepository>?> GetRepositoriesByUserOwnerId(Guid id);
+
+        Task<List<DockerRepository>?> GetRepositoriesByOrganizationOwnerId(Guid id);
+
         public DockerRepository GetFullDockerRepositoryById(Guid id);
         public List<DockerRepository> GetStarRepositoriesForUser(Guid userId);
         public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId);

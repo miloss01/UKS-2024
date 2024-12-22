@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 import { LandingPageComponent } from './modules/layout/landing-page/landing-page.component';
+import { CreateRepositoryComponent } from './modules/repository/create-repository/create-repository.component';
 import {LoginPageComponent} from "./modules/layout/login-page/login-page.component";
 import {HomePageComponent} from "./modules/layout/home-page/home-page.component";
+import { SingeRepositoryComponent } from './modules/repository/singe-repository/singe-repository.component';
+import { AllRepositoriesComponent } from './modules/repository/all-repositories/all-repositories.component';
 import {ChangePasswordPageComponent} from "./modules/layout/change-password-page/change-password-page.component";
 import {ExplorePageComponent} from "./modules/layout/explore-page/explore-page.component";
 import { PublicRepositoryOverviewComponent } from './modules/layout/public-repository-overview/public-repository-overview.component';
@@ -17,6 +20,9 @@ import { RoleGuard } from './security/role.guard';
 import { UserBadgesComponent } from './modules/layout/user-badges/user-badges.component';
 
 export const routes: Routes = [
+  { path: 'all-user-repo', component: AllRepositoriesComponent, canActivate: [AuthGuard] },
+  { path: 'single-repo/:id', component: SingeRepositoryComponent, canActivate: [AuthGuard] },
+  { path: 'create-repo', component: CreateRepositoryComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginPageComponent, canActivate: [PreventAuthGuard] },
   { path: 'home', component: HomePageComponent, canActivate: [AuthGuard] },
   { path: 'password/change', component: ChangePasswordPageComponent },

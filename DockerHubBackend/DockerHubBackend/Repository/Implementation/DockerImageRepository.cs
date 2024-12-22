@@ -50,5 +50,10 @@ namespace DockerHubBackend.Repository.Implementation
 
             return pageDto;
         }
-    }
+
+		public async Task<DockerImage?> GetDockerImageById(Guid id)
+		{
+			return await _context.DockerImages.FirstOrDefaultAsync(repo => repo.Id == id);
+		}
+	}
 }

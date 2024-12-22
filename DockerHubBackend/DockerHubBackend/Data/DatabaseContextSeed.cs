@@ -37,7 +37,7 @@ namespace DockerHubBackend.Data
                 await context.SaveChangesAsync();
             }
 
-            if (!context.Teams.Any()) 
+            /*if (!context.Teams.Any()) 
             {
                 HashSet<StandardUser> members = new HashSet<StandardUser>();
                 members.Add((StandardUser)context.Users.OrderBy(u => u.Id).Last());
@@ -60,7 +60,7 @@ namespace DockerHubBackend.Data
                 );
 
                 await context.SaveChangesAsync();
-            }
+            }*/
 
             if (!context.DockerRepositories.Any())
             {

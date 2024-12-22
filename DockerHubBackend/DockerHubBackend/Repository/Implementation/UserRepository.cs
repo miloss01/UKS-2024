@@ -30,6 +30,11 @@ namespace DockerHubBackend.Repository.Implementation
             return await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
         }
 
+        public async Task<BaseUser?> GetUserById(Guid id) 
+        {
+            return await _context.Users.FindAsync(id);
+
+		}
         public List<StandardUser> GetAllStandardUsers()
         {
             return _context.Users

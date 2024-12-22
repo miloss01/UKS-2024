@@ -3,6 +3,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { DockerImageDTO } from 'app/models/models';
+import { DockerImageService } from 'app/services/docker-image.service';
 
 @Component({
   selector: 'app-images-list',
@@ -19,12 +20,17 @@ export class ImagesListComponent implements OnChanges {
 
   @Input() images: DockerImageDTO[] = [];
 
+  @Input() forDeleting: boolean = false;
+
   filteredImages = [...this.images];
+  selectedImage: DockerImageDTO | null= null;
   sortOption = 'newest';
   filterTag = '';
   page = 0;
   pageSize = 5;
   totalNumberOfPages = 0;
+
+  constructor(private readonly dockerImageService: DockerImageService){}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['images']) {
@@ -90,5 +96,29 @@ export class ImagesListComponent implements OnChanges {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text);
+  }
+
+  selectImage(image: any) {
+    this.selectedImage = image;
+  }
+
+  DeleteTag(): void {
+    if (this.selectedImage) {
+      console.log('Selected Image:', this.selectedImage);
+      this.dockerImageService.deleteDockerImage(this.selectedImage.imageId).subscribe({
+          next: (response: void) => {
+            console.log('Deleted:', response);
+            this.filteredImages = this.filteredImages.filter(
+              image => image.imageId !== this.selectedImage?.imageId
+            );
+        
+            // Optionally clear the selection
+            this.selectedImage = null;
+          },
+          error: (error) => {
+            console.error('Error creating repository:', error);
+          }
+        });     
+      }
   }
 }

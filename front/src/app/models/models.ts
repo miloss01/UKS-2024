@@ -1,7 +1,17 @@
 export default interface RepositoryCreation {
-  id: string,
-  name: string,
-  description: string,
+    name:string
+    owner:string
+    description:string
+    isPublic: boolean
+}
+
+export interface DescriptionRequest {
+  repositoryId: string,
+  newDescription: string
+}
+
+export interface VisibilityRequest {
+  repositoryId: string,
   isPublic: boolean
 }
 
@@ -77,16 +87,13 @@ export interface PageDTO<T> {
   totalNumberOfElements: number;
 }
 
-export interface DockerRepositoryDTO {
+export interface DockerRepositoryDTO extends RepositoryCreation {
   id: string;
-  name: string;
-  description: string;
-  isPublic: boolean;
   starCount: number;
   badge: string;
   images: DockerImageDTO[];
-  owner: string;
   createdAt: string;
+  lastPushed?: string
 }
 
 export interface MinifiedStandardUserDTO {
