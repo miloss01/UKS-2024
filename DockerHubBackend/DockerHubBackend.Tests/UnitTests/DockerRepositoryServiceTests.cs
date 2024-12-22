@@ -16,13 +16,16 @@ namespace DockerHubBackend.Tests.UnitTests
     {
         private readonly Mock<IDockerRepositoryRepository> _mockDockerRepositoryRepository;
         private readonly Mock<IUserRepository> _mockUserRepository;
-        private readonly DockerRepositoryService _service;
+        private readonly Mock<IOrganizationRepository> _mockOrganizationRepository;
+
+		private readonly DockerRepositoryService _service;
 
         public DockerRepositoryServiceTests()
         {
             _mockDockerRepositoryRepository = new Mock<IDockerRepositoryRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
-			_service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object);
+            _mockOrganizationRepository = new Mock<IOrganizationRepository>();
+			_service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object, _mockOrganizationRepository.Object);
         }
 
         [Fact]

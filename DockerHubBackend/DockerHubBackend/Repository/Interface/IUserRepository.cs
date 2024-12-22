@@ -8,5 +8,6 @@ namespace DockerHubBackend.Repository.Interface
         Task<BaseUser?> GetUserByEmail(string email);
         Task<BaseUser?> GetUserByUsername(string username);
         Task<BaseUser?> GetUserWithTokenByEmail(string email);
-    }
+        Task<BaseUser?> GetUserById(Guid id);
+	}
 }

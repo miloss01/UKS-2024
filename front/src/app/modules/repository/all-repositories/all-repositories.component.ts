@@ -9,6 +9,7 @@ import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 import { AuthService } from 'app/services/auth.service';
+import { OrganizationService } from 'app/services/organization.service';
 
 @Component({
   selector: 'app-all-repositories',
@@ -18,7 +19,7 @@ import { AuthService } from 'app/services/auth.service';
   styleUrl: './all-repositories.component.css'
 })
 export class AllRepositoriesComponent  implements AfterViewInit{
-  namespaces: string[] = ["n1", "n2", "n3"]
+  namespaces: string[] = []
   categories: string[] = ["c1", "c2", "c3"]
   searchQuery: Signal<string> = signal("");
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
@@ -37,10 +38,12 @@ export class AllRepositoriesComponent  implements AfterViewInit{
   paginator!: MatPaginator;
 
   constructor(private readonly repositoryService: RepositoryService,
-              private authService: AuthService) 
+              private readonly authService: AuthService,
+              private readonly organizationService: OrganizationService
+            ) 
   {
+    this.fillNamespaces()
     const userId: string = this.authService.userData.value?.userId || ""
-    console.log(userId)
     this.repositoryService.GetUsersRepositories(userId).subscribe({
       next: (response: DockerRepositoryDTO[]) => {
         console.log(response)
@@ -55,6 +58,22 @@ export class AllRepositoriesComponent  implements AfterViewInit{
 
   }
 
+  fillNamespaces() {
+    const userEmail: string = this.authService.userData.value?.userEmail || ""
+    this.namespaces.push(userEmail)
+    this.organizationService.getOrganizations(userEmail).subscribe({
+      next: (data) => {
+        console.log(data)
+        data.forEach(organization => {
+          this.namespaces.push(organization.name)          
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching organizations:', err);
+      }
+    });
+
+  }
 
   ngAfterViewInit() {
     this.repositorySource.sort = this.sort;

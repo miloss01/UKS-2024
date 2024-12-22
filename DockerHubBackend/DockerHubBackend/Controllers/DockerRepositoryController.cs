@@ -129,7 +129,7 @@ namespace DockerHubBackend.Controllers
 		}
 
 		[HttpDelete("delete/{id}")]
-		public async Task<IActionResult> DeleteOrganization(string id)
+		public async Task<IActionResult> DeleteRepositoryById(string id)
 		{
 			var parsed = Guid.TryParse(id, out var repositoryId);
 

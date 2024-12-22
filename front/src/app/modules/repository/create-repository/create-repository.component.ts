@@ -5,6 +5,7 @@ import RepositoryCreation, { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 import { AuthService } from 'app/services/auth.service';
 import { Router } from '@angular/router';
+import { OrganizationService } from 'app/services/organization.service';
 
 @Component({
   selector: 'app-create-repository',
@@ -14,23 +15,48 @@ import { Router } from '@angular/router';
   styleUrl: './create-repository.component.css'
 })
 export class CreateRepositoryComponent {
-  namespaces: string[] = [];
+  namespaces: {id:string, name:string}[] = [];
 
   router = inject(Router)
 
   repoForm:FormGroup = new FormGroup({
     namespace: new FormControl("", [Validators.required]),
     description: new FormControl(''),
-    visibility: new FormControl("", [Validators.required]),
+    visibility: new FormControl('true', [Validators.required]),
     name: new FormControl("", [Validators.required])
   });
 
   constructor(
     private repositoryService: RepositoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private organizationService: OrganizationService
   ) {
-    this.namespaces.push(this.authService.userData.value?.userEmail || "")
+    this.fillNamespaces()
+  }
 
+  fillNamespaces() {
+    const userEmail: string = this.authService.userData.value?.userEmail || ""
+    const userId: string = this.authService.userData.value?.userId || ""
+    this.namespaces.push({
+      id: userId,
+      name: userEmail
+    })
+    this.repoForm.controls['namespace'].setValue(userId)
+    this.organizationService.getOrganizations(userEmail).subscribe({
+      next: (data) => {
+        console.log(data)
+        data.forEach(organization => {
+          console.log(organization)
+          return this.namespaces.push({
+            id: organization.id,
+            name: organization.name
+          });          
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching organizations:', err);
+      }
+    });
   }
 
 

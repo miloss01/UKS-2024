@@ -14,11 +14,13 @@ namespace DockerHubBackend.Services.Implementation
     {
         private readonly IDockerRepositoryRepository _dockerRepositoryRepository;
 		private readonly IUserRepository _userRepository;
+		private readonly IOrganizationRepository _organizationRepository;
 
-        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository, IUserRepository userRepository)
+        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository, IUserRepository userRepository, IOrganizationRepository organizationRepository)
         {
             _dockerRepositoryRepository = dockerRepositoryRepository;
 			_userRepository = userRepository;
+			_organizationRepository = organizationRepository;
         }
 
 		private async Task<DockerRepository?> getRepository(Guid id)
@@ -70,11 +72,17 @@ namespace DockerHubBackend.Services.Implementation
 			return updatedRepositoryDto;
 		}
 
-		public async Task<StandardUser?> getUser(string repoNamespace)
+		public async Task<StandardUser?> getUser(string id)
 		{
+			var parsed = Guid.TryParse(id, out var userId);
+
+			if (!parsed)
+			{
+				return null;
+			}
 			try
 			{
-				var user = await _userRepository.GetUserByEmail(repoNamespace);
+				var user = await _userRepository.GetUserById(userId);
 				return (StandardUser?)user;
 			}
 			catch (Exception)
@@ -84,9 +92,15 @@ namespace DockerHubBackend.Services.Implementation
 		}
 
 
-		public Organization? getOrganization(string repoNamespace)
+		public async Task<Organization?> getOrganization(string id)
 		{
-			return null;
+			var parsed = Guid.TryParse(id, out var orgId);
+
+			if (!parsed)
+			{
+				return null;
+			}
+			return await _organizationRepository.GetOrganizationById(orgId);
 		}
 
 		public async Task<DockerRepositoryDTO> CreateDockerRepository(CreateRepositoryDto createRepositoryDto)
@@ -94,7 +108,7 @@ namespace DockerHubBackend.Services.Implementation
 			Console.WriteLine(createRepositoryDto);
 			// Get either User or Organization
 			var userOwner = await getUser(createRepositoryDto.Owner);
-			var organizationOwner = getOrganization(createRepositoryDto.Owner);
+			var organizationOwner = await getOrganization(createRepositoryDto.Owner);
 			if ((userOwner == null) && (organizationOwner == null))
 			{
 				throw new ArgumentException("Invalid namespace name. It can be either an organization name or username.");

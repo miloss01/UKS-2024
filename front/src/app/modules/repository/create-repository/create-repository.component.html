@@ -9,7 +9,7 @@
                     <mat-label>namespace</mat-label>
                     <mat-select formControlName="namespace">
                         @for (namespace of namespaces; track namespace) {
-                            <mat-option [value]="namespace">{{namespace}}</mat-option>
+                            <mat-option [value]="namespace.id">{{namespace.name}}</mat-option>
 
                         }
                     </mat-select>
@@ -31,7 +31,7 @@
                 <h4>Visibility</h4>
                 <mat-radio-group aria-label="Select an option" formControlName="visibility" class="radio-container">
                     <div class="radio-item">
-                        <mat-radio-button value=true>
+                        <mat-radio-button value=true [checked]="true">
                             Public <mat-icon>public</mat-icon>
                         </mat-radio-button>
                         <span class="description">Appears in Docker Hub search results</span>
