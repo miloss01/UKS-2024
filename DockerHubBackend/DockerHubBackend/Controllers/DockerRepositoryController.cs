@@ -1,6 +1,7 @@
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
+using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
@@ -35,34 +36,111 @@ namespace DockerHubBackend.Controllers
             }
 
             var dockerRepository = _dockerRepositoryService.GetDockerRepositoryById(repositoryId);
-            Console.WriteLine(dockerRepository.Images == null);
 
-            var dockerRepositoryDto = new DockerRepositoryDTO
-            {
-                Id = dockerRepository.Id.ToString(),
-                Name = dockerRepository.Name,
-                Description = dockerRepository.Description,
-                Badge = dockerRepository.Badge.ToString(),
-                CreatedAt = dockerRepository.CreatedAt.ToString(),
-                IsPublic = dockerRepository.IsPublic,
-                StarCount = dockerRepository.StarCount,
-                Owner = dockerRepository.OrganizationOwner == null ? dockerRepository.UserOwner.Email : dockerRepository.OrganizationOwner.Name,
-                Images = dockerRepository.Images.Select(img => new DockerImageDTO
-                {
-                    RepositoryName = img.Repository.Name,
-                    RepositoryId = img.Repository.Id.ToString(),
-                    Badge = img.Repository.Badge.ToString(),
-                    Description = img.Repository.Description,
-                    CreatedAt = img.CreatedAt.ToString(),
-                    LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
-                    ImageId = img.Id.ToString(),
-                    StarCount = img.Repository.StarCount,
-                    Tags = img.Tags,
-                    Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
-                }).ToList()
-            };
+            var dockerRepositoryDto = new DockerRepositoryDTO(dockerRepository);
 
             return Ok(dockerRepositoryDto);
+        }
+
+        [HttpGet("star/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetStarRepositoriesForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var starRepositories = _dockerRepositoryService.GetStarRepositoriesForUser(userId);
+            var starRepositoriesDto = starRepositories.Select(starRepository => new DockerRepositoryDTO(starRepository));
+
+            return Ok(starRepositoriesDto);
+        }
+
+        [HttpGet("private/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetPrivateRepositoriesForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var privateRepositories = _dockerRepositoryService.GetPrivateRepositoriesForUser(userId);
+            var privateRepositoriesDto = privateRepositories.Select(privateRepository => new DockerRepositoryDTO(privateRepository));
+
+            return Ok(privateRepositoriesDto);
+        }
+
+        [HttpPatch("star/{userId}/{repositoryId}")]
+        [AllowAnonymous]
+        public IActionResult AddStarRepository(string userId, string repositoryId)
+        {
+            var parsed = Guid.TryParse(userId, out var userGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            parsed = Guid.TryParse(repositoryId, out var repositoryGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("Repository not found. Bad repository id.");
+            }
+
+            _dockerRepositoryService.AddStarRepository(userGuid, repositoryGuid);
+
+            return NoContent();
+        }
+
+        [HttpPatch("star/remove/{userId}/{repositoryId}")]
+        [AllowAnonymous]
+        public IActionResult RemoveStarRepository(string userId, string repositoryId)
+        {
+            var parsed = Guid.TryParse(userId, out var userGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            parsed = Guid.TryParse(repositoryId, out var repositoryGuid);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("Repository not found. Bad repository id.");
+            }
+
+            _dockerRepositoryService.RemoveStarRepository(userGuid, repositoryGuid);
+
+            return NoContent();
+        }
+
+        [HttpGet("star/notallowed/{id}")]
+        [AllowAnonymous]
+        public IActionResult GetNotAllowedRepositoriesToStarForUser(string id)
+        {
+            var parsed = Guid.TryParse(id, out var userId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad user id.");
+            }
+
+            var myRepositories = _dockerRepositoryService.GetAllRepositoriesForUser(userId);
+            var organizationRepositories = _dockerRepositoryService.GetOrganizationRepositoriesForUser(userId);
+            
+            var allGuids = myRepositories
+                .Concat(organizationRepositories)
+                .Select(repository => repository.Id.ToString());
+
+            return Ok(allGuids);
         }
     }
 }

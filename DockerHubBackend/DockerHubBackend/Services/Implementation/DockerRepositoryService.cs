@@ -29,5 +29,35 @@ namespace DockerHubBackend.Services.Implementation
 
             return dockerRepository;
         }
+
+        public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetStarRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetPrivateRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetPrivateRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetOrganizationRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetOrganizationRepositoriesForUser(userId);
+        }
+
+        public List<DockerRepository> GetAllRepositoriesForUser(Guid userId)
+        {
+            return _dockerRepositoryRepository.GetAllRepositoriesForUser(userId);
+        }
+
+        public void AddStarRepository(Guid userId, Guid repositoryId)
+        {
+            _dockerRepositoryRepository.AddStarRepository(userId, repositoryId);
+        }
+
+        public void RemoveStarRepository(Guid userId, Guid repositoryId)
+        {
+            _dockerRepositoryRepository.RemoveStarRepository(userId, repositoryId);
+        }
     }
 }

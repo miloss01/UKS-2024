@@ -15,6 +15,31 @@ namespace DockerHubBackend.Dto.Response
         public string Owner { get; set; }
         public string CreatedAt { get; set; }
 
+        public DockerRepositoryDTO(DockerRepository dockerRepository)
+        {
+            Id = dockerRepository.Id.ToString();
+            Name = dockerRepository.Name;
+            Description = dockerRepository.Description;
+            Badge = dockerRepository.Badge.ToString();
+            CreatedAt = dockerRepository.CreatedAt.ToString();
+            IsPublic = dockerRepository.IsPublic;
+            StarCount = dockerRepository.StarCount;
+            Owner = dockerRepository.OrganizationOwner == null ? dockerRepository.UserOwner.Email : dockerRepository.OrganizationOwner.Name;
+            Images = dockerRepository.Images.Select(img => new DockerImageDTO
+            {
+                RepositoryName = img.Repository.Name,
+                RepositoryId = img.Repository.Id.ToString(),
+                Badge = img.Repository.Badge.ToString(),
+                Description = img.Repository.Description,
+                CreatedAt = img.CreatedAt.ToString(),
+                LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
+                ImageId = img.Id.ToString(),
+                StarCount = img.Repository.StarCount,
+                Tags = img.Tags,
+                Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
+            }).ToList();
+        }
+
         public override string ToString()
         {
             return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
