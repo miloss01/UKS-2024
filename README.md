@@ -23,11 +23,18 @@ docker run --name postgres-container -e POSTGRES_USER=<username> -e POSTGRES_PAS
 Replace `<username>`, `<password>`, and `<database_name>` with the credentials defined in `appsettings.json`.
 
 ### 2. Configure `appsettings.json`
-Ensure that your `appsettings.json` file is configured with the correct database credentials. Example:
+Ensure that your `appsettings.json` file is configured with the correct database and aws credentials. Example:
 
 ```json
+{
 "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=<database_name>;Username=<username>;Password=<password>"
+    },
+"AWS": {
+    "AccessKey": "XXXXXXXXXXXXX",
+    "SecretKey": "XXXXXXXXXXXXX",
+    "Region": "eu-central-1"
+    }
 }
 ```
 
@@ -45,6 +52,12 @@ Create `super_admin_cred.json` file inside `Startup` folder. The file should hav
 `email` - Email for super admin account  
 
 If `generatePassword` is true, after the first successful application run its value will be automatically changed to `false`.
+
+### 4. Add new package
+On path UKS-2024/DockerHubBackend/DockerHubBackend open cmd and run command
+```bash
+dotnet add package Swashbuckle.AspNetCore --version 6.0.0
+```
 ## Running the Project
 
 ### 1. Apply Migrations
@@ -58,6 +71,11 @@ Add-Migration InitialCreate -Project DockerHubBackend -StartupProject DockerHubB
 #### Step 2: Update the Database
 ```powershell
 Update-Database -Project DockerHubBackend -StartupProject DockerHubBackend
+```
+
+#### Step 3: Add S3 package
+```powershell
+Install-Package AWSSDK.S3
 ```
 
 ### 2. Start the Project
