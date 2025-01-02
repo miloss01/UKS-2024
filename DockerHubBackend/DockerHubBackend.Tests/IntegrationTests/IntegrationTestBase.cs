@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,6 +16,7 @@ public class IntegrationTestBase : IAsyncLifetime
 {
     protected readonly HttpClient _httpClient;
     protected readonly IServiceScopeFactory _scopeFactory;
+    protected readonly JsonSerializerOptions _jsonSerializerOptions; 
 
     public IntegrationTestBase()
     {
@@ -32,6 +34,10 @@ public class IntegrationTestBase : IAsyncLifetime
 
         _httpClient = factory.CreateClient();
         _scopeFactory = factory.Services.GetRequiredService<IServiceScopeFactory>();
+        _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
     }
 
     // Resetovanje baze pre svakog testa
