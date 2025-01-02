@@ -108,7 +108,7 @@ builder.Services.AddHostedService<StartupScript>();
 
 var app = builder.Build();
 
-await DatabaseContextSeed.SeedDataAsync(app.Services);
+//await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -126,3 +126,5 @@ app.UseCors("CORS_CONFIG");
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
