@@ -1,9 +1,11 @@
 ﻿using DockerHubBackend.Data;
+using DockerHubBackend.Startup;
 using DockerHubBackend.Tests.IntegrationTests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Net.Http;
@@ -26,6 +28,13 @@ public class IntegrationTestBase : IAsyncLifetime
             {
                 builder.ConfigureServices(services =>
                 {
+                    var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IHostedService) &&
+                                                              d.ImplementationType == typeof(StartupScript));
+                    if (descriptor != null)
+                    {
+                        services.Remove(descriptor);
+                    }
+
                     var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
                     services.AddDbContext<DataContext>(options =>
                         options.UseNpgsql(configuration.GetConnectionString("TestConnection")));

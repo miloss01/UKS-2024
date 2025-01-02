@@ -27,7 +27,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
             dbContext.DockerRepositories.Add(repo);
             dbContext.DockerImages.Add(img);
 
-            //dbContext.SaveChanges();
+            dbContext.SaveChanges();
 
             var response = await _httpClient.GetAsync("/api/dockerImages?page=1&pageSize=10");
             response.EnsureSuccessStatusCode();
