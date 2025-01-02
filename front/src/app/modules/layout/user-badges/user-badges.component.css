@@ -10,4 +10,9 @@ table {
   .mat-column-actions {
     text-align: center;
   }
+
+.search-input {
+  padding: 8px;
+  font-size: 14px;
+}
   

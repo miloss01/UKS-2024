@@ -1,4 +1,6 @@
-<table mat-table [dataSource]="users">
+<input type="search" [(ngModel)]="searchTerm" (input)="filterTable()" class="search-input" placeholder="Search...">
+
+<table mat-table [dataSource]="filteredUsers">
     <ng-container matColumnDef="username">
       <th mat-header-cell *matHeaderCellDef>Username</th>
       <td mat-cell *matCellDef="let user"> {{ user.username }} </td>
