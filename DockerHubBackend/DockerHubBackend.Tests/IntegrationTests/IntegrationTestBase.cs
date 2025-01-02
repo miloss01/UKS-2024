@@ -37,7 +37,7 @@ public class IntegrationTestBase : IAsyncLifetime
 
                     var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
                     services.AddDbContext<DataContext>(options =>
-                        options.UseNpgsql(configuration.GetConnectionString("TestConnection")));
+                        options.UseNpgsql("Host=localhost;Port=5432;Username=admin;Password=admin;Database=test-uks-database"));
                 });
             });
 
