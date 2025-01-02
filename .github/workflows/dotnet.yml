@@ -44,18 +44,13 @@ jobs:
           sleep 5
         done      
     - name: Create and clone test database
-      uses: MonoidDev/clone-postgresql-action@v0.0.2
-      with:
-        from-host: 'localhost'
-        from-port: '5432'
-        from-username: 'admin'
-        from-password: 'admin'
-        from-database: 'uks-database'
-        to-host: 'localhost'
-        to-port: '5432'
-        to-username: 'admin'
-        to-password: 'admin'
-        to-database: 'test-uks-database'
+      env:
+        PGPASSWORD: admin
+      run: |
+        echo "Creating test-uks-database..."
+        psql -h localhost -U admin -d postgres -c "CREATE DATABASE \"test-uks-database\";"
+        echo "Cloning uks-database to test-uks-database..."
+        pg_dump -h localhost -U admin -d uks-database | psql -h localhost -U admin -d test-uks-database
     - name: Restore dependencies for default project
       run: dotnet restore ./DockerHubBackend/DockerHubBackend
     - name: Restore dependencies for test project
