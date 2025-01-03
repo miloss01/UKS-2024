@@ -18,6 +18,7 @@ import { AuthGuard } from './security/auth.guard';
 import { UserRole } from './models/models';
 import { RoleGuard } from './security/role.guard';
 import { UserBadgesComponent } from './modules/layout/user-badges/user-badges.component';
+import { LogsComponent } from './modules/layout/logs/logs.component';
 
 export const routes: Routes = [
   { path: 'all-user-repo', component: AllRepositoriesComponent, canActivate: [AuthGuard] },
@@ -34,5 +35,6 @@ export const routes: Routes = [
   { path: 'teams', component: TeamsComponent, canActivate: [AuthGuard] },
   { path: 'team-details/:id', component: TeamDetailsComponent, canActivate: [AuthGuard] },
   { path: 'badges', component: UserBadgesComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
+  { path: 'logs', component: LogsComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
   { path: '**', component: LandingPageComponent }
 ];
