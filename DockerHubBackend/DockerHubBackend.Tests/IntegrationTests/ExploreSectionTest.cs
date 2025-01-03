@@ -12,7 +12,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
     public class ExploreSectionTest : IntegrationTestBase
     {
         [Fact]
-        public async Task Test_Getting_DockerImages()
+        public async Task GettingDockerImages_PassAllQueryParams_ReturnsValidImages()
         {
             using var dbContext = GetDbContext();
 
