@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,6 +106,20 @@ builder.Services.AddControllers(options =>
 });
 
 builder.Services.AddHostedService<StartupScript>();
+
+// Konfiguracija Serilog-a za pisanje u log fajlove
+builder.Host.UseSerilog((context, config) =>
+{
+    config
+        .MinimumLevel.Information() 
+        .WriteTo.Console()
+        .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day)
+        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+        {
+            AutoRegisterTemplate = true,
+            IndexFormat = "logstash-{0:yyyy.MM.dd}"  // Format logova u Elasticsearch-u
+        });
+});
 
 var app = builder.Build();
 
