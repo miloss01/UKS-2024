@@ -14,7 +14,6 @@ namespace DockerHubBackend.Controllers
     {
         private readonly IElasticClient _elasticClient;
 
-        // Konstruktor za injectovanje ElasticClient-a
         public LogSearchController(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
@@ -25,23 +24,37 @@ namespace DockerHubBackend.Controllers
         {
             try
             {
-                // Validacija unosa
-                if (request == null || (string.IsNullOrWhiteSpace(request.Query) && !request.StartDate.HasValue && !request.EndDate.HasValue))
-                {
-                    return BadRequest("At least one search criterion (query or date range) is required.");
-                }
+                bool noCriteriaProvided = (string.IsNullOrWhiteSpace(request.Query) &&
+                                           !request.StartDate.HasValue &&
+                                           !request.EndDate.HasValue);
 
-                // Osnovni QueryContainer za ElasticSearch
                 QueryContainer query = new QueryContainer();
 
-                // 1. Tekstualni pretrazivacki upit (ako postoji)
+                // no critera
+                if (noCriteriaProvided)
+                {
+                    var defaultResponse = _elasticClient.Search<LogDto>(s => s
+                        .Sort(sort => sort.Descending(f => f.Timestamp))
+                        .Size(100)
+                    );
+
+                    if (!defaultResponse.IsValid)
+                    {
+                        return BadRequest(defaultResponse.DebugInformation);
+                    }
+
+                    var defaultLogs = defaultResponse.Hits.Select(hit => hit.Source).ToList();
+                    return Ok(defaultLogs);
+                }
+
+                // 1. query
                 if (!string.IsNullOrWhiteSpace(request.Query))
                 {
                     query &= new QueryContainerDescriptor<LogDto>()
                         .QueryString(q => q.Query(request.Query));
                 }
 
-                // 2. Filter po datumu i vremenu (ako postoji)
+                // 2. date and time filter
                 if (request.StartDate.HasValue || request.EndDate.HasValue)
                 {
                     query &= new QueryContainerDescriptor<LogDto>()
@@ -51,11 +64,11 @@ namespace DockerHubBackend.Controllers
                             .LessThanOrEquals(request.EndDate));
                 }
 
-                // Slanje upita ElasticSearch serveru
+                // send quesry to ElasticSearch
                 var response = _elasticClient.Search<LogDto>(s => s
                     .Query(q => query)
-                    .Sort(sort => sort.Descending(f => f.Timestamp)) // Sortiranje po vremenu
-                    .Size(100) // Maksimalan broj rezultata
+                    .Sort(sort => sort.Descending(f => f.Timestamp))
+                    .Size(100)
                 );
 
                 if (!response.IsValid)
@@ -63,14 +76,11 @@ namespace DockerHubBackend.Controllers
                     return BadRequest(response.DebugInformation);
                 }
 
-                // Mapiranje rezultata na DTO
                 var logs = response.Hits.Select(hit => hit.Source).ToList();
-
                 return Ok(logs);
             }
             catch (Exception ex)
             {
-                // Greska tokom pretrage
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }

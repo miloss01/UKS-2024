@@ -25,6 +25,38 @@ export class LogsComponent {
 
   constructor(private logService: LogsService, private snackBar: MatSnackBar) {}
 
+  ngOnInit(): void {
+    this.loadInitialLogs();
+  }
+
+  loadInitialLogs(): void {
+    this.logService.searchLogs({ query: null, startDate: null, endDate: null }).subscribe({
+      next: (response: any[]) => {
+          this.logs = response;
+      },
+      error: (error) => {
+        this.logs = [];
+        console.error('Error:', error);
+      },
+    });
+  }
+
+  isFormValid(): boolean {
+    if (!this.query || !this.startDate || !this.startTime || !this.endDate || !this.endTime) {
+      return false;
+    }
+
+    const startDateTime = new Date(this.startDate);
+    const [startHours, startMinutes] = this.startTime.split(':').map(Number);
+    startDateTime.setHours(startHours, startMinutes);
+
+    const endDateTime = new Date(this.endDate);
+    const [endHours, endMinutes] = this.endTime.split(':').map(Number);
+    endDateTime.setHours(endHours, endMinutes);
+
+    return startDateTime <= endDateTime;
+  }
+
   onSubmit() {
     const formatDateTime = (date: Date | null, time: string): string | null => {
         if (!date) return null;

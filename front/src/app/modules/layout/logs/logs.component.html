@@ -41,7 +41,7 @@
         </div>
   
         <!-- Button for search -->
-        <button mat-raised-button color="primary" type="submit" class="submit-button">Seach logs</button>
+        <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Seach logs</button>
       </form>
     </div>
   
