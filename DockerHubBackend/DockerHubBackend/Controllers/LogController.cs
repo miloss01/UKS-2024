@@ -21,20 +21,41 @@ namespace DockerHubBackend.Controllers
         }
 
         [HttpPost("search")]
-        public IActionResult SearchLogs([FromBody] LogCriteriaDto criteria)
+        public IActionResult SearchLogs([FromBody] LogSearchDto request)
         {
             try
             {
-                // Kreiranje Elasticsearch upita na osnovu kriterijuma
-                var query = BuildQuery(criteria);
+                // Validacija unosa
+                if (request == null || (string.IsNullOrWhiteSpace(request.Query) && !request.StartDate.HasValue && !request.EndDate.HasValue))
+                {
+                    return BadRequest("At least one search criterion (query or date range) is required.");
+                }
 
-                // Slanje upita Elasticsearch-u
+                // Osnovni QueryContainer za ElasticSearch
+                QueryContainer query = new QueryContainer();
+
+                // 1. Tekstualni pretrazivacki upit (ako postoji)
+                if (!string.IsNullOrWhiteSpace(request.Query))
+                {
+                    query &= new QueryContainerDescriptor<LogDto>()
+                        .QueryString(q => q.Query(request.Query));
+                }
+
+                // 2. Filter po datumu i vremenu (ako postoji)
+                if (request.StartDate.HasValue || request.EndDate.HasValue)
+                {
+                    query &= new QueryContainerDescriptor<LogDto>()
+                        .DateRange(dr => dr
+                            .Field(f => f.Timestamp)
+                            .GreaterThanOrEquals(request.StartDate)
+                            .LessThanOrEquals(request.EndDate));
+                }
+
+                // Slanje upita ElasticSearch serveru
                 var response = _elasticClient.Search<LogDto>(s => s
-                    .Query(q => q.Bool(b => b
-                        .Must(query)
-                    ))
-                    .Sort(s => s.Descending(f => f.Timestamp))
-                    .Size(100) // Ogranicite broj rezultata
+                    .Query(q => query)
+                    .Sort(sort => sort.Descending(f => f.Timestamp)) // Sortiranje po vremenu
+                    .Size(100) // Maksimalan broj rezultata
                 );
 
                 if (!response.IsValid)
@@ -42,62 +63,16 @@ namespace DockerHubBackend.Controllers
                     return BadRequest(response.DebugInformation);
                 }
 
-                // Vracanje rezultata
-                return Ok(response.Hits.Select(hit => hit.Source));
+                // Mapiranje rezultata na DTO
+                var logs = response.Hits.Select(hit => hit.Source).ToList();
+
+                return Ok(logs);
             }
             catch (Exception ex)
             {
+                // Greska tokom pretrage
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }
-
-        // Pomocna metoda za kreiranje upita na osnovu kriterijuma
-        private static QueryContainer BuildQuery(LogCriteriaDto criteria)
-        {
-            var queryContainer = new QueryContainer();
-
-            // Datum filtriranje (pre i posle datuma)
-            if (criteria.StartDate != null && criteria.EndDate != null)
-            {
-                queryContainer &= new DateRangeQuery
-                {
-                    Field = Infer.Field<LogDto>(f => f.Timestamp),
-                    GreaterThanOrEqualTo = criteria.StartDate,
-                    LessThanOrEqualTo = criteria.EndDate
-                };
-            }
-
-            // Nivo filtriranje (info, warning, error, itd.)
-            if (!string.IsNullOrEmpty(criteria.Level))
-            {
-                queryContainer &= new TermQuery
-                {
-                    Field = Infer.Field<LogDto>(f => f.Level),
-                    Value = criteria.Level
-                };
-            }
-
-            // Tekstualni sadrzaj pretrage
-            if (!string.IsNullOrEmpty(criteria.SearchText))
-            {
-                queryContainer &= new MatchQuery
-                {
-                    Field = Infer.Field<LogDto>(f => f.Message),
-                    Query = criteria.SearchText
-                };
-            }
-
-            // Ako je korisnik definisao slozeni logicki upit
-            if (!string.IsNullOrEmpty(criteria.ComplexQuery))
-            {
-                // Parsiranje slozenog upita u odgovarajuci Elasticsearch upit
-                queryContainer &= new QueryStringQuery
-                {
-                    Query = criteria.ComplexQuery
-                };
-            }
-
-            return queryContainer;
         }
 
         [HttpGet("information")]
