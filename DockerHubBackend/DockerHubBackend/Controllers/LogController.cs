@@ -84,32 +84,5 @@ namespace DockerHubBackend.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
-        [HttpGet("information")]
-        public IActionResult GetInformationLogs()
-        {
-            try
-            {
-                // Pretraga logova sa nivoom 'information'
-                var response = _elasticClient.Search<LogDto>(s => s
-                    .Query(q => q.Term(t => t.Field(f => f.Level).Value("information"))) // Filtrira po nivou
-                    .Sort(sort => sort.Descending(f => f.Timestamp)) // Sortira po vremenu
-                    .Size(100) // Ogranicava broj rezultata na 100
-                );
-
-                if (!response.IsValid)
-                {
-                    return BadRequest(response.DebugInformation);
-                }
-
-                // Vracanje rezultata
-                return Ok(response.Hits.Select(hit => hit.Source));
-            }
-            catch (Exception ex)
-            {
-                // Ako dodje do greske u procesu
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
     }
 }
