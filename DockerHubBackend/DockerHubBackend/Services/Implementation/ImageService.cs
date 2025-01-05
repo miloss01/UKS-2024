@@ -18,15 +18,17 @@ namespace DockerHubBackend.Services.Implementation
     public class ImageService : IImageService
     {
         private readonly IAmazonS3 _s3Client;
+        private readonly ILogger<ImageService> _logger;
         private readonly string _bucketName = "uks-2024";    
      
-        public ImageService(IOptions<AwsSettings> awsSettings)
+        public ImageService(IOptions<AwsSettings> awsSettings, ILogger<ImageService> logger)
         {
             var awsConfig = awsSettings.Value;
 
             // int AWS client
             var credentials = new BasicAWSCredentials(awsConfig.AccessKey, awsConfig.SecretKey);
             _s3Client = new AmazonS3Client(credentials, RegionEndpoint.GetBySystemName(awsConfig.Region));
+            _logger = logger;
         }
 
         // get image from s3
@@ -34,6 +36,7 @@ namespace DockerHubBackend.Services.Implementation
         {
             try
             {
+                _logger.LogInformation("Generating pre-signed URL for file: {FileName}", fileName);
                 var request = new GetPreSignedUrlRequest
                 {
                     BucketName = _bucketName,
@@ -42,11 +45,12 @@ namespace DockerHubBackend.Services.Implementation
                 };
 
                 string preSignedUrl = _s3Client.GetPreSignedURL(request);
+                _logger.LogInformation("Pre-signed URL generated successfully for file: {FileName}", fileName);
                 return preSignedUrl;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting image URL: {ex.Message}");
+                _logger.LogError(ex, "Error generating pre-signed URL for file: {FileName}", fileName);
                 return null;
             }
         }
@@ -56,13 +60,14 @@ namespace DockerHubBackend.Services.Implementation
         {
             try
             {
+                _logger.LogInformation("Uploading file to S3 with name: {ImageName}", imageName);
                 var transferUtility = new TransferUtility(_s3Client);
                 await transferUtility.UploadAsync(fileStream, _bucketName, imageName);
-                Console.WriteLine("File uploaded successfully.");
+                _logger.LogInformation("File uploaded successfully to S3 with name: {ImageName}", imageName);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error uploading image: {ex.Message}");
+                _logger.LogError(ex, "Error uploading file to S3 with name: {ImageName}", imageName);
             }
         }
 
@@ -71,6 +76,7 @@ namespace DockerHubBackend.Services.Implementation
         {
             try
             {
+                _logger.LogInformation("Deleting file from S3 with path: {FilePath}", filePath);
                 var deleteObjectRequest = new DeleteObjectRequest
                 {
                     BucketName = _bucketName,
@@ -78,15 +84,15 @@ namespace DockerHubBackend.Services.Implementation
                 };
 
                 await _s3Client.DeleteObjectAsync(deleteObjectRequest);
-                Console.WriteLine($"File '{filePath}' deleted successfully.");
+                _logger.LogInformation("File deleted successfully from S3 with path: {FilePath}", filePath);
             }
             catch (AmazonS3Exception ex)
             {
-                Console.WriteLine($"Amazon S3 error while deleting file: {ex.Message}");
+                _logger.LogError(ex, "Amazon S3 error while deleting file with path: {FilePath}", filePath);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting file: {ex.Message}");
+                _logger.LogError(ex, "Error deleting file from S3 with path: {FilePath}", filePath);
             }
         }
 

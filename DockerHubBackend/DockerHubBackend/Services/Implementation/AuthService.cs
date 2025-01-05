@@ -53,29 +53,29 @@ namespace DockerHubBackend.Services.Implementation
 
         public async Task<LoginResponse> Login(LoginCredentialsDto credentials)
         {
-            _logger.LogInformation("Pokušaj prijave korisnika sa email adresom: {Email}", credentials.Email);
+            _logger.LogInformation("User login attempt with email address: {Email}", credentials.Email);
 
             var user = await _userRepository.GetUserWithTokenByEmail(credentials.Email);
             if (user == null)
             {
-                _logger.LogWarning("Neuspešna prijava: Korisnik sa email adresom {Email} nije pronađen.", credentials.Email);
+                _logger.LogWarning("Login failed: User with email address {Email} not found.", credentials.Email);
                 throw new UnauthorizedException("Wrong email or password");
             }
             if (_passwordHasher.VerifyHashedPassword(String.Empty, user.Password, credentials.Password) != PasswordVerificationResult.Success)
             {
-                _logger.LogWarning("Neuspešna prijava: Korisnik sa email adresom {Email} nije pronađen.", credentials.Email);
+                _logger.LogWarning("Login failed: User with email address {Email} not found.", credentials.Email);
                 throw new UnauthorizedException("Wrong email or password");
             }
             if(user.GetType() == typeof(SuperAdmin) && !((SuperAdmin)user).IsVerified)
             {
                 var verificationToken = _randomTokenGenerator.GenerateVerificationToken(256);
                 await UpdateVerificationToken((SuperAdmin)user, verificationToken);
-                _logger.LogWarning("Nalog nije verifikovan za korisnika {Email}. Generisan je token za verifikaciju.", credentials.Email);
+                _logger.LogWarning("Account not verified for user {Email}.", credentials.Email);
                 throw new AccountVerificationRequiredException("Account verification required", verificationToken);
             }
             var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email);
 
-            _logger.LogInformation("Korisnik {Email} je uspešno prijavljen.", credentials.Email);
+            _logger.LogInformation("User {Email} has successfully logged in.", credentials.Email);
 
             LoginResponse response = new LoginResponse {
                 AccessToken = token
