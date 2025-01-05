@@ -58,6 +58,17 @@ On path UKS-2024/DockerHubBackend/DockerHubBackend open cmd and run command
 ```bash
 dotnet add package Swashbuckle.AspNetCore --version 6.0.0
 ```
+
+### 5. Install Elasticsearch
+
+#### Docker Command to Run PostgreSQL
+In the folder UKS-2024 open cmd and run command
+```bash
+docker build -t my-elasticsearch .
+```
+```bash
+docker run -d --name elasticsearch -p 9200:9200 my-elasticsearch
+```
 ## Running the Project
 
 ### 1. Apply Migrations
