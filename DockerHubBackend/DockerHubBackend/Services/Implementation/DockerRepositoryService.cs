@@ -33,7 +33,7 @@ namespace DockerHubBackend.Services.Implementation
 			var repository = await _dockerRepositoryRepository.GetDockerRepositoryById(id);
 			if (repository == null)
 			{
-				_logger.LogWarning("Docker repository with ID: {Id} not found.", id);
+				_logger.LogError("Docker repository with ID: {Id} not found.", id);
 				throw new NotFoundException($"Docker repository with id {id.ToString()} not found.");
 			}
 
@@ -72,7 +72,7 @@ namespace DockerHubBackend.Services.Implementation
 
 			if (repository.IsPublic == visibility)
 			{
-				_logger.LogWarning("The visibility for Docker repository with ID: {Id} is already set to {Visibility}.", id, visibility);
+				_logger.LogError("The visibility for Docker repository with ID: {Id} is already set to {Visibility}.", id, visibility);
 				throw new BadRequestException("The new visibility value is the same as the current value.");
 			}
 			repository.IsPublic = visibility;

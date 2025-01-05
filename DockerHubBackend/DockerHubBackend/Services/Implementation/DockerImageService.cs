@@ -37,7 +37,7 @@ namespace DockerHubBackend.Services.Implementation
             var repository = await _dockerImageRepository.GetDockerImageById(id);
 			if (repository == null)
 			{
-                _logger.LogWarning("Docker image with ID: {Id} not found.", id);
+                _logger.LogError("Docker image with ID: {Id} not found.", id);
                 throw new NotFoundException($"Docker image with id {id.ToString()} not found.");
 			}
 

@@ -40,7 +40,7 @@ namespace DockerHubBackend.Services.Implementation
             Team? team = await _repository.Get(id);
             if (team == null) 
             {
-                _logger.LogWarning("Team with ID {TeamId} not found", id);
+                _logger.LogError("Team with ID {TeamId} not found", id);
                 throw new NotFoundException("Team not found."); 
             }
             return new TeamDto(team);
@@ -52,14 +52,14 @@ namespace DockerHubBackend.Services.Implementation
             Organization? organization = await _organizationRepository.Get(teamDto.OrganizationId);
             if (organization == null) 
             {
-                _logger.LogWarning("Organization with ID {OrganizationId} does not exist", teamDto.OrganizationId);
+                _logger.LogError("Organization with ID {OrganizationId} does not exist", teamDto.OrganizationId);
                 throw new NotFoundException("Organization does not exist."); 
             }
 
             Team? t = await _repository.GetByOrgIdAndTeamName(organization.Id, teamDto.Name);
             if (t != null)
             {
-                _logger.LogWarning("Team with name {TeamName} already exists in organization {OrganizationId}", teamDto.Name, teamDto.OrganizationId);
+                _logger.LogError("Team with name {TeamName} already exists in organization {OrganizationId}", teamDto.Name, teamDto.OrganizationId);
                 throw new BadRequestException("Team with chosen name already exists.");
             }
 
@@ -81,7 +81,7 @@ namespace DockerHubBackend.Services.Implementation
             Team? team = await _repository.Get(teamId);
             if (team == null) 
             {
-                _logger.LogWarning("Team with ID {TeamId} does not exist", teamId);
+                _logger.LogError("Team with ID {TeamId} does not exist", teamId);
                 throw new NotFoundException("Team does not exist."); 
             }
             team.Members = await toStandardUsers(memberDtos);  // TODO: add check for members (this should be done after organization merge)
@@ -102,20 +102,20 @@ namespace DockerHubBackend.Services.Implementation
             TeamPermission? teamPerm = _repository.GetTeamPermission(teamPermissionDto.RepositoryId, teamPermissionDto.TeamId);
             if (teamPerm != null) 
             {
-                _logger.LogWarning("Permission already exists for team {TeamId} on repository {RepositoryId}", teamPermissionDto.TeamId, teamPermissionDto.RepositoryId);
+                _logger.LogError("Permission already exists for team {TeamId} on repository {RepositoryId}", teamPermissionDto.TeamId, teamPermissionDto.RepositoryId);
                 throw new BadRequestException("Team-Permission already exists."); 
             }
 
             DockerRepository? dr = await _dockerRepositoryRepository.Get(teamPermissionDto.RepositoryId);
             if (dr == null) 
             {
-                _logger.LogWarning("Repository with ID {RepositoryId} not found", teamPermissionDto.RepositoryId);
+                _logger.LogError("Repository with ID {RepositoryId} not found", teamPermissionDto.RepositoryId);
                 throw new NotFoundException("Repositoy not found."); 
             }
 
             Team? t = await _repository.Get(teamPermissionDto.TeamId);
             if (t == null) {
-                _logger.LogWarning("Team with ID {TeamId} not found", teamPermissionDto.TeamId);
+                _logger.LogError("Team with ID {TeamId} not found", teamPermissionDto.TeamId);
                 throw new NotFoundException("Team not found."); 
             }
             TeamPermission tp = new TeamPermission
@@ -138,7 +138,7 @@ namespace DockerHubBackend.Services.Implementation
             Team? team = await _repository.Get(id);
             if (team == null) 
             {
-                _logger.LogWarning("Team with ID {TeamId} not found", id);
+                _logger.LogError("Team with ID {TeamId} not found", id);
                 throw new NotFoundException("Team not found."); 
             }
             team.Name = teamDto.Name;
@@ -160,7 +160,7 @@ namespace DockerHubBackend.Services.Implementation
             Team? team = await _repository.Delete(id);
             if (team == null) 
             {
-                _logger.LogWarning("Team with ID {TeamId} not found", id);
+                _logger.LogError("Team with ID {TeamId} not found", id);
                 throw new NotFoundException("Team not found."); 
             }
 
@@ -195,7 +195,7 @@ namespace DockerHubBackend.Services.Implementation
             }
             else
             {
-                _logger.LogWarning("Permission type {PermissionType} not found", input);
+                _logger.LogError("Permission type {PermissionType} not found", input);
                 throw new NotFoundException("Chosen permission type not found.");
             }
         }

@@ -31,7 +31,7 @@ namespace DockerHubBackend.Services.Implementation
             var token = await _verificationTokenRepository.GetTokenByValue(changePasswordDto.Token);
             if (token == null || token.ValidUntil < DateTime.UtcNow)
             {
-                _logger.LogWarning("Invalid or expired token: {Token}", changePasswordDto.Token);
+                _logger.LogError("Invalid or expired token: {Token}", changePasswordDto.Token);
                 throw new UnauthorizedException("Invalid token");
             }
             token.User.LastPasswordChangeDate = DateTime.UtcNow;
@@ -48,12 +48,12 @@ namespace DockerHubBackend.Services.Implementation
 
             if (await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
             {
-                _logger.LogWarning("Registration failed. Email {Email} is already in use.", registerUserDto.Email);
+                _logger.LogError("Registration failed. Email {Email} is already in use.", registerUserDto.Email);
                 throw new BadRequestException("An account with given email aready exists");
             }
             if(await _userRepository.GetUserByUsername(registerUserDto.Username) != null)
             {
-                _logger.LogWarning("Registration failed. Username {Username} is already in use.", registerUserDto.Username);
+                _logger.LogError("Registration failed. Username {Username} is already in use.", registerUserDto.Username);
                 throw new BadRequestException("A given username is already in use");
             }
             var hashedPassword = _passwordHasher.HashPassword(String.Empty, registerUserDto.Password);

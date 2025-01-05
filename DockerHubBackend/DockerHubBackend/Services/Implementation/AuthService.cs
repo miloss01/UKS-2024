@@ -58,19 +58,19 @@ namespace DockerHubBackend.Services.Implementation
             var user = await _userRepository.GetUserWithTokenByEmail(credentials.Email);
             if (user == null)
             {
-                _logger.LogWarning("Login failed: User with email address {Email} not found.", credentials.Email);
+                _logger.LogError("Login failed: User with email address {Email} not found.", credentials.Email);
                 throw new UnauthorizedException("Wrong email or password");
             }
             if (_passwordHasher.VerifyHashedPassword(String.Empty, user.Password, credentials.Password) != PasswordVerificationResult.Success)
             {
-                _logger.LogWarning("Login failed: User with email address {Email} not found.", credentials.Email);
+                _logger.LogError("Login failed: User with email address {Email} not found.", credentials.Email);
                 throw new UnauthorizedException("Wrong email or password");
             }
             if(user.GetType() == typeof(SuperAdmin) && !((SuperAdmin)user).IsVerified)
             {
                 var verificationToken = _randomTokenGenerator.GenerateVerificationToken(256);
                 await UpdateVerificationToken((SuperAdmin)user, verificationToken);
-                _logger.LogWarning("Account not verified for user {Email}.", credentials.Email);
+                _logger.LogError("Account not verified for user {Email}.", credentials.Email);
                 throw new AccountVerificationRequiredException("Account verification required", verificationToken);
             }
             var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email);

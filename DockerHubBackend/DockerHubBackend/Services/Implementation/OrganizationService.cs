@@ -25,7 +25,7 @@ namespace DockerHubBackend.Services.Implementation
             var result = await _orgRepository.AddOrganization(organization);
             if (result == null)
             {
-                _logger.LogWarning("Failed to add organization: {OrganizationName}", organization.Name);
+                _logger.LogError("Failed to add organization: {OrganizationName}", organization.Name);
             }
             else
             {
@@ -40,7 +40,7 @@ namespace DockerHubBackend.Services.Implementation
             var organizations = await _orgRepository.GetUserOrganizations(email);
             if (organizations == null)
             {
-                _logger.LogWarning("No organizations found for user: {Email}", email);
+                _logger.LogError("No organizations found for user: {Email}", email);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace DockerHubBackend.Services.Implementation
             var organization = await _orgRepository.GetOrganizationById(id);
             if (organization == null)
             {
-                _logger.LogWarning("Organization with ID: {OrganizationId} not found", id);
+                _logger.LogError("Organization with ID: {OrganizationId} not found", id);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace DockerHubBackend.Services.Implementation
             var users = await _orgRepository.GetListUsersByOrganizationId(organizationId);
             if (users == null)
             {
-                _logger.LogWarning("No users found for organization with ID: {OrganizationId}", organizationId);
+                _logger.LogError("No users found for organization with ID: {OrganizationId}", organizationId);
             }
             else
             {
@@ -89,7 +89,7 @@ namespace DockerHubBackend.Services.Implementation
             }
             else
             {
-                _logger.LogWarning("Failed to add user with ID: {UserId} to organization with ID: {OrganizationId}. Reason: {Reason}", userId, organizationId, result);
+                _logger.LogError("Failed to add user with ID: {UserId} to organization with ID: {OrganizationId}. Reason: {Reason}", userId, organizationId, result);
             }
             return result;
         }
