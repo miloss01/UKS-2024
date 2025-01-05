@@ -5,10 +5,10 @@
   }
   
   .input-section {
+    margin: 16px;
     flex: 1; 
     padding: 16px;
     background-color: #f5f5f5;
-    border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -48,7 +48,7 @@
     display: flex;
     flex: 2;
     overflow: auto;
-    padding: 0 0 0 16px;
+    padding: 16px;
   }
   
   .mat-elevation-z8 {
@@ -60,3 +60,16 @@
     word-wrap: break-word; 
     white-space: normal;   
   }
+
+  .log-row-error {
+    background-color: rgba(255, 0, 0, 0.2); /* Pastelno crveno za error logove */
+  }
+  
+  .log-row-warning {
+    background-color: rgba(255, 255, 0, 0.2); /* Pastelno žuto za warning logove */
+  }
+  
+  .log-row-info {
+    background-color: rgba(0, 0, 255, 0.2); /* Pastelno plavo za info logove */
+  }
+  

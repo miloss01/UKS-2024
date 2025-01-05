@@ -6,7 +6,7 @@
         <!-- Input query -->
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Query</mat-label>
-          <textarea matInput [(ngModel)]="query" name="query" placeholder="(level:warning OR level:error) AND message:'error occurred'" rows="4"></textarea>
+          <textarea matInput [(ngModel)]="query" name="query" placeholder="(level:WRN OR level:ERR) AND message:'error occurred'" rows="4"></textarea>
         </mat-form-field>
   
         <!-- Input date time -->
@@ -68,7 +68,7 @@
           </ng-container>
       
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="getLogRowClass(row)"></tr>
         </table>
       </div>
     </div>      

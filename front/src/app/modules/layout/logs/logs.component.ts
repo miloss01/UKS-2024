@@ -96,4 +96,17 @@ export class LogsComponent {
         },
       });
     }
+
+    getLogRowClass(row: any): string {
+        switch (row.level) {
+          case 'ERR':
+            return 'log-row-error'; 
+          case 'WRN':
+            return 'log-row-warning'; 
+          case 'INF':
+            return ''; 
+          default:
+            return 'log-row-info';
+        }
+    }    
 }
