@@ -5,7 +5,6 @@ namespace DockerHubBackend.Dto.Response
 {
     public class LogDto
     {
-        [PropertyName("@timestamp")]
         public DateTime? Timestamp { get; set; }
         public string Level { get; set; }
         public string Message { get; set; }
