@@ -80,7 +80,7 @@ namespace DockerHubBackend.Services.Implementation
                 RepositoryId = teamPermissionDto.RepositoryId,
                 Team = t,
                 Repository = dr,
-                permission = toPermissionType(teamPermissionDto.Permission),
+                Permission = toPermissionType(teamPermissionDto.Permission),
             };
             _repository.AddPermissions(tp);
 
