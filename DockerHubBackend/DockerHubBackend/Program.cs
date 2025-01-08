@@ -26,7 +26,7 @@ var jwtCookieName = builder.Configuration["JWT:CookieName"];
 // Add services to the container.
 
 // Authentication
-builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
+builder.Services.AddScoped<IPasswordHasher<string>, BCryptPasswordHasher>();
 
 builder.Services.AddAuthentication(options =>
 {
