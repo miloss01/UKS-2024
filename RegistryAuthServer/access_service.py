@@ -1,12 +1,15 @@
 import psycopg2
-from passlib.context import CryptContext
 from config import DATABASE_URI
-
-pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+import bcrypt
 
 class AccessService:
     def __init__(self):
         self.connection_string = DATABASE_URI
+
+
+
+    def _verify_password(self, raw_password: str, hashed_password: str) -> bool:
+        return bcrypt.checkpw(raw_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
     def authenticate_user(self, username: str, password: str) -> str | None:
         """Returns user id if authentication is correct, otherwise returns None"""
@@ -18,9 +21,9 @@ class AccessService:
             cursor = connection.cursor()
 
             query = """
-                SELECT Id, Username, Password
-                FROM Users
-                WHERE Username = %s;
+                SELECT "Id", "Username", "Password"
+                FROM "Users"
+                WHERE "Username" = %s;
             """
 
             # Execute the query with parameters
@@ -35,7 +38,7 @@ class AccessService:
             stored_password_hash = user[2]
 
             # Compare the provided password with the stored hash using passlib
-            if pwd_context.verify(password, stored_password_hash):
+            if self._verify_password(password, stored_password_hash):
                 return user[0]
             else:
                 return None
@@ -59,15 +62,16 @@ class AccessService:
 
             query = """
                 SELECT 1
-                FROM DockerRepositories AS r
-                WHERE r.Name = %s
-                  AND (r.IsPublic = true
-                       OR r.UserOwnerId = %s
-                       OR EXISTS (
-                           SELECT 1
-                           FROM OrganizationMembers
-                           WHERE OrganizationId = r.Id AND MemberId = %s
-                       ))
+                FROM "DockerRepositories" AS r
+                WHERE r."Name" = %s
+                AND (r."IsPublic" = TRUE
+                    OR r."UserOwnerId" = %s
+                    OR EXISTS (
+                        SELECT 1
+                        FROM "OrganizationMembers" AS om
+                        WHERE om."OrganizationId" = r."Id" 
+                            AND om."MemberId" = %s
+                    ))
                 LIMIT 1;
             """
 
@@ -97,22 +101,23 @@ class AccessService:
 
             query = """
                 SELECT 1
-                FROM DockerRepositories AS r
-                WHERE r.Name = %s
+                FROM "DockerRepositories" AS r
+                WHERE r."Name" = %s
                 AND (
-                    r.UserOwnerId = %s
+                    r."UserOwnerId" = %s
                     OR EXISTS (
                         SELECT 1
-                        FROM TeamPermissions
-                        WHERE permission IN ('ReadWrite', 'Admin')
-                            AND RepositoryId = r.Id
+                        FROM "TeamPermissions" AS tp
+                        WHERE tp."Permission" IN (1, 2)
+                            AND tp."RepositoryId" = r."Id"
                     )
                 )
                 LIMIT 1;
             """
 
+
             # Execute the query with parameters
-            cursor.execute(query, (repository_name, user_id, user_id))
+            cursor.execute(query, (repository_name, user_id))
 
             # Fetch the result
             result = cursor.fetchone()
