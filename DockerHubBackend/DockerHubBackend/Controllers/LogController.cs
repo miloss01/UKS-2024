@@ -64,7 +64,7 @@ namespace DockerHubBackend.Controllers
                             .LessThanOrEquals(request.EndDate));
                 }
 
-                // send quesry to ElasticSearch
+                // send query to ElasticSearch
                 var response = _elasticClient.Search<LogDto>(s => s
                     .Query(q => query)
                     .Sort(sort => sort.Descending(f => f.Timestamp))

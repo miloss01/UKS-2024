@@ -96,7 +96,6 @@ public class LogService : BackgroundService
 
             if (logEntry == null)
             {
-                Console.WriteLine($"Skipping invalid log line: {logLine}");
                 return;
             }
 

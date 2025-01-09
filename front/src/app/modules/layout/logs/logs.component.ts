@@ -59,10 +59,15 @@ export class LogsComponent {
 
   onSubmit() {
     const formatDateTime = (date: Date | null, time: string): string | null => {
-        if (!date) return null;
-        const dateStr = date.toISOString().split('T')[0]; 
-        return time ? `${dateStr}T${time}:00` : `${dateStr}T00:00:00`; 
-    };
+      if (!date) return null;
+    
+      const localDate = new Date(date); 
+      const [hours, minutes] = time.split(':').map(Number);
+    
+      localDate.setHours(hours || 0, minutes || 0, 0, 0);
+    
+      return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000).toISOString();
+    };    
   
     const requestBody = {
         query: this.query || null,
