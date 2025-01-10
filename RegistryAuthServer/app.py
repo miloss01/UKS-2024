@@ -18,8 +18,6 @@ from config import PRIVILEGED_USERS
 app = Flask(__name__)
 app.debug = True
 
-
-
 app.config['SERVICE'] = 'uks-registry'  # eg. "registry.ceph.com"
 app.config['ISSUER'] = 'uks.registry-auth'  # eg. "registry-auth.ceph.com"
 access_service = AccessService()
@@ -173,10 +171,9 @@ def token():
             response = jsonify({'error': 'insufficient permissions'})
             response.status_code = 401
             return response
-    scopes.add(Scope("registry", "catalog", None, ["*"]))
+    # scopes.add(Scope("registry", "catalog", None, ["*"]))
     # scopes.add(Scope("repository","*", None, ["*"]))
     payload = construct_token_response(service, app.config['ISSUER'], scopes, user_id)
-    # print(payload)
     return jsonify(**payload)
 
 

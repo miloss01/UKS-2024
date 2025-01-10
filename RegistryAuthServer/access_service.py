@@ -6,8 +6,6 @@ class AccessService:
     def __init__(self):
         self.connection_string = DATABASE_URI
 
-
-
     def _verify_password(self, raw_password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(raw_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
