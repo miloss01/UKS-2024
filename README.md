@@ -29,18 +29,24 @@ Replace `<username>`, `<password>`, and `<database_name>` with the credentials d
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//SKIP=skip/CN=uks-registry'
 ```
 3.  Copy the `cert.pem` file to the same location as `app.py`
-4.  Run the server
+4.  In `config.py` edit `DATABASE_URI` to match URI of the main database
+5.  Run the server
 
-### 3. Setup Docker Registry Server
+### 3. Setup Docker Registry Webhooks Server
+1. Open `RegistryWebhookServer/config.py` and edit `DATABASE_URI` to match URI of the main database
+2. Run the server
+
+### 4. Setup Docker Registry Server
 1.  Navigate to the `Registry` folder
 2.  Copy the certificate from before (`cert.pem`) to the `certs` subfolder
-3.  Run the following command from the `Registry` folder to start the docker registry server:
+3.  Edit ip address of auth server in `docker-compose.yml`
+4.  Run the following command from the `Registry` folder to start the docker registry server:
 ```bash
 docker compose up -d
 ```
 4.  Check the logs for any error messages
 
-### 4. Configure `appsettings.json`
+### 5. Configure `appsettings.json`
 Ensure that your `appsettings.json` file is configured with the correct database credentials. Example:
 
 ```json
@@ -49,7 +55,7 @@ Ensure that your `appsettings.json` file is configured with the correct database
 }
 ```
 
-### 5. Configure `super_admin_cred.json`
+### 6. Configure `super_admin_cred.json`
 Create `super_admin_cred.json` file inside `Startup` folder. The file should have the structure as shown below:
 ```json
 {
@@ -82,3 +88,19 @@ Update-Database -Project DockerHubBackend -StartupProject DockerHubBackend
 Finally, run the project in Visual Studio to start the application.
 
 ---
+
+## Example usage of local docker registry
+1. Login with username and password:
+```
+docker login
+```
+
+2. Tag local docker image:
+```
+docker tag my-app:latest localhost:5000/my-app:v1.0
+```
+
+3. Push the image to registry:
+```
+docker push localhost:5000/my-app:v1.0
+```
