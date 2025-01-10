@@ -15,3 +15,4 @@ services:
       REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE: /certs/cert.pem
     volumes:
       - ./certs:/certs
+      - ./config.yml:/etc/docker/registry/config.yml
