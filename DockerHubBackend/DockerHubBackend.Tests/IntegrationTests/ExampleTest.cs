@@ -21,7 +21,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             var user = new StandardUser { Email = "user@email.com", Password = "pass", Username = "user", Id = Guid.NewGuid() };
             var repo = new DockerRepository { Id = Guid.NewGuid(), Name = "repo", IsPublic = true, UserOwner = user, UserOwnerId = user.Id };
-            var img = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo.Id, Repository = repo };
+            var img = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo.Id, Repository = repo, Digest = "123" };
 
             dbContext.Users.Add(user);
             dbContext.DockerRepositories.Add(repo);

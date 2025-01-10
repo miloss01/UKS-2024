@@ -43,7 +43,6 @@ namespace DockerHubBackend.Dto.Response
 				LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
 				ImageId = img.Id.ToString(),
 				StarCount = img.Repository.StarCount,
-				Tags = img.Tags,
 				Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
 			}).ToList();
 
