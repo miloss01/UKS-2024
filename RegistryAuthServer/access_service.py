@@ -23,7 +23,7 @@ class AccessService:
             query = """
                 SELECT "Id", "Username", "Password"
                 FROM "Users"
-                WHERE "Username" = %s;
+                WHERE "Username" = %s AND "IsDeleted" = false;
             """
 
             # Execute the query with parameters
@@ -62,8 +62,8 @@ class AccessService:
 
             query = """
                 SELECT 1
-                FROM "DockerRepositories" AS r
-                WHERE r."Name" = %s
+                FROM "DockerRepositories" AS r                
+                WHERE r."IsDeleted" = false AND r."Name" = %s
                 AND (r."IsPublic" = TRUE
                     OR r."UserOwnerId" = %s
                     OR EXISTS (
@@ -102,7 +102,7 @@ class AccessService:
             query = """
                 SELECT 1
                 FROM "DockerRepositories" AS r
-                WHERE r."Name" = %s
+                WHERE r."IsDeleted" = false AND r."Name" = %s
                 AND (
                     r."UserOwnerId" = %s
                     OR EXISTS (

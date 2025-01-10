@@ -12,11 +12,13 @@ from cryptography.hazmat.primitives import serialization
 
 from scope import Scope
 from access_service import AccessService
+from config import TOKEN_VALID_FOR_SECONDS
+from config import PRIVILEGED_USERS
 
 app = Flask(__name__)
 app.debug = True
 
-TOKEN_VALID_FOR_SECONDS = 3600
+
 
 app.config['SERVICE'] = 'uks-registry'  # eg. "registry.ceph.com"
 app.config['ISSUER'] = 'uks.registry-auth'  # eg. "registry-auth.ceph.com"
@@ -42,7 +44,6 @@ def get_private_key():
 
 
 def get_token_payload(service, issuer, scopes, user_id):
-    # scopes.add(Scope("registry", "catalog", None, ["*"]))
     now = datetime.now(timezone.utc)
     token_payload = {
                      'iss' : issuer,
@@ -116,9 +117,10 @@ def decode_basic_auth():
 def authenticate():
     username, password = decode_basic_auth()
     if username == None or password == None:
-        return None
-    
-    return access_service.authenticate_user(username, password)
+        return None, None
+    if username in PRIVILEGED_USERS and PRIVILEGED_USERS[username] == password:
+        return username, True
+    return access_service.authenticate_user(username, password), False
 
 def authorize(user_id, scopes: List[Scope]):
     for scope in scopes:
@@ -159,18 +161,20 @@ def token():
         return response
     scopes = get_scopes()
     
-    user_id = authenticate()
+    user_id, is_privileged = authenticate()
 
     if not user_id:
         response = jsonify({'error': 'authentication unsuccessfull'})
         response.status_code = 401
         return response
     
-    if not authorize(user_id, scopes):
-        response = jsonify({'error': 'insufficient permissions'})
-        response.status_code = 401
-        return response
-    
+    if not is_privileged:
+        if not authorize(user_id, scopes):
+            response = jsonify({'error': 'insufficient permissions'})
+            response.status_code = 401
+            return response
+    scopes.add(Scope("registry", "catalog", None, ["*"]))
+    # scopes.add(Scope("repository","*", None, ["*"]))
     payload = construct_token_response(service, app.config['ISSUER'], scopes, user_id)
     # print(payload)
     return jsonify(**payload)
