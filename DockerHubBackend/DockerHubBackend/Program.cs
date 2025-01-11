@@ -14,6 +14,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Nest;
+using Serilog.Formatting.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +81,7 @@ builder.Services.AddCors(options =>
 
 // Database
 builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
@@ -96,6 +101,7 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -104,7 +110,30 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<GlobalExceptionHandler>();
 });
 
+builder.Services.AddSingleton<IElasticClient>(new ElasticClient(
+    new ConnectionSettings(new Uri("http://localhost:9200"))
+        .DefaultIndex("logstash-*")
+        .DisableDirectStreaming()
+    ));
+builder.Services.AddHostedService<LogService>();
 builder.Services.AddHostedService<StartupScript>();
+
+// confing serilog 
+builder.Host.UseSerilog((context, config) =>
+{
+    config
+        //.MinimumLevel.Information() 
+        .WriteTo.Console()
+        .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day);
+        //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+        //{
+        //    AutoRegisterTemplate = true,
+        //    IndexFormat = "logstash-{0:yyyy.MM.dd}",  // Format logova u Elasticsearch-u
+        //    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7, // Dodajte ovo ako koristite Elasticsearch 7+
+        //    EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
+        //    CustomFormatter = new ElasticsearchJsonFormatter()
+        //});
+});
 
 var app = builder.Build();
 

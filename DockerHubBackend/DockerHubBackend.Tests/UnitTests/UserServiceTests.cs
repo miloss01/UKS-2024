@@ -5,6 +5,7 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Implementation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,14 @@ namespace DockerHubBackend.Tests.UnitTests
         private readonly Mock<IVerificationTokenRepository> _mockVerificationTokenRepository;
         private readonly Mock<IPasswordHasher<string>> _mockPasswordHasher;
         private readonly UserService _service;
+        private readonly Mock<ILogger<UserService>> _mockLogger = new Mock<ILogger<UserService>>();
 
         public UserServiceTests()
         {
             _mockUserRepository = new Mock<IUserRepository>();
             _mockVerificationTokenRepository = new Mock<IVerificationTokenRepository>();
             _mockPasswordHasher = new Mock<IPasswordHasher<string>>();
-            _service = new UserService(_mockUserRepository.Object, _mockVerificationTokenRepository.Object, _mockPasswordHasher.Object);
+            _service = new UserService(_mockUserRepository.Object, _mockVerificationTokenRepository.Object, _mockPasswordHasher.Object, _mockLogger.Object);
         }
 
         [Fact]

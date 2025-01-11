@@ -5,6 +5,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Implementation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,14 @@ namespace DockerHubBackend.Tests.UnitTests
         private readonly Mock<IOrganizationRepository> _mockOrganizationRepository;
 
 		private readonly DockerRepositoryService _service;
+        private readonly Mock<ILogger<DockerRepositoryService>> _mockLogger = new Mock<ILogger<DockerRepositoryService>>();
 
         public DockerRepositoryServiceTests()
         {
             _mockDockerRepositoryRepository = new Mock<IDockerRepositoryRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
             _mockOrganizationRepository = new Mock<IOrganizationRepository>();
-			_service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object, _mockOrganizationRepository.Object);
+			_service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object, _mockOrganizationRepository.Object, _mockLogger.Object);
         }
 
         [Fact]
