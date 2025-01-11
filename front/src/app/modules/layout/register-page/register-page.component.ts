@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
@@ -13,7 +13,7 @@ import {
   Validators
 } from "@angular/forms";
 import {AuthService} from "../../../services/auth.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {LoginCredentials, RegisterUserDto} from "../../../models/models";
 import {HttpErrorResponse} from "@angular/common/http";
 import {Observable, of} from "rxjs";
@@ -33,6 +33,9 @@ import {UserService} from "../../../services/user.service";
   styleUrl: './register-page.component.css'
 })
 export class RegisterPageComponent {
+  title: string = "Sign Up";
+  isAdmin: boolean = false;
+
   errorMessage: string = "";
   registerForm:FormGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -42,7 +45,14 @@ export class RegisterPageComponent {
     confirmPassword: new FormControl('', [Validators.required], [this.confirmPasswordValidator()]),
   });
 
-  constructor(private userService: UserService, private router: Router) {
+  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) {
+  }
+
+  ngOnInit(): void {
+    this.route.data.subscribe((data) => {
+      this.title = data['title'] || 'Sign Up';  // default value
+      this.isAdmin = data['isAdmin'] || false;
+    });
   }
 
   submitForm(){
@@ -53,6 +63,9 @@ export class RegisterPageComponent {
         password: this.registerForm.controls['password'].value,
         location: this.registerForm.controls['location'].value,
         username: this.registerForm.controls['username'].value
+      }
+      if (this.isAdmin) {
+        console.log('admin jeee');
       }
       this.register(user);
     }
