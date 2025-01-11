@@ -35,28 +35,16 @@ namespace DockerHubBackend.Services.Implementation
             await _userRepository.Update(token.User);
         }
 
-        public async Task<StandardUserDto> RegisterStandardUser(RegisterUserDto registerUserDto)
+        public async Task<BaseUserDTO> RegisterStandardUser(RegisterUserDto registerUserDto)
         {
-            if(await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
-            {
-                throw new BadRequestException("An account with given email aready exists");
-            }
-            if(await _userRepository.GetUserByUsername(registerUserDto.Username) != null)
-            {
-                throw new BadRequestException("A given username is already in use");
-            }
-            var hashedPassword = _passwordHasher.HashPassword(String.Empty, registerUserDto.Password);
-            var user = new StandardUser
-            {
-                Email = registerUserDto.Email,
-                Username = registerUserDto.Username,
-                Password = hashedPassword,
-                Location = registerUserDto.Location,
-                Badge = Badge.NoBadge
-            };
-            StandardUser savedUser = (StandardUser) await _userRepository.Create(user);
+            var user = await RegisterUserAsync<StandardUser>(registerUserDto);
+            return new BaseUserDTO(user);
+        }
 
-            return new StandardUserDto(savedUser);
+        public async Task<BaseUserDTO> RegisterAdmin(RegisterUserDto registerUserDto)
+        {
+            var user = await RegisterUserAsync<Admin>(registerUserDto);
+            return new BaseUserDTO(user);
         }
 
         public List<StandardUser> GetAllStandardUsers()
@@ -67,6 +55,28 @@ namespace DockerHubBackend.Services.Implementation
         public void ChangeUserBadge(Badge badge, Guid userId)
         {
             _userRepository.ChangeUserBadge(badge, userId);
+        }
+        private async Task<BaseUser> RegisterUserAsync<TUser>(RegisterUserDto registerUserDto) where TUser : BaseUser
+        {
+            if (await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
+            {
+                throw new BadRequestException("An account with the given email already exists.");
+            }
+
+            if (await _userRepository.GetUserByUsername(registerUserDto.Username) != null)
+            {
+                throw new BadRequestException("The given username is already in use.");
+            }
+
+            var hashedPassword = _passwordHasher.HashPassword(string.Empty, registerUserDto.Password);
+
+            var user = (TUser)Activator.CreateInstance(typeof(TUser),
+                registerUserDto.Email,
+                registerUserDto.Username,
+                hashedPassword,
+                registerUserDto.Location);
+
+            return await _userRepository.Create(user);
         }
     }
 }

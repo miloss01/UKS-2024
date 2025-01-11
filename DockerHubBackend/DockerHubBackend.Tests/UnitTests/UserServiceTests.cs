@@ -154,7 +154,7 @@ namespace DockerHubBackend.Tests.UnitTests
                 .ReturnsAsync(savedUser);
 
             var result = await _service.RegisterStandardUser(registerUserDto);
-            var expectedResult = new StandardUserDto(savedUser);
+            var expectedResult = new BaseUserDTO(savedUser);
 
             Assert.Equal(expectedResult.Id, result.Id);
             Assert.Equal(expectedResult.Email, result.Email);
