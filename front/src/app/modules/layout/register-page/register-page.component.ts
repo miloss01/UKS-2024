@@ -65,9 +65,10 @@ export class RegisterPageComponent {
         username: this.registerForm.controls['username'].value
       }
       if (this.isAdmin) {
-        console.log('admin jeee');
+        this.registerAdmin(user);
+      } else {
+        this.register(user);
       }
-      this.register(user);
     }
   }
 
@@ -85,6 +86,22 @@ export class RegisterPageComponent {
       }
     });
   }
+
+  private registerAdmin(user:RegisterUserDto){
+    this.userService.registerAdmin(user).subscribe({
+      next: () => {
+        this.router.navigate(["/home"]);
+      },
+      error: (error) => {
+        if(error instanceof HttpErrorResponse){
+          this.errorMessage = error.error.message;
+        }else{
+          this.errorMessage = "Something went wrong"
+        }
+      }
+    });
+  }
+
   private usernameValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if(control.value.length < 4){

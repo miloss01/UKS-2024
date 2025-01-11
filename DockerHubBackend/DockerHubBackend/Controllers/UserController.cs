@@ -30,7 +30,15 @@ namespace DockerHubBackend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto changePasswordDto)
         {
-            var response = await _userService.RegisterStandardUser(changePasswordDto);
+            var response = await _userService.Register<StandardUser>(changePasswordDto);
+            return Ok(response);
+        }
+
+        [HttpPost("admin")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterUserDto userDto)
+        { 
+            var response = await _userService.Register<Admin>(userDto);
             return Ok(response);
         }
 

@@ -35,18 +35,6 @@ namespace DockerHubBackend.Services.Implementation
             await _userRepository.Update(token.User);
         }
 
-        public async Task<BaseUserDTO> RegisterStandardUser(RegisterUserDto registerUserDto)
-        {
-            var user = await RegisterUserAsync<StandardUser>(registerUserDto);
-            return new BaseUserDTO(user);
-        }
-
-        public async Task<BaseUserDTO> RegisterAdmin(RegisterUserDto registerUserDto)
-        {
-            var user = await RegisterUserAsync<Admin>(registerUserDto);
-            return new BaseUserDTO(user);
-        }
-
         public List<StandardUser> GetAllStandardUsers()
         {
             return _userRepository.GetAllStandardUsers();
@@ -56,7 +44,7 @@ namespace DockerHubBackend.Services.Implementation
         {
             _userRepository.ChangeUserBadge(badge, userId);
         }
-        private async Task<BaseUser> RegisterUserAsync<TUser>(RegisterUserDto registerUserDto) where TUser : BaseUser
+        public async Task<BaseUserDTO> Register<TUser>(RegisterUserDto registerUserDto) where TUser : BaseUser
         {
             if (await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
             {
@@ -76,7 +64,8 @@ namespace DockerHubBackend.Services.Implementation
                 hashedPassword,
                 registerUserDto.Location);
 
-            return await _userRepository.Create(user);
+            await _userRepository.Create(user);
+            return new BaseUserDTO(user);
         }
     }
 }

@@ -9,7 +9,4 @@ import { Component } from '@angular/core';
 })
 export class LandingPageComponent {
   
-  openRegistrationPage() {
-    window.location.replace("/sign-up");
-  }
 }
