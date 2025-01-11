@@ -2,6 +2,8 @@
 {
     public class Admin : BaseUser
     {
+        public Admin() { }
+
         public Admin(string email, string username, string password, string location)
         {
             Email = email;

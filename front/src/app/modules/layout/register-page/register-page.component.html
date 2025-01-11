@@ -52,6 +52,6 @@
         {{ isAdmin ? 'Sign Up Admin' : 'Sign Up' }}
       </button>
     </form>
-    <a class="action-link" href="/login">Already have an account? Login</a>
+    <a *ngIf="!isAdmin" class="action-link" href="/login">Already have an account? Login</a>
   </div>
 </div>
