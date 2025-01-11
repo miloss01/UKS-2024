@@ -35,7 +35,7 @@ namespace DockerHubBackend.Controllers
         }
 
         [HttpPost("admin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterUserDto userDto)
         { 
             var response = await _userService.Register<Admin>(userDto);
