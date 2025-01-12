@@ -40,6 +40,7 @@ namespace DockerHubBackend.Controllers
                                     LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
                                     ImageId = img.Id.ToString(),
                                     StarCount = img.Repository.StarCount,
+                                    Tags = img.Tags.Select(tag => tag.Name).ToList(),
                                     Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
                                 }).ToList(),
                                 pagedDockerImages.TotalNumberOfElements

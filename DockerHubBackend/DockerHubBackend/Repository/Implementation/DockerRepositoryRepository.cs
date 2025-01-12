@@ -31,6 +31,7 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(dockerRepository => dockerRepository.UserOwner)
                 .Include(dockerRepository => dockerRepository.OrganizationOwner)
                 .Include(dockerRepository => dockerRepository.Images)
+                    .ThenInclude(img => img.Tags)
                 .FirstOrDefault(dockerRepository => dockerRepository.Id == id);
         }
 
