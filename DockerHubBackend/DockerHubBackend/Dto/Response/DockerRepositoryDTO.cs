@@ -21,6 +21,8 @@ namespace DockerHubBackend.Dto.Response
         public string Owner { get; set; }
         public string CreatedAt { get; set; }
 
+		public DockerRepositoryDTO() { }
+
 		public DockerRepositoryDTO(DockerRepository dockerRepository)
 		{
 			Id = dockerRepository.Id.ToString();

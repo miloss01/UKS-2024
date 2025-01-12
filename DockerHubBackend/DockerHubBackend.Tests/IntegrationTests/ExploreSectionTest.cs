@@ -56,5 +56,47 @@ namespace DockerHubBackend.Tests.IntegrationTests
             Assert.Equal(1, pageDto.TotalNumberOfElements);
             Assert.Equal(img1.Id.ToString(), pageDto.Data[0].ImageId);
         }
+
+        [Fact]
+        public async Task GettingDockerRepositories_PassAllQueryParams_ReturnsValidRepositories()
+        {
+            using var dbContext = GetDbContext();
+
+            var user = new StandardUser { Email = "user@email.com", Password = "pass", Username = "user", Id = Guid.NewGuid() };
+            var repo1 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo1", IsPublic = true, UserOwner = user, UserOwnerId = user.Id, Badge = Badge.VerifiedPublisher };
+            var repo2 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo2", IsPublic = true, UserOwner = user, UserOwnerId = user.Id };
+
+            dbContext.Users.Add(user);
+            dbContext.DockerRepositories.Add(repo1);
+            dbContext.DockerRepositories.Add(repo2);
+
+            dbContext.SaveChanges();
+
+            var response = await _httpClient.GetAsync("/api/dockerRepositories?page=1&pageSize=10");
+            var responseString = await response.Content.ReadAsStringAsync();
+            var pageDto = JsonSerializer.Deserialize<PageDTO<DockerRepositoryDTO>>(responseString, _jsonSerializerOptions);
+
+            Assert.Equal(2, pageDto.TotalNumberOfElements);
+            Assert.Contains(pageDto.Data[0].Id, repo1.Id.ToString() + repo2.Id.ToString());
+            Assert.Contains(pageDto.Data[1].Id, repo1.Id.ToString() + repo2.Id.ToString());
+
+            response = await _httpClient.GetAsync("/api/dockerRepositories?page=3&pageSize=1");
+            responseString = await response.Content.ReadAsStringAsync();
+            pageDto = JsonSerializer.Deserialize<PageDTO<DockerRepositoryDTO>>(responseString, _jsonSerializerOptions);
+            Assert.Equal(2, pageDto.TotalNumberOfElements);
+            Assert.Empty(pageDto.Data);
+
+            response = await _httpClient.GetAsync("/api/dockerRepositories?page=1&pageSize=10&searchTerm=repo1");
+            responseString = await response.Content.ReadAsStringAsync();
+            pageDto = JsonSerializer.Deserialize<PageDTO<DockerRepositoryDTO>>(responseString, _jsonSerializerOptions);
+            Assert.Equal(1, pageDto.TotalNumberOfElements);
+            Assert.Equal(repo1.Id.ToString(), pageDto.Data[0].Id);
+
+            response = await _httpClient.GetAsync("/api/dockerRepositories?page=1&pageSize=10&badges=VerifiedPublisher");
+            responseString = await response.Content.ReadAsStringAsync();
+            pageDto = JsonSerializer.Deserialize<PageDTO<DockerRepositoryDTO>>(responseString, _jsonSerializerOptions);
+            Assert.Equal(1, pageDto.TotalNumberOfElements);
+            Assert.Equal(repo1.Id.ToString(), pageDto.Data[0].Id);
+        }
     }
 }
