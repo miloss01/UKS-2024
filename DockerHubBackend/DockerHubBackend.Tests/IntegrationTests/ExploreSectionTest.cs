@@ -20,7 +20,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
             var repo1 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo1", IsPublic = true, UserOwner = user, UserOwnerId = user.Id, Badge = Badge.VerifiedPublisher };
             var repo2 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo2", IsPublic = true, UserOwner = user, UserOwnerId = user.Id };
             var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1, Digest = "123" };
-            var img2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo2.Id, Repository = repo2, Digest = "123" };
+            var img2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo2.Id, Repository = repo2, Digest = "456" };
 
             dbContext.Users.Add(user);
             dbContext.DockerRepositories.Add(repo1);
