@@ -1,0 +1,1 @@
+DATABASE_URI = "postgresql://admin:admin@localhost:5432/uks-database"

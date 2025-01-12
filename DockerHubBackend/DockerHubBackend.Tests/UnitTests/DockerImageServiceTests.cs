@@ -29,8 +29,8 @@ namespace DockerHubBackend.Tests.UnitTests
         [Fact]
         public void GetDockerImages_SearchTermAndBadgesEmpty_ReturnsAllDockerImages()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);
@@ -54,8 +54,8 @@ namespace DockerHubBackend.Tests.UnitTests
         [Fact]
         public void GetDockerImages_SearchTermNotEmpty_ReturnsDockerImagesWhichIdContainsSearchTerm()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);
@@ -78,8 +78,8 @@ namespace DockerHubBackend.Tests.UnitTests
         [Fact]
         public void GetDockerImages_BadgesNotEmpty_ReturnsDockerImagesWhichRepositoryHasProvidedBadge()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo1", Badge = Badge.DockerOfficialImage } };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VerifiedPublisher } };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), Digest = "123", DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo1", Badge = Badge.DockerOfficialImage } };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), Digest = "123", DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VerifiedPublisher } };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);

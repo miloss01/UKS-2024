@@ -16,6 +16,7 @@ namespace DockerHubBackend.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamPermission> TeamPermissions { get; set; }
         public DbSet<VerificationToken> VerificationTokens { get; set; }
+        public DbSet<ImageTag> ImageTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,11 +93,9 @@ namespace DockerHubBackend.Data
                 .HasOne<BaseUser>(vt => vt.User)
                 .WithOne(u => u.VerificationToken)
                 .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<DockerImage>()
-                .Property(p => p.Tags)
-                .HasConversion(v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
+                .HasIndex(di => di.Digest)
+                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }

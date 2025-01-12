@@ -16,7 +16,7 @@ namespace DockerHubBackend.Dto.Response
         {
             TeamName = tp.Team.Name;
             RepositoryName = tp.Repository.Name;
-            Permission = tp.permission.ToString();
+            Permission = tp.Permission.ToString();
         }
     }
 }

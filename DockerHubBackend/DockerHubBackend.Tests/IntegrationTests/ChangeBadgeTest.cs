@@ -21,7 +21,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             var user = new StandardUser { Email = "user@email.com", Password = "pass", Username = "user", Id = Guid.NewGuid(), Badge = Badge.VerifiedPublisher };
             var repo1 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo1", IsPublic = true, UserOwner = user, UserOwnerId = user.Id, Badge = Badge.VerifiedPublisher };
-            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1 };
+            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1, Digest = "123" };
 
             dbContext.Users.Add(user);
             dbContext.DockerRepositories.Add(repo1);
@@ -47,7 +47,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             var user = new StandardUser { Email = "user@email.com", Password = "pass", Username = "user", Id = Guid.NewGuid(), Badge = Badge.VerifiedPublisher };
             var repo1 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo1", IsPublic = true, UserOwner = user, UserOwnerId = user.Id, Badge = Badge.VerifiedPublisher };
-            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1 };
+            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1, Digest = "123" };
 
             dbContext.Users.Add(user);
             dbContext.DockerRepositories.Add(repo1);
@@ -68,7 +68,7 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             var user = new StandardUser { Email = "user@email.com", Password = "pass", Username = "user", Id = Guid.NewGuid(), Badge = Badge.VerifiedPublisher };
             var repo1 = new DockerRepository { Id = Guid.NewGuid(), Name = "repo1", IsPublic = true, UserOwner = user, UserOwnerId = user.Id, Badge = Badge.VerifiedPublisher };
-            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1 };
+            var img1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = repo1.Id, Repository = repo1, Digest = "123" };
 
             dbContext.Users.Add(user);
             dbContext.DockerRepositories.Add(repo1);

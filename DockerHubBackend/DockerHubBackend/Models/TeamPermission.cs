@@ -4,7 +4,7 @@ namespace DockerHubBackend.Models
 {
     public class TeamPermission : BaseEntity
     {
-        public PermissionType permission {  get; set; }
+        public PermissionType Permission {  get; set; }
         public required Guid TeamId { get; set; }
         [ForeignKey(nameof(TeamId))]
         public required Team Team { get; set; }
