@@ -80,6 +80,7 @@ export interface DockerImageDTO {
   lastPush: string;
   owner: string;
   createdAt: string;
+  digest: string;
 }
 
 export interface PageDTO<T> {
