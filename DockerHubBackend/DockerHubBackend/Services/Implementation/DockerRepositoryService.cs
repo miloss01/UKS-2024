@@ -3,6 +3,7 @@ using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
+using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
@@ -281,5 +282,14 @@ namespace DockerHubBackend.Services.Implementation
 			_dockerRepositoryRepository.RemoveStarRepository(userId, repositoryId);
 			_logger.LogInformation("Successfully removed repository with ID: {RepositoryId} from starred list for user with ID: {UserId}", repositoryId, userId);
 		}
-	}
+
+        public PageDTO<DockerRepository> GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges)
+        {
+            _logger.LogInformation("Fetching Docker repositories with parameters: Page={Page}, PageSize={PageSize}, SearchTerm={SearchTerm}, Badges={Badges}", page, pageSize, searchTerm, badges);
+            var result = _dockerRepositoryRepository.GetDockerRepositories(page, pageSize, searchTerm, badges);
+
+            _logger.LogInformation("Fetched Docker repositories.");
+            return result;
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using Amazon.S3.Model;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Utils;
@@ -19,5 +20,6 @@ namespace DockerHubBackend.Repository.Interface
         public List<DockerRepository> GetAllRepositoriesForUser(Guid userId);
         public void AddStarRepository(Guid userId, Guid repositoryId);
         public void RemoveStarRepository(Guid userId, Guid repositoryId);
+        public PageDTO<DockerRepository> GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges);
     }
 }

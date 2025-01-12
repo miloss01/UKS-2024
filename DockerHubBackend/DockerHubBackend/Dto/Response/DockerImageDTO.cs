@@ -14,6 +14,7 @@ namespace DockerHubBackend.Dto.Response
         public string LastPush { get; set; }
         public string Owner { get; set; }
         public string CreatedAt { get; set; }
+        public string Digest { get; set; }
 
         public override string ToString()
         {

@@ -27,6 +27,7 @@ namespace DockerHubBackend.Repository.Implementation
                     .ThenInclude(repo => repo.UserOwner)
                 .Include(img => img.Repository)
                     .ThenInclude(repo => repo.OrganizationOwner)
+                .Include(img => img.Tags)
                 .Where(img => !img.IsDeleted)
                 .Where(img => img.Repository.IsPublic)
                 .Where(img => !badgeList.Any() ||
