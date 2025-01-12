@@ -1,6 +1,6 @@
 <div class="centered-container">
   <div class="base-container">
-    <h1 class="form-title">Sign Up</h1>
+    <h1 class="form-title">{{ title }}</h1>
     <form [formGroup]="registerForm">
       <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
@@ -48,8 +48,10 @@
       <mat-error *ngIf="errorMessage !== ''">
         {{errorMessage}}
       </mat-error>
-      <button mat-raised-button color="primary" type="submit" (click)="submitForm()" [disabled]="registerForm.invalid">Sign Up</button>
+      <button mat-raised-button color="primary" type="submit" (click)="submitForm()" [disabled]="registerForm.invalid">
+        {{ isAdmin ? 'Sign Up Admin' : 'Sign Up' }}
+      </button>
     </form>
-    <a class="action-link" href="/login">Already have an account? Login</a>
+    <a *ngIf="!isAdmin" class="action-link" href="/login">Already have an account? Login</a>
   </div>
 </div>

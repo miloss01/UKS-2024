@@ -31,7 +31,7 @@ export interface RegisterUserDto{
   password: string
 }
 
-export interface StandardUser{
+export interface BaseUser{
   id: string,
   email: string,
   username: string,

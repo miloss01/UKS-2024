@@ -42,35 +42,6 @@ namespace DockerHubBackend.Services.Implementation
             _logger.LogInformation("Password successfully changed for user: {UserEmail}", token.User.Email);
         }
 
-        public async Task<StandardUserDto> RegisterStandardUser(RegisterUserDto registerUserDto)
-        {
-            _logger.LogInformation("Attempting to register a new user with email: {Email} and username: {Username}", registerUserDto.Email, registerUserDto.Username);
-
-            if (await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
-            {
-                _logger.LogError("Registration failed. Email {Email} is already in use.", registerUserDto.Email);
-                throw new BadRequestException("An account with given email aready exists");
-            }
-            if(await _userRepository.GetUserByUsername(registerUserDto.Username) != null)
-            {
-                _logger.LogError("Registration failed. Username {Username} is already in use.", registerUserDto.Username);
-                throw new BadRequestException("A given username is already in use");
-            }
-            var hashedPassword = _passwordHasher.HashPassword(String.Empty, registerUserDto.Password);
-            var user = new StandardUser
-            {
-                Email = registerUserDto.Email,
-                Username = registerUserDto.Username,
-                Password = hashedPassword,
-                Location = registerUserDto.Location,
-                Badge = Badge.NoBadge
-            };
-            StandardUser savedUser = (StandardUser) await _userRepository.Create(user);
-            _logger.LogInformation("User successfully registered with email: {Email}", savedUser.Email);
-
-            return new StandardUserDto(savedUser);
-        }
-
         public List<StandardUser> GetAllStandardUsers()
         {
             _logger.LogInformation("Fetching all standard users.");
@@ -84,6 +55,34 @@ namespace DockerHubBackend.Services.Implementation
             _logger.LogInformation("Changing badge for user with ID: {UserId} to {Badge}", userId, badge);
             _userRepository.ChangeUserBadge(badge, userId);
             _logger.LogInformation("Badge successfully updated for user with ID: {UserId}", userId);
+        }
+
+        public async Task<BaseUserDTO> Register<TUser>(RegisterUserDto registerUserDto) where TUser : BaseUser
+        {
+            _logger.LogInformation("Attempting to register a new user with email: {Email} and username: {Username}", registerUserDto.Email, registerUserDto.Username);
+            if (await _userRepository.GetUserByEmail(registerUserDto.Email) != null)
+            {
+                _logger.LogError("Registration failed. Email {Email} is already in use.", registerUserDto.Email);
+                throw new BadRequestException("An account with the given email already exists.");
+            }
+
+            if (await _userRepository.GetUserByUsername(registerUserDto.Username) != null)
+            {
+                _logger.LogError("Registration failed. Username {Username} is already in use.", registerUserDto.Username);
+                throw new BadRequestException("The given username is already in use.");
+            }
+
+            var hashedPassword = _passwordHasher.HashPassword(string.Empty, registerUserDto.Password);
+
+            var user = (TUser)Activator.CreateInstance(typeof(TUser),
+                registerUserDto.Email,
+                registerUserDto.Username,
+                hashedPassword,
+                registerUserDto.Location);
+
+            await _userRepository.Create(user);
+             _logger.LogInformation("User successfully registered with email: {Email}", savedUser.Email);
+            return new BaseUserDTO(user);
         }
     }
 }
