@@ -115,5 +115,45 @@ namespace DockerHubBackend.Repository.Implementation
             repository.StarCount -= 1;
             _context.SaveChanges();
         }
+
+        public PageDTO<DockerRepository> GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges)
+        {
+            searchTerm = searchTerm ?? string.Empty;
+            badges = badges ?? string.Empty;
+
+            var badgeList = badges.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(badge => Enum.TryParse<Badge>(badge, true, out _))
+                .Select(badge => Enum.Parse<Badge>(badge, true))
+                .ToList();
+
+            var dockerRepositories = _context.DockerRepositories
+                .AsQueryable()
+                .Include(repo => repo.UserOwner)
+                .Include(repo => repo.OrganizationOwner)
+                .Include(repo => repo.Images)
+                    .ThenInclude(img => img.Tags)
+                .Where(repo => !repo.IsDeleted)
+                .Where(repo => repo.IsPublic)
+                .Where(repo => !badgeList.Any() ||
+                              badgeList.Contains(repo.Badge))
+                .Where(repo => repo.Name.Contains(searchTerm) ||
+                              repo.Id.ToString().Contains(searchTerm))
+                .ToList();
+
+            var pageDto = new PageDTO<DockerRepository>(
+                            dockerRepositories
+                             .OrderByDescending(repo => repo.Badge == Badge.DockerOfficialImage)
+                             .ThenByDescending(repo => repo.Badge == Badge.VerifiedPublisher)
+                             .ThenByDescending(repo => repo.Badge == Badge.SponsoredOSS)
+                             .ThenByDescending(repo => repo.Badge == Badge.NoBadge)
+                             .ThenByDescending(repo => repo.StarCount)
+                             .Skip((page - 1) * pageSize)
+                             .Take(pageSize)
+                             .ToList(),
+                            dockerRepositories.Count
+                        );
+
+            return pageDto;
+        }
     }
 }
