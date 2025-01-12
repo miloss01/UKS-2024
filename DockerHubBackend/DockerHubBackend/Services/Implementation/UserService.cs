@@ -81,7 +81,7 @@ namespace DockerHubBackend.Services.Implementation
                 registerUserDto.Location);
 
             await _userRepository.Create(user);
-             _logger.LogInformation("User successfully registered with email: {Email}", savedUser.Email);
+             _logger.LogInformation("User successfully registered with email: {Email}", user.Email);
             return new BaseUserDTO(user);
         }
     }
