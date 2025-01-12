@@ -4,6 +4,7 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Implementation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,12 @@ namespace DockerHubBackend.Tests.UnitTests
     {
         private readonly Mock<IDockerImageRepository> _mockDockerImageRepository;
         private readonly DockerImageService _service;
+        private readonly Mock<ILogger<DockerImageService>> _mockLogger = new Mock<ILogger<DockerImageService>>();
 
         public DockerImageServiceTests()
         {
             _mockDockerImageRepository = new Mock<IDockerImageRepository>();
-            _service = new DockerImageService(_mockDockerImageRepository.Object);
+            _service = new DockerImageService(_mockDockerImageRepository.Object, _mockLogger.Object);
         }
 
         [Fact]

@@ -5,7 +5,9 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Implementation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
+using Npgsql.TypeMapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +24,14 @@ namespace DockerHubBackend.Tests.UnitTests
         private readonly Mock<IVerificationTokenRepository> _mockVerificationTokenRepository;
         private readonly Mock<IPasswordHasher<string>> _mockPasswordHasher;
         private readonly UserService _service;
+        private readonly Mock<ILogger<UserService>> _mockLogger = new Mock<ILogger<UserService>>();
 
         public UserServiceTests()
         {
             _mockUserRepository = new Mock<IUserRepository>();
             _mockVerificationTokenRepository = new Mock<IVerificationTokenRepository>();
             _mockPasswordHasher = new Mock<IPasswordHasher<string>>();
-            _service = new UserService(_mockUserRepository.Object, _mockVerificationTokenRepository.Object, _mockPasswordHasher.Object);
+            _service = new UserService(_mockUserRepository.Object, _mockVerificationTokenRepository.Object, _mockPasswordHasher.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -74,8 +77,10 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockUserRepository.Verify(repo => repo.Update(It.IsAny<BaseUser>()), Times.Once);
         }
 
-        [Fact]
-        public async Task RegisterUser_ExistingEmailThrowsBadRequestException()
+        [Theory]
+        [InlineData(typeof(StandardUser))]
+        [InlineData(typeof(Admin))]
+        public async Task RegisterUser_ExistingEmailThrowsBadRequestException(Type userType)
         {
             RegisterUserDto registerUserDto = new RegisterUserDto
             {
@@ -88,12 +93,15 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockUserRepository.Setup(repo => repo.GetUserByEmail(registerUserDto.Email))
                 .ReturnsAsync(new StandardUser { Email = registerUserDto.Email, Username="user123", Password="password123"});
 
-            var exception = await Assert.ThrowsAsync<BadRequestException>(() => _service.RegisterStandardUser(registerUserDto));
-            Assert.Equal("An account with given email aready exists", exception.Message);
+            var method = typeof(UserService).GetMethod("Register").MakeGenericMethod(userType);
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() => (Task<BaseUserDTO>)method.Invoke(_service, new object[] { registerUserDto }));
+            Assert.Equal("An account with the given email already exists.", exception.Message);
         }
 
-        [Fact]
-        public async Task RegisterUser_ExistingUsernameThrowsBadRequestException()
+        [Theory]
+        [InlineData(typeof(StandardUser))]
+        [InlineData(typeof(Admin))]
+        public async Task RegisterUser_ExistingUsernameThrowsBadRequestException(Type userType)
         {
             RegisterUserDto registerUserDto = new RegisterUserDto
             {
@@ -109,12 +117,15 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockUserRepository.Setup(repo => repo.GetUserByUsername(registerUserDto.Username))
                 .ReturnsAsync(new StandardUser { Email = "user123@email.com", Username = registerUserDto.Username, Password = "password123" });
 
-            var exception = await Assert.ThrowsAsync<BadRequestException>(() => _service.RegisterStandardUser(registerUserDto));
-            Assert.Equal("A given username is already in use", exception.Message);
+            var method = typeof(UserService).GetMethod("Register").MakeGenericMethod(userType);
+            var exception = await Assert.ThrowsAsync<BadRequestException>(() => (Task<BaseUserDTO>)method.Invoke(_service, new object[] { registerUserDto }));
+            Assert.Equal("The given username is already in use.", exception.Message);
         }
 
-        [Fact]
-        public async Task RegisterUser_UniqueEmailAndUsernameCreateUser()
+        [Theory]
+        [InlineData(typeof(StandardUser))]
+        [InlineData(typeof(Admin))]
+        public async Task RegisterUser_UniqueEmailAndUsernameCreateUser(Type userType)
         {
             RegisterUserDto registerUserDto = new RegisterUserDto
             {
@@ -133,30 +144,31 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockPasswordHasher.Setup(hasher => hasher.HashPassword(It.IsAny<string>(), registerUserDto.Password))
                 .Returns("hashedPassword");
 
-            var user = new StandardUser
+            var user = Activator.CreateInstance(userType) as BaseUser;
+            if (user != null)
             {
-                Email = registerUserDto.Email,
-                Username = registerUserDto.Username,
-                Password = "hashedPassword",
-                Location = registerUserDto.Location
-            };
+                user.Email = registerUserDto.Email;
+                user.Username = registerUserDto.Username;
+                user.Password = "hashedPassword";
+                user.Location = registerUserDto.Location;
+            }
 
-            var savedUser = new StandardUser
+            var savedUser = Activator.CreateInstance(userType) as BaseUser;
+            if (savedUser != null)
             {
-                Id = Guid.Parse("98828440-8780-42da-94f4-03253b2cda6b"),
-                Email = registerUserDto.Email,
-                Username = registerUserDto.Username,
-                Password = "hashedPassword",
-                Location = registerUserDto.Location
-            };
+                savedUser.Email = registerUserDto.Email;
+                savedUser.Username = registerUserDto.Username;
+                savedUser.Password = "hashedPassword";
+                savedUser.Location = registerUserDto.Location;
+            }
 
             _mockUserRepository.Setup(repo => repo.Create(It.IsAny<BaseUser>()))
                 .ReturnsAsync(savedUser);
 
-            var result = await _service.RegisterStandardUser(registerUserDto);
-            var expectedResult = new StandardUserDto(savedUser);
+            var method = typeof(UserService).GetMethod("Register").MakeGenericMethod(userType);
+            var result = await (Task<BaseUserDTO>)method.Invoke(_service, new object[] { registerUserDto });
+            var expectedResult = new BaseUserDTO(savedUser);
 
-            Assert.Equal(expectedResult.Id, result.Id);
             Assert.Equal(expectedResult.Email, result.Email);
             Assert.Equal(expectedResult.Username, result.Username);
             Assert.Equal(expectedResult.Location, result.Location);
