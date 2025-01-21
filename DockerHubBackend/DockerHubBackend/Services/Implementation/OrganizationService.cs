@@ -1,10 +1,13 @@
+using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response.Organization;
+using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -12,11 +15,15 @@ namespace DockerHubBackend.Services.Implementation
     {
         private readonly IOrganizationRepository _orgRepository;
         private readonly ILogger<OrganizationService> _logger;
+        private readonly IDockerRepositoryService _repositoryService;
+        private readonly DataContext _context;
 
-        public OrganizationService(IOrganizationRepository organizationRepository, ILogger<OrganizationService> logger)
+        public OrganizationService(IOrganizationRepository organizationRepository, ILogger<OrganizationService> logger, IDockerRepositoryService repositoryService, DataContext context)
         {
             _orgRepository = organizationRepository;
             _logger = logger;
+            _repositoryService = repositoryService;
+            _context = context;
         }
 
         public async Task<Guid?> AddOrganization(AddOrganizationDto organization)
@@ -94,10 +101,45 @@ namespace DockerHubBackend.Services.Implementation
             return result;
         }
 
+        private async Task<Organization> GetOrganizationWithRepositories(Guid id)
+        {
+            _logger.LogInformation("Fetching organization with ID: {Id}", id);
+
+            var org = await _orgRepository.GetOrganizationByIdWithRepositories(id);
+            if (org == null)
+            {
+                _logger.LogError("Organization with ID: {Id} not found.", id);
+                throw new NotFoundException($"Organization with id {id.ToString()} not found.");
+            }
+
+            _logger.LogInformation("Organization with ID: {Id} successfully retrieved.", id);
+            return org;
+        }
+
         public async Task DeleteOrganization(Guid organizationId)
         {
             _logger.LogInformation("Deleting organization with ID: {OrganizationId}", organizationId);
-            await _orgRepository.DeleteOrganization(organizationId);
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var org = await GetOrganizationWithRepositories(organizationId);
+
+                    foreach (var repository in org.Repositories)
+                    {
+                        await _repositoryService.DeleteDockerRepository(repository.Id);
+                    }
+
+                    await _orgRepository.DeleteOrganization(organizationId);
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex, "Failed to delete organization with ID: {Id}", organizationId);
+                    throw new Exception("Something went wrong");
+                }
+            }
+
             _logger.LogInformation("Organization with ID: {OrganizationId} deleted successfully", organizationId);
         }
 
