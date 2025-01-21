@@ -99,6 +99,7 @@ builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IRegistryService, RegistryService>();
 
 builder.Services.AddControllers();
 
