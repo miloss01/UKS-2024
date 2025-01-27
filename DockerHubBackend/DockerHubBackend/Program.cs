@@ -20,6 +20,7 @@ using Nest;
 using Serilog.Formatting.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 
@@ -135,6 +136,11 @@ builder.Host.UseSerilog((context, config) =>
         //});
 });
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5156); // Explicitly bind to port 5156
+});
+
 var app = builder.Build();
 
 //await DatabaseContextSeed.SeedDataAsync(app.Services);
@@ -144,6 +150,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
