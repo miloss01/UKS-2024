@@ -78,5 +78,17 @@
     display: flex;
     justify-content: space-between;
   }
+
+  .timestamp-column {
+    width: 200px;
+  }
+
+  .level-column {
+    width: 100px;
+  }
+
+  .message-column {
+    width: 100%;
+  }
   
   
