@@ -73,4 +73,10 @@
   .log-row-info {
     background-color: rgba(0, 0, 255, 0.2); /* Pastelno plavo za info logove */
   }
+
+  .button-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
   

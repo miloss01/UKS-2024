@@ -53,17 +53,24 @@ export class LogsComponent {
     if (!this.query && !this.selectedOption.value && !this.startDate && !this.startTime && !this.endDate && !this.endTime) {
       return false;
     }
+    return this.checkDateAndTime();
+  }
+
+  checkDateAndTime(): boolean {
+    let startDateTime = null;
+    let endDateTime = null;
+    if(this.startDate) {
+      startDateTime = new Date(this.startDate);
+      const [startHours, startMinutes] = this.startTime.split(':').map(Number);
+      startDateTime.setHours(startHours, startMinutes);
+    }
+    if(this.endDate) {
+      endDateTime = new Date(this.endDate);
+      const [endHours, endMinutes] = this.endTime.split(':').map(Number);
+      endDateTime.setHours(endHours, endMinutes);
+    }
+    if(startDateTime && endDateTime) return startDateTime <= endDateTime;
     return true
-
-    // const startDateTime = new Date(this.startDate);
-    // const [startHours, startMinutes] = this.startTime.split(':').map(Number);
-    // startDateTime.setHours(startHours, startMinutes);
-
-    // const endDateTime = new Date(this.endDate);
-    // const [endHours, endMinutes] = this.endTime.split(':').map(Number);
-    // endDateTime.setHours(endHours, endMinutes);
-
-    // return startDateTime <= endDateTime;
   }
 
   onSubmit() {
@@ -123,5 +130,39 @@ export class LogsComponent {
           default:
             return 'log-row-info';
         }
+    } 
+
+    clearForm() {
+      this.query = '';
+      this.selectedOption = this.options[0];
+      this.startDate = null;
+      this.startTime = '';
+      this.endDate = null;
+      this.endTime = '';
     }    
+    
+    onStartDateChange(event: any) {
+      if (event.value) {
+        this.startTime = '00:00';
+      }
+    }
+    
+    onEndDateChange(event: any) {
+      if (event.value) {
+        this.endTime = '23:59';
+      }
+    }
+
+    onStartTimeChange(): void {
+      if (!this.startDate) {
+        this.startDate = new Date();
+      }
+    }
+    
+    onEndTimeChange(): void {
+      if (!this.endDate) {
+        this.endDate = new Date();
+      }
+    }
+    
 }

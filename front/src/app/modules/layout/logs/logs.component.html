@@ -23,34 +23,49 @@
           <div class="date-time-row">
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>Start date</mat-label>
-              <input matInput [matDatepicker]="picker" [(ngModel)]="startDate" name="startDate">
+              <input 
+                matInput 
+                [matDatepicker]="picker" 
+                [(ngModel)]="startDate" 
+                name="startDate"
+                (dateChange)="onStartDateChange($event)"
+              />
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
         
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>Start time</mat-label>
-              <input matInput type="time" [(ngModel)]="startTime" name="startTime">
+              <input matInput type="time" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()">
             </mat-form-field>
           </div>
         
           <div class="date-time-row">
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>End date</mat-label>
-              <input matInput [matDatepicker]="endDatePicker" [(ngModel)]="endDate" name="endDate">
+              <input 
+                matInput 
+                [matDatepicker]="endDatePicker" 
+                [(ngModel)]="endDate" 
+                name="endDate"
+                (dateChange)="onEndDateChange($event)"
+              />
               <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #endDatePicker></mat-datepicker>
             </mat-form-field>
         
             <mat-form-field appearance="fill" class="full-width">
               <mat-label>End time</mat-label>
-              <input matInput type="time" [(ngModel)]="endTime" name="endTime">
+              <input matInput type="time" [(ngModel)]="endTime" name="endTime" (ngModelChange)="onEndTimeChange()">
             </mat-form-field>
           </div>
         </div>
   
         <!-- Button for search -->
-        <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Search logs</button>
+        <div class="button-row">
+          <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Search logs</button>
+          <button mat-raised-button type="button" (click)="clearForm()">Clear</button>
+        </div>
       </form>
     </div>
   
