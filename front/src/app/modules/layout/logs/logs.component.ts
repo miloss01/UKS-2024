@@ -86,7 +86,7 @@ export class LogsComponent {
     };    
   
     const requestBody = {
-        query: this.query || null,
+        query: this.query.toLowerCase() || null,
         level: this.selectedOption.value ?? null,
         startDate: formatDateTime(this.startDate, this.startTime),
         endDate: formatDateTime(this.endDate, this.endTime),
