@@ -5,10 +5,19 @@
       <form (ngSubmit)="onSubmit()" class="form-container">
         <!-- Input query -->
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Query</mat-label>
+          <mat-label>Text or Query</mat-label>
           <textarea matInput [(ngModel)]="query" name="query" placeholder="(level:WRN OR level:ERR) AND message:'error occurred'" rows="4"></textarea>
         </mat-form-field>
-  
+
+        <!--Input level-->
+        <mat-form-field appearance="fill">
+          <mat-select placeholder="Select level..." [(ngModel)]="selectedOption" name="level">
+            <mat-option *ngFor="let option of options" [value]="option">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
         <!-- Input date time -->
         <div class="date-range">
           <div class="date-time-row">
@@ -41,11 +50,11 @@
         </div>
   
         <!-- Button for search -->
-        <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Seach logs</button>
+        <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Search logs</button>
       </form>
     </div>
   
-    <!-- Sekcija za tabelu -->
+    <!-- Table -->
     <div class="table-container">
         <table mat-table [dataSource]="logs" class="mat-elevation-z8 full-width">
       

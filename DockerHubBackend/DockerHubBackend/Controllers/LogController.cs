@@ -25,6 +25,7 @@ namespace DockerHubBackend.Controllers
             try
             {
                 bool noCriteriaProvided = (string.IsNullOrWhiteSpace(request.Query) &&
+                                           string.IsNullOrWhiteSpace(request.Level) &&
                                            !request.StartDate.HasValue &&
                                            !request.EndDate.HasValue);
 
@@ -51,7 +52,9 @@ namespace DockerHubBackend.Controllers
                 if (!string.IsNullOrWhiteSpace(request.Query))
                 {
                     query &= new QueryContainerDescriptor<LogDto>()
-                        .QueryString(q => q.Query(request.Query));
+                        .QueryString(q => q
+                            .Fields(f => f.Field(p => p.Message))
+                            .Query(request.Query));
                 }
 
                 // 2. date and time filter
@@ -62,6 +65,15 @@ namespace DockerHubBackend.Controllers
                             .Field(f => f.Timestamp)
                             .GreaterThanOrEquals(request.StartDate)
                             .LessThanOrEquals(request.EndDate));
+                }
+
+                // 3. level filter
+                if (!string.IsNullOrWhiteSpace(request.Level))
+                {
+                    query &= new QueryContainerDescriptor<LogDto>()
+                        .QueryString(q => q
+                            .Fields(f => f.Field(p => p.Level))
+                            .Query(request.Level));
                 }
 
                 // send query to ElasticSearch

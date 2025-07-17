@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LogsService } from 'app/services/logs.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-logs',
   standalone: true,
-  imports: [MaterialModule, FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [MaterialModule, FormsModule, CommonModule, ReactiveFormsModule, MatSelectModule],
   templateUrl: './logs.component.html',
   styleUrl: './logs.component.css'
 })
@@ -20,6 +21,13 @@ export class LogsComponent {
   endDate: Date | null = null;   
   endTime: string = '';
   logs: any[] = [];
+  options = [
+    { label: 'Select level', value: '' },
+    { label: 'Info', value: 'inf' },
+    { label: 'Warning', value: 'wrn' },
+    { label: 'Error', value: 'err' },
+  ];
+  selectedOption: { label: string, value: string } = this.options[0];
 
   displayedColumns: string[] = ['timestamp', 'level', 'message']; 
 
@@ -30,7 +38,7 @@ export class LogsComponent {
   }
 
   loadInitialLogs(): void {
-    this.logService.searchLogs({ query: null, startDate: null, endDate: null }).subscribe({
+    this.logService.searchLogs({ query: null, level: null, startDate: null, endDate: null }).subscribe({
       next: (response: any[]) => {
           this.logs = response;
       },
@@ -42,19 +50,20 @@ export class LogsComponent {
   }
 
   isFormValid(): boolean {
-    if (!this.query || !this.startDate || !this.startTime || !this.endDate || !this.endTime) {
+    if (!this.query && !this.selectedOption.value && !this.startDate && !this.startTime && !this.endDate && !this.endTime) {
       return false;
     }
+    return true
 
-    const startDateTime = new Date(this.startDate);
-    const [startHours, startMinutes] = this.startTime.split(':').map(Number);
-    startDateTime.setHours(startHours, startMinutes);
+    // const startDateTime = new Date(this.startDate);
+    // const [startHours, startMinutes] = this.startTime.split(':').map(Number);
+    // startDateTime.setHours(startHours, startMinutes);
 
-    const endDateTime = new Date(this.endDate);
-    const [endHours, endMinutes] = this.endTime.split(':').map(Number);
-    endDateTime.setHours(endHours, endMinutes);
+    // const endDateTime = new Date(this.endDate);
+    // const [endHours, endMinutes] = this.endTime.split(':').map(Number);
+    // endDateTime.setHours(endHours, endMinutes);
 
-    return startDateTime <= endDateTime;
+    // return startDateTime <= endDateTime;
   }
 
   onSubmit() {
@@ -71,6 +80,7 @@ export class LogsComponent {
   
     const requestBody = {
         query: this.query || null,
+        level: this.selectedOption.value ?? null,
         startDate: formatDateTime(this.startDate, this.startTime),
         endDate: formatDateTime(this.endDate, this.endTime),
     };
