@@ -29,7 +29,7 @@ namespace DockerHubBackend.Data
             modelBuilder.Entity<StandardUser>()
                 .HasMany(u => u.MyOrganizations)
                 .WithOne(o => o.Owner);
-            modelBuilder.Entity<StandardUser>()
+            modelBuilder.Entity<BaseUser>()
                 .HasMany(u => u.MyRepositories)
                 .WithOne(r => r.UserOwner);
             modelBuilder.Entity<Organization>()
