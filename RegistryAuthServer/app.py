@@ -23,7 +23,7 @@ app.config['ISSUER'] = 'uks.registry-auth'  # eg. "registry-auth.ceph.com"
 access_service = AccessService()
 
 # To generate a cert and key:
-# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//SKIP=skip/CN=uks-registry'
+# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=uks-registry'
 
 def get_certificate():
     """Return a cryptography.x509.Certificate object"""
