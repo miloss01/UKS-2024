@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
   styleUrl: './teams.component.css'
 })
 export class TeamsComponent {
-  organizationId : string = "81be8240-7270-49f3-870a-80a0e317a1d6";  // mocked organization id
+  organizationId : string = "c46be8f3-eecc-4db2-8052-7936a8e621d9";  // mocked organization id
 
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
