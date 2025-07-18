@@ -106,3 +106,9 @@ export interface MinifiedStandardUserDTO {
 export interface NewBadgeDTO {
   badge: string;
 }
+
+export interface ILogs {
+  timestamp: string,
+  level: string,
+  message: string
+}
