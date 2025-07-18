@@ -10,6 +10,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       CONNECTION_STRING: "Host=postgres;Port=5432;Database=uks-database;Username=admin;Password=admin"
+      BACKEND_PORT: "5156"
     depends_on:
       - postgres
       - elasticsearch
