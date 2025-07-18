@@ -28,9 +28,8 @@ var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtCookieName = builder.Configuration["JWT:CookieName"];
 
-String postgreConnectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? 
+String postgreConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
     "Host=localhost;Port=5432;Database=uks-database;Username=admin;Password=admin";
-
 builder.Configuration["ConnectionStrings:DefaultConnection"] = postgreConnectionString;
 
 // Add services to the container.
