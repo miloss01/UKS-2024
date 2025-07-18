@@ -1,5 +1,6 @@
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Services.Interface;
 using Elasticsearch.Net;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
@@ -13,10 +14,12 @@ namespace DockerHubBackend.Controllers
     public class LogSearchController : ControllerBase
     {
         private readonly IElasticClient _elasticClient;
+        private readonly ILogService _logService;
 
-        public LogSearchController(IElasticClient elasticClient)
+        public LogSearchController(IElasticClient elasticClient, ILogService logService)
         {
             _elasticClient = elasticClient;
+            _logService = logService;
         }
 
         [HttpPost("search")]
@@ -25,6 +28,7 @@ namespace DockerHubBackend.Controllers
             try
             {
                 bool noCriteriaProvided = (string.IsNullOrWhiteSpace(request.Query) &&
+                                           string.IsNullOrWhiteSpace(request.Level) &&
                                            !request.StartDate.HasValue &&
                                            !request.EndDate.HasValue);
 
@@ -50,8 +54,16 @@ namespace DockerHubBackend.Controllers
                 // 1. query
                 if (!string.IsNullOrWhiteSpace(request.Query))
                 {
+                    request.Query = this._logService.NormalizeQuery(request.Query);
+                    bool containsLevel = request.Query.Contains("level:", StringComparison.OrdinalIgnoreCase);
+
                     query &= new QueryContainerDescriptor<LogDto>()
-                        .QueryString(q => q.Query(request.Query));
+                           .QueryString(q => q
+                               .Query(request.Query)
+                               .Fields(f =>
+                                   containsLevel
+                                       ? f.Field(p => p.Message).Field(p => p.Level)
+                                       : f.Field(p => p.Message)));
                 }
 
                 // 2. date and time filter
@@ -62,6 +74,15 @@ namespace DockerHubBackend.Controllers
                             .Field(f => f.Timestamp)
                             .GreaterThanOrEquals(request.StartDate)
                             .LessThanOrEquals(request.EndDate));
+                }
+
+                // 3. level filter
+                if (!string.IsNullOrWhiteSpace(request.Level))
+                {
+                    query &= new QueryContainerDescriptor<LogDto>()
+                        .QueryString(q => q
+                            .Fields(f => f.Field(p => p.Level))
+                            .Query(request.Level));
                 }
 
                 // send query to ElasticSearch
