@@ -18,6 +18,7 @@ using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using Nest;
 using Serilog.Formatting.Elasticsearch;
+using DockerHubBackend.Repository.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +101,7 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IRegistryService, RegistryService>();
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 builder.Services.AddControllers();
 

@@ -3,6 +3,7 @@ using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Interface;
 
 namespace DockerHubBackend.Services.Implementation
@@ -12,14 +13,14 @@ namespace DockerHubBackend.Services.Implementation
         private readonly IDockerImageRepository _dockerImageRepository;
         private readonly ILogger<DockerImageService> _logger;
         private readonly IRegistryService _registryService;
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DockerImageService(IDockerImageRepository dockerImageRepository, ILogger<DockerImageService> logger, IRegistryService registryService, DataContext context)
+        public DockerImageService(IDockerImageRepository dockerImageRepository, ILogger<DockerImageService> logger, IRegistryService registryService, IUnitOfWork unitOfWork)
         {
             _dockerImageRepository = dockerImageRepository;
             _logger = logger;
             _registryService = registryService;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public PageDTO<DockerImage> GetDockerImages(int page, int pageSize, string? searchTerm, string? badges)
@@ -51,26 +52,26 @@ namespace DockerHubBackend.Services.Implementation
         {
             _logger.LogInformation("Attempting to delete Docker image with ID: {Id}", id);
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using var tx = await _unitOfWork.BeginTransactionAsync();
+
+            try
             {
-                try
-                {
-                    DockerImage image = await getImageWithRepository(id);
+                DockerImage image = await getImageWithRepository(id);
+                await _dockerImageRepository.Delete(id);
+                await _registryService.DeleteDockerImage(image.Digest, image.Repository.Name);
 
-                    await _dockerImageRepository.Delete(id);
-                    await _registryService.DeleteDockerImage(image.Digest, image.Repository.Name);
+                await _unitOfWork.SaveChangesAsync();
+                await tx.CommitAsync();
 
-                    await transaction.CommitAsync();
-
-                    _logger.LogInformation("Successfully deleted Docker image with ID: {Id}", id);
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    _logger.LogError(ex, "Failed to delete Docker image with ID: {Id}", id);
-                    throw new Exception("Something went wrong");
-                }
+                _logger.LogInformation("Successfully deleted Docker image with ID: {Id}", id);
             }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                _logger.LogError(ex, "Failed to delete Docker image with ID: {Id}", id);
+                throw new Exception("Something went wrong");
+            }
+            
         }
     }
 }

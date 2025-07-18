@@ -6,6 +6,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Security;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -20,16 +21,16 @@ namespace DockerHubBackend.Services.Implementation
 		private readonly IOrganizationRepository _organizationRepository;
         private readonly IRegistryService _registryService;
         private readonly ILogger<DockerRepositoryService> _logger;
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository, IUserRepository userRepository, IOrganizationRepository organizationRepository, ILogger<DockerRepositoryService> logger, IRegistryService registryService, DataContext context)
+        public DockerRepositoryService(IDockerRepositoryRepository dockerRepositoryRepository, IUserRepository userRepository, IOrganizationRepository organizationRepository, ILogger<DockerRepositoryService> logger, IRegistryService registryService, IUnitOfWork unitOfWork)
         {
             _dockerRepositoryRepository = dockerRepositoryRepository;
             _userRepository = userRepository;
             _organizationRepository = organizationRepository;
             _logger = logger;
             _registryService = registryService;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<DockerRepository?> getRepository(Guid id)
@@ -182,30 +183,32 @@ namespace DockerHubBackend.Services.Implementation
 		public async Task DeleteDockerRepository(Guid id)
 		{
 			_logger.LogInformation("Deleting Docker repository with ID: {Id}", id);
-			
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+
+            await using var tx = await _unitOfWork.BeginTransactionAsync();
+
+            try
             {
-                try
-                {
-                    DockerRepository repository = await getRepositoryWithImages(id);
+                DockerRepository repository = await getRepositoryWithImages(id);
 
-                    await _dockerRepositoryRepository.Delete(id);
+                await _dockerRepositoryRepository.Delete(id);
 
-                    foreach (var image in repository.Images)
-                    {
-                        await _registryService.DeleteDockerImage(image.Digest, repository.Name);
-                    }
-                }
-                catch (Exception ex)
+                foreach (var image in repository.Images)
                 {
-                    await transaction.RollbackAsync();
-                    _logger.LogError(ex, "Failed to delete Docker repository with ID: {Id}", id);
-                    throw new Exception("Something went wrong");
+                    await _registryService.DeleteDockerImage(image.Digest, repository.Name);
                 }
             }
-
-
+			catch (NotFoundException)
+            {
+				throw;
+			}
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                _logger.LogError(ex, "Failed to delete Docker repository with ID: {Id}", id);
+                throw new Exception("Something went wrong");
+            }
+            
 			_logger.LogInformation("Successfully deleted Docker repository with ID: {Id}", id);
 		}
 

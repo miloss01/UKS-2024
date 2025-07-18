@@ -5,6 +5,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Nest;
@@ -16,14 +17,14 @@ namespace DockerHubBackend.Services.Implementation
         private readonly IOrganizationRepository _orgRepository;
         private readonly ILogger<OrganizationService> _logger;
         private readonly IDockerRepositoryService _repositoryService;
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrganizationService(IOrganizationRepository organizationRepository, ILogger<OrganizationService> logger, IDockerRepositoryService repositoryService, DataContext context)
+        public OrganizationService(IOrganizationRepository organizationRepository, ILogger<OrganizationService> logger, IDockerRepositoryService repositoryService, IUnitOfWork unitOfWork)
         {
             _orgRepository = organizationRepository;
             _logger = logger;
             _repositoryService = repositoryService;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Guid?> AddOrganization(AddOrganizationDto organization)
@@ -119,26 +120,26 @@ namespace DockerHubBackend.Services.Implementation
         public async Task DeleteOrganization(Guid organizationId)
         {
             _logger.LogInformation("Deleting organization with ID: {OrganizationId}", organizationId);
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using var tx = await _unitOfWork.BeginTransactionAsync();
+
+            try
             {
-                try
-                {
-                    var org = await GetOrganizationWithRepositories(organizationId);
+                var org = await GetOrganizationWithRepositories(organizationId);
 
-                    foreach (var repository in org.Repositories)
-                    {
-                        await _repositoryService.DeleteDockerRepository(repository.Id);
-                    }
-
-                    await _orgRepository.DeleteOrganization(organizationId);
-                }
-                catch (Exception ex)
+                foreach (var repository in org.Repositories)
                 {
-                    await transaction.RollbackAsync();
-                    _logger.LogError(ex, "Failed to delete organization with ID: {Id}", organizationId);
-                    throw new Exception("Something went wrong");
+                    await _repositoryService.DeleteDockerRepository(repository.Id);
                 }
+
+                await _orgRepository.DeleteOrganization(organizationId);
             }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                _logger.LogError(ex, "Failed to delete organization with ID: {Id}", organizationId);
+                throw new Exception("Something went wrong");
+            }
+            
 
             _logger.LogInformation("Organization with ID: {OrganizationId} deleted successfully", organizationId);
         }
