@@ -98,6 +98,10 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="getLogRowClass(row)"></tr>
         </table>
-      </div>
-    </div>      
+      </div>    
+    </div>    
+    
+    <div class="canvas">
+      <canvas id="logChart" width="400" height="200"></canvas>
+    </div>  
   

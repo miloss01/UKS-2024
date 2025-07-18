@@ -6,6 +6,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LogsService } from 'app/services/logs.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { Chart, registerables } from 'chart.js';
+import { ILogs } from 'app/models/models';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-logs',
@@ -20,7 +24,7 @@ export class LogsComponent {
   startTime: string = '';
   endDate: Date | null = null;   
   endTime: string = '';
-  logs: any[] = [];
+  logs: ILogs[] = [];
   options = [
     { label: 'Select level', value: '' },
     { label: 'Info', value: 'inf' },
@@ -29,8 +33,10 @@ export class LogsComponent {
   ];
   selectedOption: { label: string, value: string } = this.options[0];
 
-  displayedColumns: string[] = ['timestamp', 'level', 'message']; 
-
+  displayedColumns: string[] = ['timestamp', 'level', 'message'];
+  
+  chart: Chart | null = null;
+  
   constructor(private logService: LogsService, private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
@@ -41,6 +47,7 @@ export class LogsComponent {
     this.logService.searchLogs({ query: null, level: null, startDate: null, endDate: null }).subscribe({
       next: (response: any[]) => {
           this.logs = response;
+          this.renderChart();
       },
       error: (error) => {
         this.logs = [];
@@ -107,9 +114,11 @@ export class LogsComponent {
             //   panelClass: ['snackbar-success'],
             // });
           }
+          this.renderChart();
         },
         error: (error) => {
           this.logs = []; 
+          this.renderChart();
           this.snackBar.open('No logs found for the given criteria.', 'Close', {
             duration: 3000,
             panelClass: ['snackbar-error'],
@@ -119,50 +128,140 @@ export class LogsComponent {
       });
     }
 
-    getLogRowClass(row: any): string {
-        switch (row.level) {
-          case 'ERR':
-            return 'log-row-error'; 
-          case 'WRN':
-            return 'log-row-warning'; 
-          case 'INF':
-            return ''; 
-          default:
-            return 'log-row-info';
+  getLogRowClass(row: any): string {
+      switch (row.level) {
+        case 'ERR':
+          return 'log-row-error'; 
+        case 'WRN':
+          return 'log-row-warning'; 
+        case 'INF':
+          return ''; 
+        default:
+          return 'log-row-info';
+      }
+  } 
+
+  clearForm() {
+    this.query = '';
+    this.selectedOption = this.options[0];
+    this.startDate = null;
+    this.startTime = '';
+    this.endDate = null;
+    this.endTime = '';
+  }    
+  
+  onStartDateChange(event: any) {
+    if (event.value) {
+      this.startTime = '00:00';
+    }
+  }
+  
+  onEndDateChange(event: any) {
+    if (event.value) {
+      this.endTime = '23:59';
+    }
+  }
+
+  onStartTimeChange(): void {
+    if (!this.startDate) {
+      this.startDate = new Date();
+    }
+  }
+  
+  onEndTimeChange(): void {
+    if (!this.endDate) {
+      this.endDate = new Date();
+    }
+  }
+  
+  renderChart() {
+    const groupedLogs: {
+      [minuteKey: string]: { inf: number; wrn: number; err: number };
+    } = {};
+  
+    for (const log of this.logs) {
+      const date = new Date(log.timestamp);
+      
+      const minuteKey = date.toISOString().slice(0, 16).replace('T', ' ');
+  
+      if (!groupedLogs[minuteKey]) {
+        groupedLogs[minuteKey] = { inf: 0, wrn: 0, err: 0 };
+      }
+  
+      type LogLevel = 'inf' | 'wrn' | 'err';
+
+      const rawLevel = log.level?.toLowerCase();
+      if (rawLevel === 'inf' || rawLevel === 'wrn' || rawLevel === 'err') {
+        console.log("usao")
+        const level = rawLevel as LogLevel;
+        groupedLogs[minuteKey][level]++;
+      }
+    }
+  
+    const sortedKeys = Object.keys(groupedLogs).sort();
+    const labels = sortedKeys;
+    console.log(groupedLogs)
+    const infoData = sortedKeys.map(key => groupedLogs[key].inf);
+    const warningData = sortedKeys.map(key => groupedLogs[key].wrn);
+    const errorData = sortedKeys.map(key => groupedLogs[key].err);
+  
+    const config = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Info',
+            data: infoData,
+            borderColor: 'blue',
+            fill: false
+          },
+          {
+            label: 'Warning',
+            data: warningData,
+            borderColor: 'orange',
+            fill: false
+          },
+          {
+            label: 'Error',
+            data: errorData,
+            borderColor: 'red',
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Time (per minutes)'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of logs'
+            }
+          }
         }
-    } 
-
-    clearForm() {
-      this.query = '';
-      this.selectedOption = this.options[0];
-      this.startDate = null;
-      this.startTime = '';
-      this.endDate = null;
-      this.endTime = '';
-    }    
-    
-    onStartDateChange(event: any) {
-      if (event.value) {
-        this.startTime = '00:00';
       }
+    };
+  
+    if (this.chart) {
+      this.chart.destroy();
     }
-    
-    onEndDateChange(event: any) {
-      if (event.value) {
-        this.endTime = '23:59';
-      }
+  
+    const canvas = document.getElementById('logChart') as HTMLCanvasElement;
+    if (canvas) {
+      this.chart = new Chart(canvas, config as any);
     }
-
-    onStartTimeChange(): void {
-      if (!this.startDate) {
-        this.startDate = new Date();
-      }
-    }
-    
-    onEndTimeChange(): void {
-      if (!this.endDate) {
-        this.endDate = new Date();
-      }
-    }
-    
+  }
 }

@@ -91,4 +91,8 @@
     width: 100%;
   }
   
-  
+  .canvas {
+    display: block; 
+    width: 100%; 
+    margin-top: 20px;
+  }
