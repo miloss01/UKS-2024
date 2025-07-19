@@ -27,6 +27,7 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   @Input() isOrganization = false;
   @Input() name!: string | null;
   @Input() id!: string | null;
+  @Input() isOwner: boolean | null = false;
       
   repositorySource = new MatTableDataSource(this.repositories)
 
@@ -48,29 +49,39 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.fillNamespaces();
     if(this.isOrganization && this.id) {
-      this.repositoryService.GetOrganizationRepositories(this.id)
-      .subscribe({
-        next: (response: DockerRepositoryDTO[]) => {
-        console.log(response)
-        this.repositories = response
-        this.repositorySource = new MatTableDataSource(this.repositories)
-        },
-        error: (error) => {
-          console.error('Error creating repository:', error);
-        }
-      })
+      this.getOnlyOrganizationRepositories();
+      return
     }
-    const userId: string = this.authService.userData.value?.userId || ""
+    this.getAllUserRepositories(); 
+  }
+
+  private getAllUserRepositories() {
+    const userId: string = this.authService.userData.value?.userId || "";
     this.repositoryService.GetUsersRepositories(userId).subscribe({
       next: (response: DockerRepositoryDTO[]) => {
-        console.log(response)
-        this.repositories = response
-        this.repositorySource = new MatTableDataSource(this.repositories)
+        console.log(response);
+        this.repositories = response;
+        this.repositorySource = new MatTableDataSource(this.repositories);
       },
       error: (error) => {
         console.error('Error creating repository:', error);
       }
-    }); 
+    });
+  }
+
+  private getOnlyOrganizationRepositories() {
+    if(!this.id) return
+    this.repositoryService.GetOrganizationRepositories(this.id)
+      .subscribe({
+        next: (response: DockerRepositoryDTO[]) => {
+          console.log(response);
+          this.repositories = response;
+          this.repositorySource = new MatTableDataSource(this.repositories);
+        },
+        error: (error) => {
+          console.error('Error creating repository:', error);
+        }
+      });
   }
 
   fillNamespaces() {
@@ -116,7 +127,8 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/create-repo'], 
       { queryParams: { 
           id: this.id, 
-          name: this.name
+          name: this.name,
+          isOwner: this.isOwner
         } 
       }
     );

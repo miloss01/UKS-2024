@@ -18,6 +18,7 @@ export class CreateRepositoryComponent implements OnInit {
   namespaces: {id:string, name:string}[] = [];
   orgName!: string | null;
   orgId!: string | null;
+  isOwner: boolean = false;
   role = this.authService.userData.value?.userRole || ""
   officialRepo = "Official Repo"
 
@@ -42,6 +43,7 @@ export class CreateRepositoryComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.orgName = params['name'];
       this.orgId = params['id'];
+      this.isOwner = params["isOwner"]
     });
     this.fillNamespaces();
   }
@@ -109,7 +111,7 @@ export class CreateRepositoryComponent implements OnInit {
         this.repositoryService.CreateRepository(repository).subscribe({
           next: (response: DockerRepositoryDTO) => {
             console.log('Repository created successfully:', response);
-            this.router.navigate(["/all-user-repo"])
+            this.navigationLogic()
           },
           error: (error) => {
             console.error('Error creating repository:', error);
@@ -122,7 +124,21 @@ export class CreateRepositoryComponent implements OnInit {
 
   onCancel(): void {
     console.log('Repository creation canceled');
-    // Add logic to navigate away or reset the form if needed
+    this.navigationLogic()
+  }
+
+  navigationLogic(){
+    if(this.orgId && this.orgName){
+      this.router.navigate([`/org-details/${this.orgId}`], {
+        queryParams: {
+          name: this.orgName,
+          isOwner: this.isOwner
+        }
+      });
+    } else{
+      this.router.navigate(["/all-user-repo"])
+    }
+
   }
 
 }
