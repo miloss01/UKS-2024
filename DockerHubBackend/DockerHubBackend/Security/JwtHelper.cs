@@ -17,14 +17,15 @@ namespace DockerHubBackend.Security
             _issuer = configuration["Jwt:Issuer"];
             _expiration = Convert.ToInt32(configuration["Jwt:Expiration"]);
         }
-        public string GenerateToken(string role, string userId, string userEmail)
+        public string GenerateToken(string role, string userId, string userEmail, string username)
         {
             var claims = new[]
             {
                 new Claim(ClaimTypes.Role, role),
                 new Claim(ClaimTypes.NameIdentifier, userId),
                 new Claim(ClaimTypes.Email, userEmail),
-                new Claim("type", "Bearer")
+                new Claim(ClaimTypes.Name, username),
+				new Claim("type", "Bearer")
             };
 
             var keyBytes = Encoding.UTF8.GetBytes(_key);

@@ -44,7 +44,7 @@ namespace DockerHubBackend.Tests.UnitTests
                       .Returns(PasswordVerificationResult.Success);
 
 
-            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email))
+            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email, user.Username))
                          .Returns("dummyToken");
 
 
