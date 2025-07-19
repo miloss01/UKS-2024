@@ -140,7 +140,7 @@ builder.Host.UseSerilog((context, config) =>
         //});
 });
 
-String port = Environment.GetEnvironmentVariable("BACKEND_PORT") ?? "5156";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5156";
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {

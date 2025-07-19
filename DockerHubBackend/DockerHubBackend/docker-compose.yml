@@ -9,8 +9,8 @@ services:
       - "5156:5156"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      CONNECTION_STRING: "Host=postgres;Port=5432;Database=uks-database;Username=admin;Password=admin"
-      BACKEND_PORT: "5156"
+      CONNECTION_STRING: ${ConnectionStrings__DefaultConnection}
+      PORT: ${PORT}
       RUNNING_IN_CONTAINER: true
     depends_on:
       - postgres
