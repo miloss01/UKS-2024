@@ -18,6 +18,8 @@ export class CreateRepositoryComponent implements OnInit {
   namespaces: {id:string, name:string}[] = [];
   orgName!: string | null;
   orgId!: string | null;
+  role = this.authService.userData.value?.userRole || ""
+  officialRepo = "Official Repo"
 
   router = inject(Router)
 
@@ -54,10 +56,17 @@ export class CreateRepositoryComponent implements OnInit {
       return;
     }
     const userEmail: string = this.authService.userData.value?.userEmail || ""
+    const username: string = this.authService.userData.value?.username || ""
     const userId: string = this.authService.userData.value?.userId || ""
+    if (this.role != "StandardUser"){
+      this.namespaces.push({
+      id: userId,
+      name: this.officialRepo
+    })
+    }
     this.namespaces.push({
       id: userId,
-      name: userEmail
+      name: username
     })
     this.repoForm.controls['namespace'].setValue(userId)
     this.organizationService.getOrganizations(userEmail).subscribe({
@@ -65,7 +74,7 @@ export class CreateRepositoryComponent implements OnInit {
         console.log(data)
         data.forEach(organization => {
           console.log(organization)
-          return this.namespaces.push({
+          this.namespaces.push({
             id: organization.id,
             name: organization.name
           });          
@@ -80,9 +89,19 @@ export class CreateRepositoryComponent implements OnInit {
   onCreate(): void {
       if (this.repoForm.valid) {
         console.log("AAAAAAAA")
+        var owderId = this.repoForm.controls['namespace'].value[0]
+        var namespaceSelected = this.repoForm.controls['namespace'].value[1]
+        var repo_name
+        if (this.role == "StandardUser" ||( this.role != "StandardUser" && namespaceSelected != this.officialRepo)) {
+          repo_name = namespaceSelected + "/" + this.repoForm.controls['name'].value
+        }
+        // Admin or SuperAdmin
+        else {
+          repo_name = this.repoForm.controls['name'].value
+        }
         var repository: RepositoryCreation = {
-          name: this.repoForm.controls['name'].value,
-          owner: this.repoForm.controls['namespace'].value,
+          name: repo_name,
+          owner: owderId,
           description: this.repoForm.controls['description'].value,
           isPublic: this.repoForm.controls['visibility'].value === 'true'
         }

@@ -90,7 +90,7 @@ namespace DockerHubBackend.Services.Implementation
 			return updatedRepositoryDto;
 		}
 
-		public async Task<StandardUser?> getUser(string id)
+		public async Task<BaseUser?> getUser(string id)
 		{
 			// Check the correctnes of id
 			var parsed = Guid.TryParse(id, out var userId);
@@ -103,7 +103,7 @@ namespace DockerHubBackend.Services.Implementation
 			try
 			{
 				var user = await _userRepository.GetUserById(userId);
-				return (StandardUser?)user;
+				return (BaseUser?)user;
 			}
 			catch (Exception)
 			{
@@ -133,8 +133,13 @@ namespace DockerHubBackend.Services.Implementation
 			var organizationOwner = await getOrganization(createRepositoryDto.Owner);
 			if ((userOwner == null) && (organizationOwner == null))
 			{
-				_logger.LogError("Invalid namespace name: {NamespaceName}. Must be either a username or organization name.", createRepositoryDto.Owner);
+				_logger.LogError("Invalid owner name: {NamespaceName}. Must be either a username or organization name.", createRepositoryDto.Owner);
 				throw new ArgumentException("Invalid namespace name. It can be either an organization name or username.");
+			}
+			var badge = Badge.NoBadge;
+			if (userOwner != null && userOwner.GetType().Name != "StandardUser")
+			{
+				badge = Badge.VerifiedPublisher;
 			}
 			// Create the repo
 			var newRepository = new DockerRepository
@@ -143,7 +148,7 @@ namespace DockerHubBackend.Services.Implementation
 				Description = createRepositoryDto.Description,
 				IsPublic = createRepositoryDto.IsPublic,
 				StarCount = 0,
-				Badge = Badge.NoBadge,
+				Badge = badge,
 				Images = new HashSet<DockerImage>(),
 				Teams = new HashSet<Team>(),
 				UserOwner = userOwner,

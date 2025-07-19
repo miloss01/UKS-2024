@@ -78,9 +78,11 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
       this.namespaces.push(this.name);
       return;
     }
-    const userEmail: string = this.authService.userData.value?.userEmail || ""
-    this.namespaces.push(userEmail)
-    this.organizationService.getOrganizations(userEmail).subscribe({
+    console.log(this.authService.userData.value)
+    const username: string = this.authService.userData.value?.username || ""
+    const email: string = this.authService.userData.value?.userEmail || ""
+    this.namespaces.push(username)
+    this.organizationService.getOrganizations(email).subscribe({
       next: (data) => {
         console.log(data)
         data.forEach(organization => {

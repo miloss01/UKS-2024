@@ -9,7 +9,7 @@
                     <mat-label>namespace</mat-label>
                     <mat-select formControlName="namespace">
                         @for (namespace of namespaces; track namespace) {
-                            <mat-option [value]="namespace.id">{{namespace.name}}</mat-option>
+                            <mat-option [value]="[namespace.id, namespace.name]">{{namespace.name}}</mat-option>
 
                         }
                     </mat-select>
