@@ -1,5 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { AfterViewInit, Component, inject, Signal, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit, Signal, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -18,13 +18,15 @@ import { OrganizationService } from 'app/services/organization.service';
   templateUrl: './all-repositories.component.html',
   styleUrl: './all-repositories.component.css'
 })
-export class AllRepositoriesComponent  implements AfterViewInit{
+export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   namespaces: string[] = []
   categories: string[] = ["c1", "c2", "c3"]
   searchQuery: Signal<string> = signal("");
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
-  repositories: DockerRepositoryDTO[] = []
-  
+  repositories: DockerRepositoryDTO[] = [];
+  @Input() isOrganization = false;
+  @Input() name!: string | null;
+  @Input() id!: string | null;
       
   repositorySource = new MatTableDataSource(this.repositories)
 
@@ -41,24 +43,41 @@ export class AllRepositoriesComponent  implements AfterViewInit{
               private readonly authService: AuthService,
               private readonly organizationService: OrganizationService
             ) 
-  {
-    this.fillNamespaces()
+  { }
+
+  ngOnInit(): void {
+    this.fillNamespaces();
+    if(this.isOrganization && this.id) {
+      this.repositoryService.GetOrganizationRepositories(this.id)
+      .subscribe({
+        next: (response: DockerRepositoryDTO[]) => {
+        console.log(response)
+        this.repositories = response
+        this.repositorySource = new MatTableDataSource(this.repositories)
+        },
+        error: (error) => {
+          console.error('Error creating repository:', error);
+        }
+      })
+    }
     const userId: string = this.authService.userData.value?.userId || ""
     this.repositoryService.GetUsersRepositories(userId).subscribe({
       next: (response: DockerRepositoryDTO[]) => {
         console.log(response)
         this.repositories = response
         this.repositorySource = new MatTableDataSource(this.repositories)
-
       },
       error: (error) => {
         console.error('Error creating repository:', error);
       }
     }); 
-
   }
 
   fillNamespaces() {
+    if(this.isOrganization && this.name) {
+      this.namespaces.push(this.name);
+      return;
+    }
     const userEmail: string = this.authService.userData.value?.userEmail || ""
     this.namespaces.push(userEmail)
     this.organizationService.getOrganizations(userEmail).subscribe({
@@ -72,7 +91,6 @@ export class AllRepositoriesComponent  implements AfterViewInit{
         console.error('Error fetching organizations:', err);
       }
     });
-
   }
 
   ngAfterViewInit() {
@@ -93,8 +111,13 @@ export class AllRepositoriesComponent  implements AfterViewInit{
   }
 
   onCreate(): void {
-    this.router.navigate(["/create-repo"])
-    
+    this.router.navigate(['/create-repo'], 
+      { queryParams: { 
+          id: this.id, 
+          name: this.name
+        } 
+      }
+    );
   }
 
   openRepository(repository: DockerRepositoryDTO): void {

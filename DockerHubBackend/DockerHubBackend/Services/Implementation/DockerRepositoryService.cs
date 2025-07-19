@@ -291,5 +291,33 @@ namespace DockerHubBackend.Services.Implementation
             _logger.LogInformation("Fetched Docker repositories.");
             return result;
         }
+
+        public async Task<List<DockerRepositoryDTO>> GetRepositoriesByOrganizationId(Guid id)
+        {
+            _logger.LogInformation("Fetching repositories for organization with ID: {OrganizationId}", id);
+
+            List<DockerRepositoryDTO> responce = new List<DockerRepositoryDTO>();
+
+            // get repos for each organization he is in
+            var organization = await _organizationRepository.GetOrganizationById(id);
+            if (organization != null)
+            {
+                _logger.LogInformation("Fetching repositories for organization with ID: {OrganizationId} and Name: {OrganizationName}", organization.Id, organization.Name);
+                var repositories = await _dockerRepositoryRepository.GetRepositoriesByOrganizationOwnerId(organization.Id);
+                if (repositories != null)
+                {
+                    foreach (var repo in repositories)
+                    {
+                        var repoDto = new DockerRepositoryDTO(repo);
+                        repoDto.Owner = organization.Name;
+                        responce.Add(repoDto);
+                    }
+                    _logger.LogInformation("Added {RepositoryCount} repositories for organization with ID: {OrganizationId}", repositories.Count, organization.Id);
+                }
+            }
+
+            _logger.LogInformation("Successfully fetched all repositories for user with ID: {UserId}", id);
+            return responce;
+        }
     }
 }

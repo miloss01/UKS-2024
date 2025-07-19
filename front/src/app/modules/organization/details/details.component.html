@@ -72,8 +72,11 @@
 
   <mat-tab label="Repositories">
     <div class="tab-content">
-      <h2>Repositories</h2>
-      <p>Ovde se prikazuje lista repozitorijuma.</p>
+      <app-all-repositories 
+        [isOrganization]=true 
+        [name]="name"
+        [id]="id">
+      </app-all-repositories>
     </div>
   </mat-tab>
 </mat-tab-group>

@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import RepositoryCreation, { DockerRepositoryDTO } from 'app/models/models';
 import { RepositoryService } from '../services/repository.service';
 import { AuthService } from 'app/services/auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { OrganizationService } from 'app/services/organization.service';
 
 @Component({
@@ -14,8 +14,10 @@ import { OrganizationService } from 'app/services/organization.service';
   templateUrl: './create-repository.component.html',
   styleUrl: './create-repository.component.css'
 })
-export class CreateRepositoryComponent {
+export class CreateRepositoryComponent implements OnInit {
   namespaces: {id:string, name:string}[] = [];
+  orgName!: string | null;
+  orgId!: string | null;
 
   router = inject(Router)
 
@@ -29,12 +31,28 @@ export class CreateRepositoryComponent {
   constructor(
     private repositoryService: RepositoryService,
     private authService: AuthService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private route: ActivatedRoute
   ) {
-    this.fillNamespaces()
+  }
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.orgName = params['name'];
+      this.orgId = params['id'];
+    });
+    this.fillNamespaces();
   }
 
   fillNamespaces() {
+    if(this.orgId && this.orgName) {
+      this.namespaces.push({
+        id: this.orgId,
+        name: this.orgName
+      });
+      this.repoForm.controls['namespace'].setValue(this.orgId);
+      return;
+    }
     const userEmail: string = this.authService.userData.value?.userEmail || ""
     const userId: string = this.authService.userData.value?.userId || ""
     this.namespaces.push({
@@ -58,7 +76,6 @@ export class CreateRepositoryComponent {
       }
     });
   }
-
 
   onCreate(): void {
       if (this.repoForm.valid) {
