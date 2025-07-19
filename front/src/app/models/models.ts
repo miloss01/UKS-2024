@@ -22,7 +22,8 @@ export interface LoginCredentials {
 export interface UserData{
   userId: string,
   userEmail: string,
-  userRole: UserRole
+  userRole: UserRole,
+  username: string,
 }
 export interface RegisterUserDto{
   email: string,
@@ -111,4 +112,10 @@ export interface ILogs {
   timestamp: string,
   level: string,
   message: string
+}
+
+export interface Member {
+  id: string,
+  email: string,
+  isOwner: boolean
 }

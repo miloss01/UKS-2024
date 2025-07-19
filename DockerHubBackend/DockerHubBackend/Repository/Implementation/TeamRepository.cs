@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
@@ -28,7 +29,7 @@ namespace DockerHubBackend.Repository.Implementation
                     team.Id,
                     team.Name,
                     team.Description,
-                    team.Members.Select(member => new EmailDto
+                    team.Members.Select(member => new MemberDto
                     {
                         Email = member.Email,
                     }).ToList()
