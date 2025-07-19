@@ -7,11 +7,13 @@ import { PaginatorComponent } from '../paginator/paginator.component';
 import { OrganizationService } from 'app/services/organization.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TeamsComponent } from "app/modules/layout/teams/all-teams/teams.component";
+import { Member } from 'app/models/models';
 
 @Component({
   selector: 'app-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent, TeamsComponent],
   templateUrl: './details.component.html',
   styleUrl: './details.component.css'
 })
@@ -24,7 +26,7 @@ export class DetailsComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   displayedAllUsers: any[] = [];
-  members: any[] = [];
+  members: Member[] = [];
   displayedMembers: any[] = [];
 
   searchQuery = ''
