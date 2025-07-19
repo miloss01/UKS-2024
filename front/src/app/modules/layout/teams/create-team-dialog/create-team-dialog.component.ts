@@ -10,7 +10,7 @@ import { Member } from 'app/models/models';
 @Component({
   selector: 'app-create-team-dialog',
   standalone: true,
-  imports: [MaterialModule, ReactiveFormsModule, CommonModule, EditTeamDialogComponent],
+  imports: [MaterialModule, ReactiveFormsModule, CommonModule],
   templateUrl: './create-team-dialog.component.html',
   styleUrl: './create-team-dialog.component.css'
 })

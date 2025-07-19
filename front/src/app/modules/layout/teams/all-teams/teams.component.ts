@@ -6,6 +6,7 @@ import { TeamService } from 'app/services/team.service';
 import { CreateTeamDialogComponent } from '../create-team-dialog/create-team-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-teams',
@@ -21,8 +22,9 @@ export class TeamsComponent {
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
 
-  constructor(private teamService: TeamService, private dialog: MatDialog, private router: Router) {
-  }
+  constructor(private teamService: TeamService,
+    private dialog: MatDialog,
+    private router: Router) {}
 
   async getTeams(organizationId: string) {
     this.teamService.getTeams(organizationId).subscribe(

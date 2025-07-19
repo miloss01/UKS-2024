@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +29,7 @@ export class DetailsComponent implements OnInit {
   members: Member[] = [];
   displayedMembers: any[] = [];
 
-  searchQuery = ''
+  searchQuery = '';
   pageSize: number = 2;
   currentPage: number = 1;
 
@@ -62,9 +62,6 @@ export class DetailsComponent implements OnInit {
         this.users = data.otherUsers;
         this.filteredUsers = [...this.users];
         this.updateDisplayedUsers();
-
-        console.log(data)
-        console.log("ok")
       },
       error: (err) => {
         this.members = [];
