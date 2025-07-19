@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using DockerHubBackend.Models;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response.Organization;
 
 namespace DockerHubBackend.Controllers
 {
@@ -54,7 +55,7 @@ namespace DockerHubBackend.Controllers
 
 
         [HttpPut("member/{id}")]
-        public async Task<IActionResult> UpdateMembers([FromBody] ICollection<EmailDto> memberDtos, [FromRoute] Guid id)
+        public async Task<IActionResult> UpdateMembers([FromBody] ICollection<MemberDto> memberDtos, [FromRoute] Guid id)
         {
             var result = await _teamService.AddMembers(id, memberDtos);
             return Ok(result);

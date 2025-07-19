@@ -1,12 +1,10 @@
-using System.Text.Json.Serialization;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 
 namespace DockerHubBackend.Models
 {
     public class StandardUser : BaseUser
     {
-        public ICollection<DockerRepository> StarredRepositories { get; set; } = new HashSet<DockerRepository>();
-        public ICollection<DockerRepository> MyRepositories { get; set; } = new HashSet<DockerRepository>();
+        
         public ICollection<Organization> MyOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Organization> MemberOrganizations { get; set; } = new HashSet<Organization>();
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
@@ -23,9 +21,9 @@ namespace DockerHubBackend.Models
             CreatedAt = DateTime.UtcNow;
         }
 
-        public EmailDto ToMemberDto()
+        public MemberDto ToMemberDto()
         {
-            return new EmailDto { Email = Email };
+            return new MemberDto { Email = Email };
         }
 
     }

@@ -26,11 +26,12 @@ Replace `<username>`, `<password>`, and `<database_name>` with the credentials d
 1. Open Git Bash
 2. Create certificate with the following command(certificate will be saved in the folder where terminal is located):
 ```bash
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//SKIP=skip/CN=uks-registry'
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//CN=uks-registry'
 ```
-3.  Copy the `cert.pem` file to the same location as `app.py`
-4.  In `config.py` edit `DATABASE_URI` to match URI of the main database
-5.  Run the server
+3.  Copy `cert.pem` and `key.pem` in the same location as `app.py`
+4.  Copy the `cert.pem` file to `Registry/certs` folder
+5.  In `config.py` edit `DATABASE_URI` to match URI of the main database
+6.  Run the server
 
 ### 3. Setup Docker Registry Webhooks Server
 1. Open `RegistryWebhookServer/config.py` and edit `DATABASE_URI` to match URI of the main database

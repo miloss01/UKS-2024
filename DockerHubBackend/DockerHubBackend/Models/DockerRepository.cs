@@ -13,7 +13,7 @@ namespace DockerHubBackend.Models
         public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
         public Guid? UserOwnerId { get; set; }
         [ForeignKey(nameof(UserOwnerId))]
-        public StandardUser? UserOwner { get; set; }
+        public BaseUser? UserOwner { get; set; }
         public Guid? OrganizationOwnerId { get; set; }
         [ForeignKey(nameof(OrganizationOwnerId))]
         public Organization? OrganizationOwner { get; set; }
