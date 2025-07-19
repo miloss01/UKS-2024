@@ -1,5 +1,4 @@
-using System.Text.Json.Serialization;
-using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 
 namespace DockerHubBackend.Models
 {
@@ -23,9 +22,9 @@ namespace DockerHubBackend.Models
             CreatedAt = DateTime.UtcNow;
         }
 
-        public EmailDto ToMemberDto()
+        public MemberDto ToMemberDto()
         {
-            return new EmailDto { Email = Email };
+            return new MemberDto { Email = Email };
         }
 
     }

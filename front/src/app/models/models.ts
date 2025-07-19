@@ -112,3 +112,9 @@ export interface ILogs {
   level: string,
   message: string
 }
+
+export interface Member {
+  id: string,
+  email: string,
+  isOwner: boolean
+}

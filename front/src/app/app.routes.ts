@@ -33,7 +33,6 @@ export const routes: Routes = [
   { path: 'sign-up-admin', component: RegisterPageComponent, canActivate: [AuthGuard], data: { title: 'Sign Up Admin', isAdmin: true } },
   { path: 'organizations', component: ListOrganizationsComponent, canActivate: [AuthGuard] },
   { path: 'org-details/:id', component: DetailsComponent, canActivate: [AuthGuard] },
-  { path: 'teams', component: TeamsComponent, canActivate: [AuthGuard] },
   { path: 'team-details/:id', component: TeamDetailsComponent, canActivate: [AuthGuard] },
   { path: 'badges', component: UserBadgesComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
   { path: 'logs', component: LogsComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
