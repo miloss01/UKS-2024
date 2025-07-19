@@ -152,11 +152,12 @@ var app = builder.Build();
 //await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
+var isInContainer = Environment.GetEnvironmentVariable("RUNNING_IN_CONTAINER") == "true";
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.ApplyMigrations();
+    if (isInContainer) app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
