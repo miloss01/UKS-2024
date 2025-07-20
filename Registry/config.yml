@@ -3,6 +3,8 @@ log:
   fields:
     service: registry
 storage:
+  delete:
+    enabled: true
   cache:
     blobdescriptor: inmemory
   filesystem:
@@ -19,7 +21,7 @@ health:
 notifications:
   endpoints:
     - name: "push-notification"
-      url: "http://192.168.1.102:5002/notify/push"
+      url: "http://host.docker.internal:5002/notify/push"
       events:
         - push
       timeout: 500ms

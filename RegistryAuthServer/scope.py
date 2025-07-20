@@ -1,6 +1,6 @@
 import re
 
-SCOPE_RE = re.compile(r'^(?P<type>repository):(?P<name>[^:]+)(?::(?P<tag>[^:]))?:(?P<actions>.*)$')
+SCOPE_RE = re.compile(r'^(?P<type>repository|registry):(?P<name>[^:]+)(?::(?P<tag>[^:]))?:(?P<actions>.*)$')
 
 class Scope(object):
     def __init__(self, scope_type, name, tag, actions):

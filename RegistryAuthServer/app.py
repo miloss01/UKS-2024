@@ -5,6 +5,7 @@ import base64
 from typing import List
 
 from flask import Flask, jsonify, request
+import os
 import jwt
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
@@ -12,18 +13,36 @@ from cryptography.hazmat.primitives import serialization
 
 from scope import Scope
 from access_service import AccessService
-from config import TOKEN_VALID_FOR_SECONDS
-from config import PRIVILEGED_USERS
+
 
 app = Flask(__name__)
-app.debug = True
 
-app.config['SERVICE'] = 'uks-registry'  # eg. "registry.ceph.com"
-app.config['ISSUER'] = 'uks.registry-auth'  # eg. "registry-auth.ceph.com"
-access_service = AccessService()
+# Load configuration from environment variables with defaults
+app.config['SERVICE'] = os.environ.get('UKS_AUTH_SERVICE', 'uks-registry')
+app.config['ISSUER'] = os.environ.get('UKS_AUTH_ISSUER', 'uks.registry-auth')
+app.config['DATABASE_URI'] = os.environ.get('UKS_DATABASE_URI', 'postgresql://admin:admin@localhost:5432/uks-database')
+app.config['TOKEN_VALID_FOR_SECONDS'] = int(os.environ.get('UKS_AUTH_TOKEN_VALID_FOR_SECONDS', '3600'))
+# PRIVILEGED_USERS as comma-separated pairs: user1:pass1,user2:pass2
+privileged_users_env = os.environ.get('UKS_AUTH_PRIVILEGED_USERS', 'vlada:123456')
+privileged_users = {}
+for pair in privileged_users_env.split(','):
+    if ':' in pair:
+        user, pwd = pair.split(':', 1)
+        privileged_users[user.strip()] = pwd.strip()
+app.config['PRIVILEGED_USERS'] = privileged_users
+
+# Host, port, and debug from environment variables
+app.config['HOST'] = os.environ.get('UKS_AUTH_HOST', '0.0.0.0')
+app.config['PORT'] = int(os.environ.get('UKS_AUTH_PORT', '5001'))
+app.config['DEBUG'] = os.environ.get('UKS_AUTH_DEBUG', '1') == '1'
+app.debug = app.config['DEBUG']
+
+# Pass database URI to AccessService
+from access_service import AccessService
+access_service = AccessService(app.config['DATABASE_URI'])
 
 # To generate a cert and key:
-# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//SKIP=skip/CN=uks-registry'
+# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//CN=uks-registry'
 
 def get_certificate():
     """Return a cryptography.x509.Certificate object"""
@@ -44,22 +63,22 @@ def get_private_key():
 def get_token_payload(service, issuer, scopes, user_id):
     now = datetime.now(timezone.utc)
     token_payload = {
-                     'iss' : issuer,
-                     'sub' : user_id,
-                     'aud' : service,
-                     'exp' : now + timedelta(seconds=TOKEN_VALID_FOR_SECONDS),
-                     'nbf' : now,
-                     'iat' : now,
-                     'jti' : uuid4().hex,
-                     'access' : [
-                                {
-                                 'type' : scope.type,
-                                 'name' : scope.name,
-                                 'actions' : scope.actions
-                                 }
-                                for scope in scopes
-                                 ]
-                     }
+        'iss': issuer,
+        'sub': user_id,
+        'aud': service,
+        'exp': now + timedelta(seconds=app.config['TOKEN_VALID_FOR_SECONDS']),
+        'nbf': now,
+        'iat': now,
+        'jti': uuid4().hex,
+        'access': [
+            {
+                'type': scope.type,
+                'name': scope.name,
+                'actions': scope.actions
+            }
+            for scope in scopes
+        ]
+    }
     return token_payload
 
 
@@ -114,9 +133,9 @@ def decode_basic_auth():
 
 def authenticate():
     username, password = decode_basic_auth()
-    if username == None or password == None:
+    if username is None or password is None:
         return None, None
-    if username in PRIVILEGED_USERS and PRIVILEGED_USERS[username] == password:
+    if username in app.config['PRIVILEGED_USERS'] and app.config['PRIVILEGED_USERS'][username] == password:
         return username, True
     return access_service.authenticate_user(username, password), False
 
@@ -177,6 +196,5 @@ def token():
     return jsonify(**payload)
 
 
-app.logger.setLevel(logging.DEBUG)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host=app.config['HOST'], port=app.config['PORT'], debug=app.config['DEBUG'])

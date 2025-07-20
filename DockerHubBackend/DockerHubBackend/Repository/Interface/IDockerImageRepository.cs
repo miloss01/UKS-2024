@@ -9,5 +9,7 @@ namespace DockerHubBackend.Repository.Interface
         public PageDTO<DockerImage> GetDockerImages(int page, int pageSize, string? searchTerm, string? badges);
 		Task<DockerImage?> GetDockerImageById(Guid id);
 
-	}
+        Task<DockerImage?> GetDockerImageByIdWithRepository(Guid id);
+
+    }
 }
