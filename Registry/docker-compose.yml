@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   registry:
-    image: registry:latest
+    image: registry:2.8.3
     container_name: registry
     ports:
       - "5000:5000"
