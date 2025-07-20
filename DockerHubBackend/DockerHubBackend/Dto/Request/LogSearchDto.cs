@@ -6,6 +6,7 @@ namespace DockerHubBackend.Dto.Request
     {
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string? Level { get; set; }
         public string? Query { get; set; }
 
         public LogSearchDto() { }

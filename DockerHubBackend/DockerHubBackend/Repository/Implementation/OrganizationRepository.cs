@@ -85,6 +85,11 @@ namespace DockerHubBackend.Repository.Implementation
             return await _context.Organizations.FindAsync(id);
         }
 
+        public async Task<Organization?> GetOrganizationByIdWithRepositories(Guid id)
+        {
+            return await _context.Organizations.Include(o => o.Repositories).FirstOrDefaultAsync(o => o.Id == id);
+        }
+
         public async Task<OrganizationUsersDto> GetListUsersByOrganizationId(Guid organizationId)
         {
             var organization = await _context.Organizations

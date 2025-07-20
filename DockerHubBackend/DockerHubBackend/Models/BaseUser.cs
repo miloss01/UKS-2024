@@ -11,5 +11,7 @@ namespace DockerHubBackend.Models
         public required string Username { get; set; }
         public string? Location { get; set; }
         public Badge Badge { get; set; }
-    }
+		public ICollection<DockerRepository> StarredRepositories { get; set; } = new HashSet<DockerRepository>();
+		public ICollection<DockerRepository> MyRepositories { get; set; } = new HashSet<DockerRepository>();
+	}
 }

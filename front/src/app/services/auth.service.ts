@@ -24,13 +24,16 @@ export class AuthService {
     }
     const helper = new JwtHelperService();
     const decodedToken = helper.decodeToken(token);
+    console.log(decodedToken)
     const id:string = decodedToken.nameid;
     const email:string = decodedToken.email;
+    const username: string = decodedToken.unique_name
     const role:UserRole = decodedToken.role as UserRole;
     this.userData.next({
       userId: id,
       userEmail: email,
       userRole: role,
+      username: username,
     });
   }
 

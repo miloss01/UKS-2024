@@ -73,7 +73,7 @@ namespace DockerHubBackend.Services.Implementation
                 _logger.LogError("Account not verified for user {Email}.", credentials.Email);
                 throw new AccountVerificationRequiredException("Account verification required", verificationToken);
             }
-            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email);
+            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email, user.Username);
 
             _logger.LogInformation("User {Email} has successfully logged in.", credentials.Email);
 

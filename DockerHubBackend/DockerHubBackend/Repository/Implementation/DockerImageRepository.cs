@@ -56,5 +56,10 @@ namespace DockerHubBackend.Repository.Implementation
 		{
 			return await _context.DockerImages.FirstOrDefaultAsync(repo => repo.Id == id);
 		}
-	}
+
+        public async Task<DockerImage?> GetDockerImageByIdWithRepository(Guid id)
+        {
+            return await _context.DockerImages.Include(image => image.Repository).FirstOrDefaultAsync(image => image.Id == id);
+        }
+    }
 }
