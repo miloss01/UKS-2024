@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,6 +17,7 @@ import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dia
   styleUrl: './team-details.component.css'
 })
 export class TeamDetailsComponent implements OnInit {
+  isOwner: boolean | null = false;
   displayedColumns: string[] = ['name', 'visibility', 'permissions'];
   repositories: any[] = [];
 
@@ -30,6 +31,10 @@ export class TeamDetailsComponent implements OnInit {
     private location: Location) {}
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.isOwner = params['isOwner'] === 'true';
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       console.log(id);
@@ -74,10 +79,9 @@ export class TeamDetailsComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((confirmed) => {
         if (confirmed) {
-          console.log('Team deleted: ', id);
           this.teamService.deleteTeam(id).subscribe((res) => {
             if (res != null) {
-              this.router.navigate(['teams']);
+              this.goBack();
             }
           });
         }

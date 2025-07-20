@@ -16,8 +16,8 @@
       </ul>
     </div>
     <div class="buttons">
-      <button mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
-      <button mat-raised-button color="warn" (click)="openDeleteDialog()">Delete Team</button>
+      <button *ngIf="isOwner" mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
+      <button *ngIf="isOwner" mat-raised-button color="warn" (click)="openDeleteDialog()">Delete Team</button>
     </div>
   </div>
 

@@ -6,18 +6,19 @@ import { TeamService } from 'app/services/team.service';
 import { CreateTeamDialogComponent } from '../create-team-dialog/create-team-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [MaterialModule, FormsModule],
+  imports: [CommonModule, MaterialModule, FormsModule],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.css'
 })
 export class TeamsComponent {
   @Input() organizationId : string | null = "";
   @Input() members : Member[] = [];
+  @Input() isOwner : boolean | null = false;
 
   displayedColumns: string[] = ['position', 'name', 'description'];
   teams: TeamsData[] = [];
@@ -46,20 +47,23 @@ export class TeamsComponent {
   }
 
   onRowClick(row: any) {
-    this.router.navigate(['/team-details', row.id]);
+    this.router.navigate(['/team-details', row.id], {
+      queryParams: { isOwner: this.isOwner }
+    });
   }
 
   openCreateTeamForm(): void {
     const dialogRef = this.dialog.open(CreateTeamDialogComponent, {data: {members: this.members}});
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        result.organizationId = this.organizationId;
-        // result.members = this.parseMembersList(result.members);
-        this.teamService.createTeam(result).subscribe((team) => {
+      console.log("resulltttt " + result?.isClosed); 
+      if (!result?.isClosed) {
+        result.data.organizationId = this.organizationId;
+        this.teamService.createTeam(result.data).subscribe((team) => {
           this.teams.push(team);
           this.teams = [...this.teams];  // update table
         });
+        result.isClosed = true;
       }
     });
   }

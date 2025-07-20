@@ -32,13 +32,15 @@ export class CreateTeamDialogComponent {
   }
 
   onSubmit(): void {
+    console.log("tralala");
     if (this.teamForm.valid) {
-      this.dialogRef.close(this.teamForm.value); 
+      this.dialogRef.close({isClosed: false, data: this.teamForm.value}); 
     }
   }
 
   onCancel(): void {
-    this.dialogRef.close(); 
+    console.log("on cancel")
+    this.dialogRef.close({isClosed: true}); 
   }
 
 }
