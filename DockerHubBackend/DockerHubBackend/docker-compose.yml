@@ -11,7 +11,7 @@ services:
       ASPNETCORE_ENVIRONMENT: "Development"
       CONNECTION_STRING: ${ConnectionStrings__DefaultConnection}
       PORT: ${PORT}
-      RUNNING_IN_CONTAINER: true
+      APPLY_MIGRATIONS: true
     depends_on:
       - postgres
       - elasticsearch
