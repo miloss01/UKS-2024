@@ -28,8 +28,8 @@
         </mat-form-field>
 
         <div mat-dialog-actions>
-        <button mat-button (click)="onCancel()">Cancel</button>
-        <button color="primary" mat-button type="submit" [disabled]="teamForm.invalid">Create</button>
+        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+        <button color="primary" mat-button type="button" (click)="onSubmit()" [disabled]="teamForm.invalid">Create</button>
         </div>
     </form>
     </div>

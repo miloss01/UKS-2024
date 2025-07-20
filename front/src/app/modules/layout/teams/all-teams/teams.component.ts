@@ -56,8 +56,7 @@ export class TeamsComponent {
     const dialogRef = this.dialog.open(CreateTeamDialogComponent, {data: {members: this.members}});
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log("resulltttt " + result?.isClosed); 
-      if (!result?.isClosed) {
+      if (result?.isConfirmed) {
         result.data.organizationId = this.organizationId;
         this.teamService.createTeam(result.data).subscribe((team) => {
           this.teams.push(team);
