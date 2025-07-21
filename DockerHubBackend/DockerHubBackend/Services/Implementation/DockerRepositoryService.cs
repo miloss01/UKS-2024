@@ -205,7 +205,8 @@ namespace DockerHubBackend.Services.Implementation
             }
 			catch (NotFoundException)
             {
-				throw;
+                await tx.RollbackAsync();
+                throw;
 			}
             catch (Exception ex)
             {

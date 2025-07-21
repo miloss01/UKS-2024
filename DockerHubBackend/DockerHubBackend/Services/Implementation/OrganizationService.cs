@@ -132,6 +132,12 @@ namespace DockerHubBackend.Services.Implementation
                 }
 
                 await _orgRepository.DeleteOrganization(organizationId);
+                await tx.CommitAsync();
+            }
+            catch (NotFoundException)
+            {
+                await tx.RollbackAsync();
+                throw;
             }
             catch (Exception ex)
             {
@@ -140,7 +146,6 @@ namespace DockerHubBackend.Services.Implementation
                 throw new Exception("Something went wrong");
             }
             
-
             _logger.LogInformation("Organization with ID: {OrganizationId} deleted successfully", organizationId);
         }
 
