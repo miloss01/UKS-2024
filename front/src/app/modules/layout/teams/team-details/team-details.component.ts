@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
-import RepositoryCreation, { TeamsData } from 'app/models/models';
+import { TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
 import { EditTeamDialogComponent } from '../edit-team-dialog/edit-team-dialog.component';
 import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dialog.component';
@@ -26,7 +26,8 @@ export class TeamDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private teamService: TeamService, 
     private dialog: MatDialog,
-    private router: Router) {}
+    private router: Router,
+    private location: Location) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -82,5 +83,9 @@ export class TeamDetailsComponent implements OnInit {
         }
       });
     }
+  }
+  
+  goBack(): void {
+    this.location.back(); 
   }
 }

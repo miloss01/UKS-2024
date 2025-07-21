@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
@@ -68,14 +69,14 @@ namespace DockerHubBackend.Services.Implementation
             await _repository.Create(team);
             
             Team returnedTeam = await _repository.GetByName(teamDto.Name);
-            ICollection<EmailDto> memberDtos = new HashSet<EmailDto>();
+            ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
             foreach (StandardUser user in team.Members) { memberDtos.Add(user.ToMemberDto()); }
 
             _logger.LogInformation("Successfully created team {TeamName} with ID {TeamId}", returnedTeam.Name, returnedTeam.Id);
             return new TeamDto(returnedTeam.Id, returnedTeam.Name, returnedTeam.Description, memberDtos);       
         }
 
-        public async Task<TeamDto> AddMembers(Guid teamId, ICollection<EmailDto> memberDtos)
+        public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
         {
             _logger.LogInformation("Adding members to team with ID {TeamId}", teamId);
             Team? team = await _repository.Get(teamId);
@@ -84,7 +85,7 @@ namespace DockerHubBackend.Services.Implementation
                 _logger.LogError("Team with ID {TeamId} does not exist", teamId);
                 throw new NotFoundException("Team does not exist."); 
             }
-            team.Members = await toStandardUsers(memberDtos);  // TODO: add check for members (this should be done after organization merge)
+            team.Members = await toStandardUsers(memberDtos);
             Team? updatedTeam = await _repository.Update(team);
             if (updatedTeam == null) 
             {
@@ -174,11 +175,11 @@ namespace DockerHubBackend.Services.Implementation
             return await _repository.GetTeamPermissions(id);
         }
 
-        private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<EmailDto> memberDtos)
+        private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
             _logger.LogInformation("Converting email DTOs to standard users");
             ICollection<StandardUser?> members = new HashSet<StandardUser?>();
-            foreach (EmailDto memberDto in memberDtos)
+            foreach (MemberDto memberDto in memberDtos)
             {
                 BaseUser? baseUser = await _userRepository.GetUserByEmail(memberDto.Email);
                 StandardUser user = (StandardUser)baseUser;

@@ -7,13 +7,30 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using DockerHubBackend.Services.Interface;
 
-public class LogService : BackgroundService
+public class LogService : BackgroundService, ILogService
 {
     private static long lastReadPosition = 0; // offset
     private static readonly string logsDirectoryPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Logs");
     private static Timer _timer;
     private static readonly HttpClient _httpClient = new HttpClient();
+    private static readonly Dictionary<string, string> LevelMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "level:warning", "level:wrn" },
+        { "level:error", "level:err" },
+        { "level:information", "level:inf" },
+    };
+
+    private static readonly HashSet<string> LogicalOperators = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "and", "or", "not"
+    };
+
+    private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "level", "message", "timestamp", "exception"
+    };
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -152,5 +169,64 @@ public class LogService : BackgroundService
         {
             return null;
         }
+    }
+
+    public string NormalizeQuery(string query)
+    {
+        query = SetLevel(query);
+        var tokens = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var resultTokens = new List<string>();
+
+        foreach (var token in tokens)
+        {
+            if (IsLogicalOperator(token))
+            {
+                resultTokens.Add(token.ToUpper());
+            }
+            else if (IsFieldToken(token, out var fieldName, out var fieldValue))
+            {
+                var normalizedField = KnownFields.Contains(fieldName)
+                    ? fieldName.ToLower()
+                    : fieldName;
+
+                resultTokens.Add($"{normalizedField}:{fieldValue}");
+            }
+            else
+            {
+                resultTokens.Add(token);
+            }
+        }
+
+        return string.Join(' ', resultTokens);
+    }
+
+    private static string SetLevel(string query)
+    {
+        foreach (var entry in LevelMap)
+        {
+            query = query.Replace(entry.Key, entry.Value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return query;
+    }
+
+    private static bool IsLogicalOperator(string token)
+    {
+        return LogicalOperators.Contains(token);
+    }
+
+    private static bool IsFieldToken(string token, out string fieldName, out string fieldValue)
+    {
+        var parts = token.Split(':', 2);
+        if (parts.Length == 2)
+        {
+            fieldName = parts[0];
+            fieldValue = parts[1];
+            return true;
+        }
+
+        fieldName = string.Empty;
+        fieldValue = string.Empty;
+        return false;
     }
 }

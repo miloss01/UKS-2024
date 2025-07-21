@@ -3,7 +3,6 @@
   <span class="fill-remaining-space"></span>
   <a class="nav-button" *ngIf="userType != undefined" href="/all-user-repo">Repositories</a>
   <a class="nav-button" *ngIf="userType == 'StandardUser'" href="/organizations">Organizations</a>
-  <a class="nav-button" *ngIf="userType != undefined" href="/teams">Teams</a>
   <a class="nav-button" *ngIf="userType == 'Admin' || userType == 'SuperAdmin'" href="/badges">Badges</a>
   <a class="nav-button" href="/explore">Explore</a>
   <a class="nav-button" *ngIf="userType == 'Admin' || userType == 'SuperAdmin'" href="/logs">Logs</a>

@@ -1,10 +1,9 @@
 import psycopg2
-from config import DATABASE_URI
 import bcrypt
 
 class AccessService:
-    def __init__(self):
-        self.connection_string = DATABASE_URI
+    def __init__(self, connection_string):
+        self.connection_string = connection_string
 
     def _verify_password(self, raw_password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(raw_password.encode('utf-8'), hashed_password.encode('utf-8'))
