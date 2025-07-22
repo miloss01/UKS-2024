@@ -1,13 +1,11 @@
-﻿using System.ComponentModel;
-using DockerHubBackend.Dto.Request;
+﻿using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
-using Microsoft.AspNetCore.Routing.Template;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -78,21 +76,17 @@ namespace DockerHubBackend.Services.Implementation
 
         public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
         {
-            Console.WriteLine("*******************************************1");
-
             _logger.LogInformation("Adding members to team with ID {TeamId}", teamId);
             Team? team = await _repository.Get(teamId);
             if (team == null) 
             {
                 _logger.LogError("Team with ID {TeamId} does not exist", teamId);
-                Console.WriteLine("*******************************************2");
                 throw new NotFoundException("Team does not exist."); 
             }
             team.Members = await toStandardUsers(memberDtos);
             Team? updatedTeam = await _repository.Update(team);
             if (updatedTeam == null) 
             {
-                Console.WriteLine("*******************************************3");
                 _logger.LogError("Error occurred while adding members to team with ID {TeamId}", teamId);
                 throw new BadRequestException("Error occured while adding members. Addition aborted."); 
             }
@@ -115,7 +109,7 @@ namespace DockerHubBackend.Services.Implementation
             if (dr == null) 
             {
                 _logger.LogError("Repository with ID {RepositoryId} not found", teamPermissionDto.RepositoryId);
-                throw new NotFoundException("Repositoy not found."); 
+                throw new NotFoundException("Repository not found."); 
             }
 
             Team? t = await _repository.Get(teamPermissionDto.TeamId);
