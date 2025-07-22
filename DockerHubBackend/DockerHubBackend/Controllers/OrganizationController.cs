@@ -1,6 +1,7 @@
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response.Organization;
+using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
@@ -102,6 +103,10 @@ namespace DockerHubBackend.Controllers
                 return Ok(new { message = "Organization deleted successfully." });
             }
             catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
