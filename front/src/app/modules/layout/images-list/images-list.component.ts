@@ -24,6 +24,7 @@ export class ImagesListComponent implements OnChanges {
 
   filteredImages = [...this.images];
   selectedImage: DockerImageDTO | null= null;
+  selectedTag: string | null = null
   sortOption = 'newest';
   filterTag = '';
   page = 0;
@@ -98,14 +99,40 @@ export class ImagesListComponent implements OnChanges {
     navigator.clipboard.writeText(text);
   }
 
-  selectImage(image: any) {
-    this.selectedImage = image;
-  }
+  // selectImage(image: any) {
+  //   this.selectedImage = image;
+  // }
 
-  DeleteTag(): void {
+  selectImage(image: any, tag: string) {
+  this.selectedImage = image;
+  this.selectedTag = tag;
+}
+
+  DeleteImage(): void {
     if (this.selectedImage) {
       console.log('Selected Image:', this.selectedImage);
       this.dockerImageService.deleteDockerImage(this.selectedImage.imageId).subscribe({
+          next: (response: void) => {
+            console.log('Deleted:', response);
+            this.filteredImages = this.filteredImages.filter(
+              image => image.imageId !== this.selectedImage?.imageId
+            );
+        
+            // Optionally clear the selection
+            this.selectedImage = null;
+          },
+          error: (error) => {
+            console.error('Error creating repository:', error);
+          }
+        });     
+      }
+  }
+
+  DeleteTag(): void {
+    if (this.selectedImage && this.selectedTag) {
+      console.log('Selected Image:', this.selectedImage);
+      console.log('Selected Image Tag:', this.selectedTag);
+      this.dockerImageService.deleteDockerImageTag(this.selectedImage.imageId, this.selectedTag).subscribe({
           next: (response: void) => {
             console.log('Deleted:', response);
             this.filteredImages = this.filteredImages.filter(
