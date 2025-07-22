@@ -78,17 +78,21 @@ namespace DockerHubBackend.Services.Implementation
 
         public async Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos)
         {
+            Console.WriteLine("*******************************************1");
+
             _logger.LogInformation("Adding members to team with ID {TeamId}", teamId);
             Team? team = await _repository.Get(teamId);
             if (team == null) 
             {
                 _logger.LogError("Team with ID {TeamId} does not exist", teamId);
+                Console.WriteLine("*******************************************2");
                 throw new NotFoundException("Team does not exist."); 
             }
             team.Members = await toStandardUsers(memberDtos);
             Team? updatedTeam = await _repository.Update(team);
             if (updatedTeam == null) 
             {
+                Console.WriteLine("*******************************************3");
                 _logger.LogError("Error occurred while adding members to team with ID {TeamId}", teamId);
                 throw new BadRequestException("Error occured while adding members. Addition aborted."); 
             }
@@ -177,7 +181,7 @@ namespace DockerHubBackend.Services.Implementation
 
         private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
-            _logger.LogInformation("Converting email DTOs to standard users");
+            _logger.LogInformation("Converting member DTOs to standard users");
             ICollection<StandardUser?> members = new HashSet<StandardUser?>();
             foreach (MemberDto memberDto in memberDtos)
             {

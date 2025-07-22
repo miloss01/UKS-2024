@@ -1,5 +1,6 @@
 ﻿using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
@@ -87,7 +88,7 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Create_ValidDto_ReturnsCreatedTeam()
         {
             var orgId = Guid.NewGuid();
-            var dto = new TeamDto { Name = "Charlie", OrganizationId = orgId, Members = new List<EmailDto>() };
+            var dto = new TeamDto { Name = "Charlie", OrganizationId = orgId, Members = new List<MemberDto>() };
             var org = new Organization { Id = orgId, Name = "Org", ImageLocation = "img.jpg", OwnerId = Guid.NewGuid(), Owner = new StandardUser
             {
                 Email = "a@example.com",
