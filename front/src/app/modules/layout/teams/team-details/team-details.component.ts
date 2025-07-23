@@ -9,6 +9,7 @@ import { TeamService } from 'app/services/team.service';
 import { EditTeamDialogComponent } from '../edit-team-dialog/edit-team-dialog.component';
 import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dialog.component';
 import { AddRepositoryDialogComponent } from '../add-repository-dialog/add-repository-dialog.component';
+import { RepositoryService } from 'app/services/repository.service';
 
 @Component({
   selector: 'app-team-details',
@@ -21,14 +22,13 @@ export class TeamDetailsComponent implements OnInit {
   isOwner: boolean | null = false;
   displayedColumns: string[] = ['name', 'visibility', 'permissions'];
   repositories: any[] = [];
-
   team: TeamsData | undefined;
 
   constructor(
     private route: ActivatedRoute,
-    private teamService: TeamService, 
+    private teamService: TeamService,
+    private repositoryService: RepositoryService,
     private dialog: MatDialog,
-    private router: Router,
     private location: Location) {}
 
   ngOnInit(): void {
@@ -38,7 +38,6 @@ export class TeamDetailsComponent implements OnInit {
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      console.log(id);
       this.teamService.getTeam(id).subscribe((team) => {
         this.team = team;
       });
@@ -90,23 +89,25 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  openAddRepositoryDialog(): void {
-    const dialogRef = this.dialog.open(AddRepositoryDialogComponent, {
-      width: '400px',
-      data: {
-        availableRepositories: this.getAvailableRepositories() // TODO: get available repositories here
-      }
-    });
+  async openAddRepositoryDialog(): Promise<void> {
+    if (this.team != undefined) {
+      await this.repositoryService.getByOrganizationId(this.team.organizationId).subscribe((repos) => {
+          console.log(repos);
+          const dialogRef = this.dialog.open(AddRepositoryDialogComponent, {
+          width: '400px',
+          data: {
+            availableRepositories: repos // TODO: get available repositories here
+          }
+          });
+          dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            console.log('Repository added:', result); // TODO: add respositories here (add on confirm check)
+          }
+        });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Repository added:', result); // TODO: add respositories here (add on confirm check)
-      }
-    });
-  }
-
-  getAvailableRepositories(): string[] {
-    return ['Repo A', 'Repo B', 'Repo C']; // TODO: replace with the actual data
+      });
+      
+    } 
   }
   
   goBack(): void {

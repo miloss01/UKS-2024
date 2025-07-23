@@ -56,6 +56,7 @@ namespace DockerHubBackend.Dto.Request
             Name = team.Name;
             Members = memberDtos;
             Description = team.Description;
+            OrganizationId = team.OrganizationId;
         }
         public Team ToTeam(Organization organization)
         {

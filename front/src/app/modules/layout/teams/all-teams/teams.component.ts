@@ -32,7 +32,6 @@ export class TeamsComponent {
       (data: TeamsData[]) => {
         this.teams = data;
         this.teams.sort((a, b) => a.name.localeCompare(b.name));
-        console.log('Teams loaded:', this.teams);
       },
       (error) => {
         console.error('Error fetching teams:', error);

@@ -38,4 +38,9 @@ export class RepositoryService {
   getDockerRepositories(page: number, pageSize: number, searchTerm: string, badges: string): Observable<PageDTO<DockerRepositoryDTO>>{
       return this.http.get<PageDTO<DockerRepositoryDTO>>(`${environment.apiHost}dockerRepositories?page=${page}&pageSize=${pageSize}&searchTerm=${searchTerm}&badges=${badges}`);
     }
+  
+  getByOrganizationId(id: string) {
+    return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/org-repository/${id}`);
+  }
+  
 }

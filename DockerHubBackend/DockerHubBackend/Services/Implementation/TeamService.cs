@@ -100,29 +100,29 @@ namespace DockerHubBackend.Services.Implementation
         public async Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto)
         {
             _logger.LogInformation("Adding permissions for team {TeamId} on repository {RepositoryId}", teamPermissionDto.TeamId, teamPermissionDto.RepositoryId);
-            TeamPermission? teamPerm = _repository.GetTeamPermission(teamPermissionDto.RepositoryId, teamPermissionDto.TeamId);
+            TeamPermission? teamPerm = _repository.GetTeamPermission(Guid.Parse(teamPermissionDto.RepositoryId), Guid.Parse((teamPermissionDto.TeamId)));
             if (teamPerm != null) 
             {
                 _logger.LogError("Permission already exists for team {TeamId} on repository {RepositoryId}", teamPermissionDto.TeamId, teamPermissionDto.RepositoryId);
                 throw new BadRequestException("Team-Permission already exists."); 
             }
 
-            DockerRepository? dr = await _dockerRepositoryRepository.Get(teamPermissionDto.RepositoryId);
+            DockerRepository? dr = await _dockerRepositoryRepository.Get(Guid.Parse(teamPermissionDto.RepositoryId));
             if (dr == null) 
             {
                 _logger.LogError("Repository with ID {RepositoryId} not found", teamPermissionDto.RepositoryId);
                 throw new NotFoundException("Repositoy not found."); 
             }
 
-            Team? t = await _repository.Get(teamPermissionDto.TeamId);
+            Team? t = await _repository.Get(Guid.Parse(teamPermissionDto.TeamId));
             if (t == null) {
                 _logger.LogError("Team with ID {TeamId} not found", teamPermissionDto.TeamId);
                 throw new NotFoundException("Team not found."); 
             }
             TeamPermission tp = new TeamPermission
             {
-                TeamId = teamPermissionDto.TeamId,
-                RepositoryId = teamPermissionDto.RepositoryId,
+                TeamId = Guid.Parse(teamPermissionDto.TeamId),
+                RepositoryId = Guid.Parse(teamPermissionDto.RepositoryId),
                 Team = t,
                 Repository = dr,
                 Permission = toPermissionType(teamPermissionDto.Permission),
