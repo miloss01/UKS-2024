@@ -21,7 +21,12 @@
     </div>
   </div>
 
+  <div class="repository-header">
   <h3>Repositories</h3>
+  <button *ngIf="isOwner" mat-raised-button color="primary" (click)="openAddRepositoryDialog()">
+    Add Repository
+  </button>
+</div>
   <div id="table-container">
     <table mat-table [dataSource]="repositories" class="mat-elevation-z8">
       <ng-container matColumnDef="name">

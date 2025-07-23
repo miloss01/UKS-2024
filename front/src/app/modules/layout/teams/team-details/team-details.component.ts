@@ -8,6 +8,7 @@ import { TeamsData } from 'app/models/models';
 import { TeamService } from 'app/services/team.service';
 import { EditTeamDialogComponent } from '../edit-team-dialog/edit-team-dialog.component';
 import { DeleteTeamDialogComponent } from '../delete-team-dialog/delete-team-dialog.component';
+import { AddRepositoryDialogComponent } from '../add-repository-dialog/add-repository-dialog.component';
 
 @Component({
   selector: 'app-team-details',
@@ -73,7 +74,7 @@ export class TeamDetailsComponent implements OnInit {
     if (this.team != undefined) {
       let id = this.team.id; // because there will be errors withoud this (team could be undefiend)
       const dialogRef = this.dialog.open(DeleteTeamDialogComponent, {
-        width: '300px',
+        width: '400px',
         data: { name: this.team.name},
       });
 
@@ -87,6 +88,25 @@ export class TeamDetailsComponent implements OnInit {
         }
       });
     }
+  }
+
+  openAddRepositoryDialog(): void {
+    const dialogRef = this.dialog.open(AddRepositoryDialogComponent, {
+      width: '400px',
+      data: {
+        availableRepositories: this.getAvailableRepositories() // TODO: get available repositories here
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Repository added:', result); // TODO: add respositories here (add on confirm check)
+      }
+    });
+  }
+
+  getAvailableRepositories(): string[] {
+    return ['Repo A', 'Repo B', 'Repo C']; // TODO: replace with the actual data
   }
   
   goBack(): void {
