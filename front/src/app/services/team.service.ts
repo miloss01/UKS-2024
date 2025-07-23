@@ -34,4 +34,8 @@ export class TeamService {
   getRepositories(id: string): Observable<TeamRepoPerm[]> {
     return this.http.get<TeamRepoPerm[]>(`${environment.apiHost}team/repositories/${id}`);
   }
+  
+  addPermission(permission: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiHost}team/permission`, permission);
+  }
 }

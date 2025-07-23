@@ -23,6 +23,7 @@ export class TeamDetailsComponent implements OnInit {
   displayedColumns: string[] = ['name', 'visibility', 'permissions'];
   repositories: any[] = [];
   team: TeamsData | undefined;
+  mapPermission : Record<string, string>  = {'0' : "ReadOnly", '1': "ReadWrite", '2': "Admin"}
 
   constructor(
     private route: ActivatedRoute,
@@ -91,7 +92,7 @@ export class TeamDetailsComponent implements OnInit {
 
   async openAddRepositoryDialog(): Promise<void> {
     if (this.team != undefined) {
-      await this.repositoryService.getByOrganizationId(this.team.organizationId).subscribe((repos) => {
+      this.repositoryService.getByOrganizationId(this.team.organizationId).subscribe((repos) => {
           console.log(repos);
           const dialogRef = this.dialog.open(AddRepositoryDialogComponent, {
           width: '400px',
@@ -102,6 +103,18 @@ export class TeamDetailsComponent implements OnInit {
           dialogRef.afterClosed().subscribe(result => {
           if (result) {
             console.log('Repository added:', result); // TODO: add respositories here (add on confirm check)
+            var permission = {"teamId": this.team?.id, "repositoryId": result.repository.id, "permission": this.mapPermission[result.permission?.toString()]};
+            console.log(permission);
+            this.teamService.addPermission(permission).subscribe((_) => {
+              this.teamService.getRepositories(this.team!.id).subscribe((repos) => {
+                const newRepos = repos.map(repo => ({
+                  name: repo.repository.name, 
+                  visibility: repo.repository.isPublic, 
+                  permissions: repo.permission
+                }));
+                this.repositories = [...newRepos];
+              });
+            });
           }
         });
 

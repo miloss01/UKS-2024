@@ -14,17 +14,17 @@ import { MaterialModule } from 'app/infrastructure/material/material.module';
 export class AddRepositoryDialogComponent {
 
   repoForm: FormGroup;
-  availableRepositories: string[] = [];
+  availableRepositories: {id: string, name: string}[] = [];
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddRepositoryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.availableRepositories = data?.availableRepositories?.map((repo: { name: string; }) => repo.name) || this.availableRepositories;
+    this.availableRepositories = data?.availableRepositories || this.availableRepositories;
 
     this.repoForm = this.fb.group({
-      repositoryName: ['', Validators.required],
+      repository: ['', Validators.required],
       permission: [null, Validators.required]
     });
   }
