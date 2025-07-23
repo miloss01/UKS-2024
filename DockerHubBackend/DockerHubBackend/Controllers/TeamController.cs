@@ -81,5 +81,12 @@ namespace DockerHubBackend.Controllers
             ICollection<TeamPermission> res = await _teamService.GetTeamPermissions(id);
             return Ok(res);
         }
+
+        [HttpGet("permission/{userId}/{repositoryId}")]
+        public async Task<IActionResult> GetPermission([FromRoute] string userId, [FromRoute] string repositoryId)
+        {
+            PermissionType res = await _teamService.GetPermissionByUserAndRepository(userId, repositoryId);
+            return Ok(res);
+        }
     }
 }

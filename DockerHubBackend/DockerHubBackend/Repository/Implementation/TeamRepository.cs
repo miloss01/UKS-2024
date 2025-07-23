@@ -44,6 +44,7 @@ namespace DockerHubBackend.Repository.Implementation
             var team = await _context.Teams
                 .Where(team => team.Id == id)
                 .Include(team => team.Members)
+                .Include(team => team.Organization)
                 .FirstOrDefaultAsync();
             return team;
         }
@@ -90,6 +91,16 @@ namespace DockerHubBackend.Repository.Implementation
         {
             return await _context.Teams.Include(team => team.Organization)
                 .FirstOrDefaultAsync(team => team.Name == teamName && team.Organization.Id == orgId);
+        }
+
+        public async Task<PermissionType> GetPermissionByUserAndRepository(Guid userId, Guid repositoryId)
+        {
+            var permission = await _context.TeamPermissions
+            .Where(tp => tp.RepositoryId == repositoryId &&
+                         tp.Team.Members.Any(m => m.Id == userId))
+            .MaxAsync(tp => (PermissionType?)tp.Permission);
+
+            return permission ?? PermissionType.ReadOnly;
         }
     }
 }

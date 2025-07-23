@@ -175,6 +175,11 @@ namespace DockerHubBackend.Services.Implementation
             return await _repository.GetTeamPermissions(id);
         }
 
+        public async Task<PermissionType> GetPermissionByUserAndRepository(string userId, string repositoryId)
+        {
+            return await _repository.GetPermissionByUserAndRepository(Guid.Parse(userId), Guid.Parse(repositoryId));
+        }
+
         private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
             _logger.LogInformation("Converting email DTOs to standard users");
