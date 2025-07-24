@@ -46,12 +46,12 @@ access_service = AccessService(app.config['DATABASE_URI'])
 
 def get_certificate():
     """Return a cryptography.x509.Certificate object"""
-    with open('cert.pem', 'rb') as cert_file:
+    with open('cert/cert.pem', 'rb') as cert_file:
         return load_pem_x509_certificate(cert_file.read(),
                                          default_backend())
 
 def get_private_key():
-    with open('key.pem', 'rb') as key_file:
+    with open('cert/key.pem', 'rb') as key_file:
         private_key = serialization.load_pem_private_key(
             key_file.read(),
             password=None,
