@@ -12,6 +12,13 @@ namespace DockerHubBackend.Repository.Implementation
 		{
 		}
 
+		public async Task<ICollection<ImageTag>> GetByDockerImageId(Guid imageId)
+		{
+			return await _context.ImageTags
+				.Where(tag => tag.DockerImageId == imageId && !tag.IsDeleted)
+				.ToListAsync();
+		}
+
 		public async Task<ImageTag?> GetByDockerImageIdAndName(Guid imageId, string tagName)
 		{
 			return await _context.ImageTags

@@ -86,8 +86,22 @@ namespace DockerHubBackend.Services.Implementation
 				_logger.LogError("Image tag with name {TagName} and image ID: {ImageId} not found.", tagName, imageId);
 				throw new NotFoundException($"Docker tag {tagName} with image id {imageId.ToString()} not found.");
 			}
-            await _imageTagRepository.Delete(tag.Id);
-            _logger.LogInformation("Deleted tag with {Id}", tag.Id);
+            if ( await is_last_tag_in_image(imageId))
+            {
+				await DeleteDockerImage(imageId);
+
+			}
+            else
+            {
+                await _imageTagRepository.Delete(tag.Id);
+                _logger.LogInformation("Deleted tag with {Id}", tag.Id);
+            }
+		}
+
+		private async Task<bool> is_last_tag_in_image(Guid imageId)
+		{
+			var tags = await _imageTagRepository.GetByDockerImageId(imageId);
+            return tags.Count <= 1;
 		}
 	}
 }

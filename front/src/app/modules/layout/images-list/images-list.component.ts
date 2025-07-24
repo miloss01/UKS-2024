@@ -135,9 +135,15 @@ export class ImagesListComponent implements OnChanges {
       this.dockerImageService.deleteDockerImageTag(this.selectedImage.imageId, this.selectedTag).subscribe({
           next: (response: void) => {
             console.log('Deleted:', response);
-            this.filteredImages = this.filteredImages.filter(
-              image => image.imageId !== this.selectedImage?.imageId
-            );
+            this.filteredImages = this.filteredImages.map(image => {
+                if (image.imageId === this.selectedImage?.imageId) {
+                  return {
+                    ...image,
+                    tags: image.tags.filter(tag => tag !== this.selectedTag)
+                  };
+                }
+                return image;
+              });
         
             // Optionally clear the selection
             this.selectedImage = null;
