@@ -5,19 +5,22 @@ using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Interface;
+using Nest;
 
 namespace DockerHubBackend.Services.Implementation
 {
     public class DockerImageService : IDockerImageService
     {
         private readonly IDockerImageRepository _dockerImageRepository;
+        private readonly IImageTagRepository _imageTagRepository;
         private readonly ILogger<DockerImageService> _logger;
         private readonly IRegistryService _registryService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public DockerImageService(IDockerImageRepository dockerImageRepository, ILogger<DockerImageService> logger, IRegistryService registryService, IUnitOfWork unitOfWork)
+        public DockerImageService(IDockerImageRepository dockerImageRepository, IImageTagRepository imageTagRepository, ILogger<DockerImageService> logger, IRegistryService registryService, IUnitOfWork unitOfWork)
         {
             _dockerImageRepository = dockerImageRepository;
+            _imageTagRepository = imageTagRepository;
             _logger = logger;
             _registryService = registryService;
             _unitOfWork = unitOfWork;
@@ -73,5 +76,32 @@ namespace DockerHubBackend.Services.Implementation
             }
             
         }
-    }
+
+        public async Task DeleteTagForDockerImage(Guid imageId, string tagName)
+        {
+			_logger.LogInformation("Attempting to delete {TagName} Docker image with ID: {ImageId}", tagName, imageId);
+			var tag = await _imageTagRepository.GetByDockerImageIdAndName(imageId, tagName);
+            if (tag == null) 
+			{
+				_logger.LogError("Image tag with name {TagName} and image ID: {ImageId} not found.", tagName, imageId);
+				throw new NotFoundException($"Docker tag {tagName} with image id {imageId.ToString()} not found.");
+			}
+            if ( await is_last_tag_in_image(imageId))
+            {
+				await DeleteDockerImage(imageId);
+
+			}
+            else
+            {
+                await _imageTagRepository.Delete(tag.Id);
+                _logger.LogInformation("Deleted tag with {Id}", tag.Id);
+            }
+		}
+
+		private async Task<bool> is_last_tag_in_image(Guid imageId)
+		{
+			var tags = await _imageTagRepository.GetByDockerImageId(imageId);
+            return tags.Count <= 1;
+		}
+	}
 }

@@ -58,7 +58,7 @@ namespace DockerHubBackend.Services.Implementation
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(_config["Registry:RegistryAddress"] + "/v2/ubuntu/manifests/" + digest),
+                RequestUri = new Uri(_config["Registry:RegistryAddress"] + $"/v2/{repository}/manifests/{digest}"),
                 Headers =
                 {
                     { "Accept", "application/vnd.docker.distribution.manifest.v2+json" },

@@ -6,11 +6,6 @@ namespace DockerHubBackend.Dto.Response
     public class DockerRepositoryDTO
     {
 
-		/*public DockerRepositoryDTO(DockerRepository repository)
-		{
-			
-		}*/
-
 		public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -20,6 +15,8 @@ namespace DockerHubBackend.Dto.Response
         public ICollection<DockerImageDTO> Images { get; set; }
         public string Owner { get; set; }
         public string CreatedAt { get; set; }
+
+		public string LastPushed { get; set; }
 
 		public DockerRepositoryDTO() { }
 
@@ -35,6 +32,7 @@ namespace DockerHubBackend.Dto.Response
 			Owner = dockerRepository.OrganizationOwner == null
 				? (dockerRepository.UserOwner == null ? null : dockerRepository.UserOwner.Email)
 				: dockerRepository.OrganizationOwner.Name;
+			LastPushed = dockerRepository.CreatedAt.ToString();
 			Images = dockerRepository.Images.Select(img => new DockerImageDTO
 			{
 				RepositoryName = img.Repository.Name,

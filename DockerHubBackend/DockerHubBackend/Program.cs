@@ -95,6 +95,7 @@ builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IImageTagRepository, ImageTagRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();

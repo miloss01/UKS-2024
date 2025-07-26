@@ -74,5 +74,30 @@ namespace DockerHubBackend.Controllers
 				return StatusCode(500, new { error = ex.Message });
 			}
 		}
+
+		[HttpDelete("delete-tag/{imageId}/{tagName}")]
+		public async Task<IActionResult> DeleteImageById(string imageId, string tagName)
+		{
+			var parsed = Guid.TryParse(imageId, out var imageID);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Image not found. Bad image id.");
+			}
+
+			try
+			{
+				await _dockerImageService.DeleteTagForDockerImage(imageID, tagName);
+				return Ok(new { message = "Image TAG deleted successfully." });
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { error = ex.Message });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { error = ex.Message });
+			}
+		}
 	}
 }
