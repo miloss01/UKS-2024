@@ -10,7 +10,7 @@
         </select>
       </div>
       <input type="text" placeholder="Filter tags" class="filter-input" [(ngModel)]="filterTag" (input)="onFilter()" />
-      @if (forDeleting) {
+      @if (forDeleting && permisionType > 0) {
         <button mat-raised-button color="primary"
          (click)="DeleteTag()"
          [disabled]="!selectedImage">

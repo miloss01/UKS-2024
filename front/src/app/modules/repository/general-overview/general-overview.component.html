@@ -1,4 +1,4 @@
-<h2>{{repository.owner}}/{{repository.name}}
+<h2>{{repository.name}}
     @if (repository.isPublic) {
         <mat-icon aria-hidden="false" aria-label="Public">public</mat-icon>
     } @else {
@@ -28,7 +28,9 @@
         } @else {
             <p class="add-a-description">Add a description</p>   
         }
-        <button  mat-button (click)="onDescriptionEddit()"><mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon></button>    
+        @if (permisionType == 2){        
+            <button  mat-button (click)="onDescriptionEddit()"><mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon></button>    
+        }    
     </div>
 }
 

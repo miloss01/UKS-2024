@@ -42,5 +42,10 @@ export class RepositoryService {
   getByOrganizationId(id: string) {
     return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/org-repository/${id}`);
   }
+
+  GetUsersPermisionForRepository(userId: string, repositoryId: string) : Observable<number> {
+    const url = `${environment.apiHost}team/permission/${userId}/${repositoryId}`;
+    return this.http.get<number>(url);    
+  }
   
 }

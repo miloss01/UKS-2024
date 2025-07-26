@@ -22,6 +22,8 @@ export class ImagesListComponent implements OnChanges {
 
   @Input() forDeleting: boolean = false;
 
+  @Input() permisionType: number = 0;
+
   filteredImages = [...this.images];
   selectedImage: DockerImageDTO | null= null;
   sortOption = 'newest';

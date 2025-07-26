@@ -27,6 +27,7 @@ export class SettingsComponent {
     starCount: 0,
     badge: ''
   }
+  @Input() permisionType: number = 0;
   readonly dialog = inject(MatDialog);
 
 
