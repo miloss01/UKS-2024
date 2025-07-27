@@ -83,7 +83,7 @@ def update_database(tag, repository, timestamp, digest):
             connection.close()
 
 def parse_push_event(event):
-    if not event.get("target").get("mediaType") == "application/vnd.docker.distribution.manifest.v2+json":
+    if event.get("target").get("mediaType") not in ["application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.index.v1+json", "application/vnd.oci.image.manifest.v1+json"]:
         return
     
     timestamp = parse_timestamp(event.get("timestamp"))
