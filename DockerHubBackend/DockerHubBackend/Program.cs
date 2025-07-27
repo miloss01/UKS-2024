@@ -29,10 +29,6 @@ var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtCookieName = builder.Configuration["JWT:CookieName"];
 
-String postgreConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
-    "Host=localhost;Port=5432;Database=uks-database;Username=admin;Password=admin";
-builder.Configuration["ConnectionStrings:DefaultConnection"] = postgreConnectionString;
-
 // Add services to the container.
 
 // Authentication
@@ -146,7 +142,7 @@ builder.Host.UseSerilog((context, config) =>
         //});
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5156";
+var port = builder.Configuration["Port"] ?? "5156";
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -158,7 +154,7 @@ var app = builder.Build();
 //await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
-var applyMigrations = Environment.GetEnvironmentVariable("APPLY_MIGRATIONS") == "true";
+var applyMigrations = builder.Configuration["Database:ApplyMigrations"] == "true";
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
