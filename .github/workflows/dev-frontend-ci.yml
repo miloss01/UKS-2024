@@ -10,10 +10,6 @@ on:
     types: ["opened", "synchronize", "reopened"]
     branches: ["dev"]
 
-permissions:
-  pull-requests: write
-  issues: write
-
 jobs:
   build-and-test:
     uses: ./.github/workflows/angular-build.yml
