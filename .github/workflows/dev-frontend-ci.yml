@@ -11,5 +11,5 @@ on:
     branches: ["dev"]
 
 jobs:
-  use_reusable:
+  build-and-test:
     uses: ./.github/workflows/reusable/angular-build.yml
