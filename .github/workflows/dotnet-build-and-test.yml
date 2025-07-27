@@ -68,8 +68,8 @@ jobs:
     - name: Download test-results artifact
       uses: actions/download-artifact@v4
       with:
-        name: test-results # Matches the artifact name from your build-and-test step
-        path: test-results # Download to a directory named 'test-results'
+        name: test-results
+        path: test-results
 
     - name: Locate Coverage XML
       id: locate_coverage
@@ -82,38 +82,9 @@ jobs:
         fi
         echo "Found coverage.xml at: $COVERAGE_FILE"
         echo "COVERAGE_FILE=$COVERAGE_FILE" >> "$GITHUB_OUTPUT"
-
-    - name: Install ReportGenerator (with cache clear)
-      run: |
-        dotnet nuget locals all --clear
-        dotnet tool install -g ReportGenerator --version 5.2.4
-
-    - name: Generate Coverage Report Summary (Markdown)
-      run: |
-        reportgenerator "-reports:${{ steps.locate_coverage.outputs.COVERAGE_FILE }}" "-targetdir:coverage-report" "-reporttypes:MarkdownSummary"
-      # This will create a file like 'coverage-report/Summary.md'
-
-    - name: Read Coverage Summary into Variable
-      id: coverage_summary
-      run: |
-        SUMMARY_CONTENT=$(cat coverage-report/Summary.md)
-        # Escape multiline string for GitHub Actions output
-        # This creates a multiline output variable
-        echo "coverage_markdown<<EOF" >> $GITHUB_OUTPUT
-        echo "$SUMMARY_CONTENT" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: Comment Test and Coverage Summary on PR
-      uses: peter-evans/create-or-update-comment@v4
-      if: github.event_name == 'pull_request' # Only comment on PRs
+    - name: ReportGenerator
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.10
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ### Test Results Summary
-          - Passed tests: ${{ steps.summary.outputs.passed }} # Keep if you have these outputs from somewhere else
-          - Failed tests: ${{ steps.summary.outputs.failed }} # Adjust as needed
-
-          ### Code Coverage Report
-          ${{ steps.coverage_summary.outputs.coverage_markdown }}  
-      
+        reports: '${{ steps.locate_coverage.outputs.COVERAGE_FILE }}'
+        targetdir: coveragereport
+        reporttypes: MarkdownSummaryGithub      
