@@ -65,23 +65,54 @@ jobs:
         path: |
           ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx
           ./DockerHubBackend/DockerHubBackend.Tests/TestResults/coverage.xml
+    - name: Download test-results artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: test-results # Matches the artifact name from your build-and-test step
+        path: test-results # Download to a directory named 'test-results'
 
-    - name: Extract test summary
-      id: summary
+    - name: Locate Coverage XML
+      id: locate_coverage
       run: |
-        passed=$(grep -oP 'Passed: \K\d+' ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx || echo 0)
-        failed=$(grep -oP 'Failed: \K\d+' ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx || echo 0)
-        echo "::set-output name=passed::$passed"
-        echo "::set-output name=failed::$failed"
+        # Find the coverage.xml file within the downloaded artifact
+        COVERAGE_FILE=$(find test-results -name "coverage.xml" | head -n 1)
+        if [ -z "$COVERAGE_FILE" ]; then
+          echo "::error::coverage.xml not found in artifact!"
+          exit 1
+        fi
+        echo "Found coverage.xml at: $COVERAGE_FILE"
+        echo "COVERAGE_FILE=$COVERAGE_FILE" >> "$GITHUB_OUTPUT"
 
-    - name: Comment test summary on PR
+    - name: Install ReportGenerator
+      run: |
+        dotnet tool install -g ReportGenerator
+
+    - name: Generate Coverage Report Summary (Markdown)
+      run: |
+        reportgenerator "-reports:${{ steps.locate_coverage.outputs.COVERAGE_FILE }}" "-targetdir:coverage-report" "-reporttypes:MarkdownSummary"
+      # This will create a file like 'coverage-report/Summary.md'
+
+    - name: Read Coverage Summary into Variable
+      id: coverage_summary
+      run: |
+        SUMMARY_CONTENT=$(cat coverage-report/Summary.md)
+        # Escape multiline string for GitHub Actions output
+        # This creates a multiline output variable
+        echo "coverage_markdown<<EOF" >> $GITHUB_OUTPUT
+        echo "$SUMMARY_CONTENT" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Comment Test and Coverage Summary on PR
       uses: peter-evans/create-or-update-comment@v4
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' # Only comment on PRs
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         issue-number: ${{ github.event.pull_request.number }}
         body: |
           ### Test Results Summary
-          - Passed tests: ${{ steps.summary.outputs.passed }}
-          - Failed tests: ${{ steps.summary.outputs.failed }}      
+          - Passed tests: ${{ steps.summary.outputs.passed }} # Keep if you have these outputs from somewhere else
+          - Failed tests: ${{ steps.summary.outputs.failed }} # Adjust as needed
+
+          ### Code Coverage Report
+          ${{ steps.coverage_summary.outputs.coverage_markdown }}  
       
