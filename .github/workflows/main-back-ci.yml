@@ -12,17 +12,8 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR source branch
-        uses: actions/checkout@v4
-      - name: Get commit hash
-        id: extract_tag
-        run: |
-          echo "Tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-      - name: Build and push Docker image
-        uses: ./.github/workflows/build-and-push-docker.yml
-        with:
-          repository-name: uks-backend
-          image-tag: ${{ steps.extract_tag.outputs.TAG }}
-          local-path: ./DockerHubBackend/DockerHubBackend
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      repository-name: uks-backend
+      image-tag: ${{ github.sha::7 }}
+      local-path: ./DockerHubBackend/DockerHubBackend

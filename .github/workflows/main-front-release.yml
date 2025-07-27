@@ -7,13 +7,8 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4    
-      - name: Build and push Docker image
-        uses: ./.github/workflows/build-and-push-docker.yml
-        with:
-          repository-name: uks-frontend
-          image-tag: ${{ github.ref_name }}
-          local-path: ./front
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      repository-name: uks-frontend
+      image-tag: ${{ github.ref_name }}
+      local-path: ./front          
