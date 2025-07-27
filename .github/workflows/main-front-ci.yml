@@ -27,3 +27,5 @@ jobs:
       repository-name: uks-frontend
       image-tag: ${{ needs.prepare-tag.outputs.tag }}
       local-path: ./front
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}      

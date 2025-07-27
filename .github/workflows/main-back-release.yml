@@ -12,3 +12,5 @@ jobs:
       repository-name: uks-backend
       image-tag: ${{ github.ref_name }}
       local-path: ./DockerHubBackend/DockerHubBackend
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}      

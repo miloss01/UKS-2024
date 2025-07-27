@@ -11,4 +11,6 @@ jobs:
     with:
       repository-name: uks-frontend
       image-tag: ${{ github.ref_name }}
-      local-path: ./front          
+      local-path: ./front
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}      
