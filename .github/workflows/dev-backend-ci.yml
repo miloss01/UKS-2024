@@ -12,5 +12,5 @@ on:
 
 jobs:
   build-and-test:
-    uses: ./.github/workflows/reusable/dotnet-build-and-test.yml
+    uses: ./.github/workflows/dotnet-build-and-test.yml
       

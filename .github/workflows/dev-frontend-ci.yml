@@ -12,4 +12,4 @@ on:
 
 jobs:
   build-and-test:
-    uses: ./.github/workflows/reusable/angular-build.yml
+    uses: ./.github/workflows/angular-build.yml
