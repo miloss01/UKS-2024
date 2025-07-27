@@ -34,5 +34,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push Docker image
         run: |
+          echo "docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repository-name }}:${{ inputs.image-tag }} ${{ inputs.local-path }}"
+          echo "docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repository-name }}:${{ inputs.image-tag }} ${{ inputs.local-path }}
           docker push ${{ secrets.DOCKERHUB_TOKEN }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}
