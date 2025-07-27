@@ -1,17 +1,10 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build And Test .NET
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+  workflow_call:
 
 jobs:
-  build:
+  build-and-test:
 
     runs-on: ubuntu-latest
     
@@ -57,22 +50,38 @@ jobs:
       run: dotnet restore ./DockerHubBackend/DockerHubBackend.Tests
     - name: Build default project
       run: dotnet build ./DockerHubBackend/DockerHubBackend --no-restore
-    - name: Run tests
-      run: dotnet test ./DockerHubBackend/DockerHubBackend.Tests --verbosity normal --logger "trx;LogFileName=TestResults.trx"
-    - name: Upload test results
+    - name: Run tests with coverage
+      run: |
+        dotnet test ./DockerHubBackend/DockerHubBackend.Tests \
+          --verbosity normal \
+          --logger "trx;LogFileName=TestResults.trx" \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=cobertura \
+          /p:CoverletOutput=./TestResults/coverage.xml
+    - name: Upload test results and coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: TestResults
-        path: "**/*.trx"
-    - name: Install ReportGenerator
-      run: dotnet tool install -g dotnet-reportgenerator-globaltool
-    - name: Generate HTML report
-      run: reportgenerator -reports:**/*.trx -targetdir:TestReport
-    - name: Upload HTML report
-      uses: actions/upload-artifact@v4
+        name: test-results
+        path: |
+          ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx
+          ./DockerHubBackend/DockerHubBackend.Tests/TestResults/coverage.xml
+
+    - name: Extract test summary
+      id: summary
+      run: |
+        passed=$(grep -oP 'Passed: \K\d+' ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx || echo 0)
+        failed=$(grep -oP 'Failed: \K\d+' ./DockerHubBackend/DockerHubBackend.Tests/TestResults.trx || echo 0)
+        echo "::set-output name=passed::$passed"
+        echo "::set-output name=failed::$failed"
+
+    - name: Comment test summary on PR
+      uses: peter-evans/create-or-update-comment@v4
+      if: github.event_name == 'pull_request'
       with:
-        name: TestReport
-        path: TestReport        
-
-
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ### Test Results Summary
+          - Passed tests: ${{ steps.summary.outputs.passed }}
+          - Failed tests: ${{ steps.summary.outputs.failed }}      
       
