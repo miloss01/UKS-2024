@@ -3,10 +3,10 @@ name: Dev Branch Frontend CI
 on:
   workflow_dispatch:
   push:
-    # paths: ["front/**"]
+    paths: ["front/**"]
     branches: ["dev"]
   pull_request:
-    # paths: ["front/**"]
+    paths: ["front/**"]
     types: ["opened", "synchronize", "reopened"]
     branches: ["dev"]
 

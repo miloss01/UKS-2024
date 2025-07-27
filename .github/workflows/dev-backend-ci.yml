@@ -3,10 +3,10 @@ name: Dev Branch Backend CI
 on:
   workflow_dispatch:
   push:
-    # paths: ["DockerHubBackend/**"]
+    paths: ["DockerHubBackend/**"]
     branches: [ "dev" ]
   pull_request:
-    # paths: ["DockerHubBackend/**"]
+    paths: ["DockerHubBackend/**"]
     types: [opened, synchronize, reopened]
     branches: [ "dev" ]
 
