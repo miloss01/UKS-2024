@@ -15,11 +15,6 @@ on:
         description: "Path to the directory containing Dockerfile"
         required: true
         type: string
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
 
 jobs:
   build-and-push:
@@ -30,11 +25,9 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: miloss01
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push Docker image
         run: |
-          echo "docker build -t miloss01/${{ inputs.repository-name }}:${{ inputs.image-tag }} ${{ inputs.local-path }}"
-          echo "docker push miloss01/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
-          docker build -t miloss01/${{ inputs.repository-name }}:${{ inputs.image-tag }} ${{ inputs.local-path }}
-          docker push miloss01/${{ inputs.repository-name }}:${{ inputs.image-tag }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repository-name }}:${{ inputs.image-tag }} ${{ inputs.local-path }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}

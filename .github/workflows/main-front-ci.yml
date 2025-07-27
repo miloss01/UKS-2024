@@ -27,6 +27,4 @@ jobs:
       repository-name: uks-frontend
       image-tag: ${{ needs.prepare-tag.outputs.tag }}
       local-path: ./front
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}       
+    secrets: inherit     
