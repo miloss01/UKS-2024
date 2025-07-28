@@ -1,0 +1,15 @@
+name: Build and Push Registry Auth Server (Release Version)
+
+on:
+  push:
+    tags:
+      - "auth-v*"
+
+jobs:
+  build-and-push:
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      repository-name: uks-registry-auth-server
+      image-tag: ${{ github.ref_name }}
+      local-path: ./RegistryAuthServer
+    secrets: inherit  

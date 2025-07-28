@@ -1,12 +1,20 @@
+
+import os
 from flask import Flask, jsonify, request
 from datetime import datetime
 import psycopg2
 import uuid
 
-import config
+
+
+# Load configuration from environment variables with defaults
+WEBHOOK_HOST = os.environ.get("UKS_WEBHOOK_HOST", "0.0.0.0")
+WEBHOOK_PORT = int(os.environ.get("UKS_WEBHOOK_PORT", 5002))
+WEBHOOK_DEBUG = os.environ.get("UKS_WEBHOOK_DEBUG", "True").lower() in ("true", "1", "yes")
+DATABASE_URI = os.environ.get("UKS_DATABASE_URI", "postgresql://admin:admin@localhost:5432/uks-database")
 
 app = Flask(__name__)
-app.debug = True
+app.debug = WEBHOOK_DEBUG
 
 def parse_timestamp(timestamp_str):
     cleaned_timestamp = timestamp_str.rstrip("Z")
@@ -17,7 +25,7 @@ def update_database(tag, repository, timestamp, digest):
     connection = None
     cursor = None
     try:
-        connection = psycopg2.connect(config.DATABASE_URI)
+        connection = psycopg2.connect(DATABASE_URI)
         cursor = connection.cursor()
 
         # Fetch repository ID
@@ -75,7 +83,7 @@ def update_database(tag, repository, timestamp, digest):
             connection.close()
 
 def parse_push_event(event):
-    if not event.get("target").get("mediaType") == "application/vnd.docker.distribution.manifest.v2+json":
+    if event.get("target").get("mediaType") not in ["application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.index.v1+json", "application/vnd.oci.image.manifest.v1+json"]:
         return
     
     timestamp = parse_timestamp(event.get("timestamp"))
@@ -106,4 +114,4 @@ def handle_push_command():
     return jsonify({"status": "received"}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host=WEBHOOK_HOST, port=WEBHOOK_PORT, debug=WEBHOOK_DEBUG)

@@ -21,7 +21,8 @@ import { OrganizationService } from 'app/services/organization.service';
 export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   namespaces: string[] = []
   categories: string[] = ["c1", "c2", "c3"]
-  searchQuery: Signal<string> = signal("");
+  selectedNamespace: string = "";
+  searchQuery: string = "";
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
   repositories: DockerRepositoryDTO[] = [];
   @Input() isOrganization = false;
@@ -29,16 +30,12 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   @Input() id!: string | null;
   @Input() isOwner: boolean | null = false;
       
-  repositorySource = new MatTableDataSource(this.repositories)
+  repositorySource = new MatTableDataSource<DockerRepositoryDTO>(this.repositories)
 
   router = inject(Router)
   private _liveAnnouncer = inject(LiveAnnouncer);
-
-  @ViewChild(MatSort)
-  sort: MatSort = new MatSort;
-
-  @ViewChild(MatPaginator)
-  paginator!: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly repositoryService: RepositoryService,
               private readonly authService: AuthService,
@@ -59,9 +56,18 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
     const userId: string = this.authService.userData.value?.userId || "";
     this.repositoryService.GetUsersRepositories(userId).subscribe({
       next: (response: DockerRepositoryDTO[]) => {
-        console.log(response);
-        this.repositories = response;
-        this.repositorySource = new MatTableDataSource(this.repositories);
+        console.log(response)
+        this.repositories = response
+        this.repositorySource.data = response;
+
+        this.repositorySource.filterPredicate = (data, filter) => {
+          const searchTerms = JSON.parse(filter);
+          const matchName = data.name.toLowerCase().includes(searchTerms.name);
+          const matchNamespace =
+            !searchTerms.namespace || data.owner.toLowerCase() === searchTerms.namespace;
+          return matchName && matchNamespace;
+        };
+
       },
       error: (error) => {
         console.error('Error creating repository:', error);
@@ -111,16 +117,8 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
     this.repositorySource.paginator = this.paginator
   }
 
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+  announceSortChange(event: any) {
+    console.log('Sort changed: ', event);
   }
 
   onCreate(): void {
@@ -137,5 +135,13 @@ export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   openRepository(repository: DockerRepositoryDTO): void {
     console.log(repository)
     this.router.navigate(["/single-repo", repository.id])
+  }
+
+  applyFilters() {
+    const filterValue = {
+      name: this.searchQuery.trim().toLowerCase(),
+      namespace: this.selectedNamespace.trim().toLowerCase(),
+    };
+    this.repositorySource.filter = JSON.stringify(filterValue);
   }
 }

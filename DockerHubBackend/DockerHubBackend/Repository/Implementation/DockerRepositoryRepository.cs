@@ -21,7 +21,8 @@ namespace DockerHubBackend.Repository.Implementation
         { 
             return await _context.DockerRepositories
 				                 .Where(repo => repo.UserOwnerId == id)
-						         .ToListAsync();
+								 .Include(repo => repo.Images)
+								 .ToListAsync();
 		}
 
 		public DockerRepository GetFullDockerRepositoryById(Guid id)
@@ -39,6 +40,7 @@ namespace DockerHubBackend.Repository.Implementation
 		{
 			return await _context.DockerRepositories
 								 .Where(repo => repo.OrganizationOwnerId == id)
+								 .Include(repo => repo.Images)
 								 .ToListAsync();
 		}
         public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
@@ -154,6 +156,11 @@ namespace DockerHubBackend.Repository.Implementation
                         );
 
             return pageDto;
+        }
+
+        public async Task<DockerRepository?> GetDockerRepositoryByIdWithImages(Guid id)
+        {
+            return await _context.DockerRepositories.Include(repo => repo.Images).FirstOrDefaultAsync(repo => repo.Id == id);
         }
     }
 }

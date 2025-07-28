@@ -26,11 +26,12 @@ Replace `<username>`, `<password>`, and `<database_name>` with the credentials d
 1. Open Git Bash
 2. Create certificate with the following command(certificate will be saved in the folder where terminal is located):
 ```bash
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//SKIP=skip/CN=uks-registry'
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '//CN=uks-registry'
 ```
-3.  Copy the `cert.pem` file to the same location as `app.py`
-4.  In `config.py` edit `DATABASE_URI` to match URI of the main database
-5.  Run the server
+3.  Copy `cert.pem` and `key.pem` in the same location as `app.py`
+4.  Copy the `cert.pem` file to `Registry/certs` folder
+5.  In `config.py` edit `DATABASE_URI` to match URI of the main database
+6.  Run the server
 
 ### 3. Setup Docker Registry Webhooks Server
 1. Open `RegistryWebhookServer/config.py` and edit `DATABASE_URI` to match URI of the main database
@@ -47,11 +48,18 @@ docker compose up -d
 4.  Check the logs for any error messages
 
 ### 5. Configure `appsettings.json`
-Ensure that your `appsettings.json` file is configured with the correct database credentials. Example:
+Ensure that your `appsettings.json` file is configured with the correct database and aws credentials. Example:
 
 ```json
+{
 "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=<database_name>;Username=<username>;Password=<password>"
+    },
+"AWS": {
+    "AccessKey": "XXXXXXXXXXXXX",
+    "SecretKey": "XXXXXXXXXXXXX",
+    "Region": "eu-central-1"
+    }
 }
 ```
 
@@ -69,6 +77,23 @@ Create `super_admin_cred.json` file inside `Startup` folder. The file should hav
 `email` - Email for super admin account  
 
 If `generatePassword` is true, after the first successful application run its value will be automatically changed to `false`.
+
+### 4. Add new package
+On path UKS-2024/DockerHubBackend/DockerHubBackend open cmd and run command
+```bash
+dotnet add package Swashbuckle.AspNetCore --version 6.0.0
+```
+
+### 5. Install Elasticsearch
+
+#### Docker Command to Run PostgreSQL
+In the folder UKS-2024 open cmd and run command
+```bash
+docker build -t my-elasticsearch .
+```
+```bash
+docker run -d --name elasticsearch -p 9200:9200 my-elasticsearch
+```
 ## Running the Project
 
 ### 1. Apply Migrations
@@ -82,6 +107,11 @@ Add-Migration InitialCreate -Project DockerHubBackend -StartupProject DockerHubB
 #### Step 2: Update the Database
 ```powershell
 Update-Database -Project DockerHubBackend -StartupProject DockerHubBackend
+```
+
+#### Step 3: Add S3 package
+```powershell
+Install-Package AWSSDK.S3
 ```
 
 ### 2. Start the Project

@@ -2,8 +2,11 @@
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Implementation;
+using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -17,13 +20,20 @@ namespace DockerHubBackend.Tests.UnitTests
     public class DockerImageServiceTests
     {
         private readonly Mock<IDockerImageRepository> _mockDockerImageRepository;
-        private readonly DockerImageService _service;
+        private readonly Mock<IImageTagRepository> _mockImageTagRepository;
+		private readonly DockerImageService _service;
         private readonly Mock<ILogger<DockerImageService>> _mockLogger = new Mock<ILogger<DockerImageService>>();
+        private readonly Mock<IRegistryService> _mockRegistryService;
+        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
 
         public DockerImageServiceTests()
         {
             _mockDockerImageRepository = new Mock<IDockerImageRepository>();
-            _service = new DockerImageService(_mockDockerImageRepository.Object, _mockLogger.Object);
+            _mockImageTagRepository = new Mock<IImageTagRepository>();
+            _mockRegistryService = new Mock<IRegistryService>();
+            _mockUnitOfWork = new Mock<IUnitOfWork>();
+            _mockUnitOfWork.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(Mock.Of<IDbContextTransaction>());
+            _service = new DockerImageService(_mockDockerImageRepository.Object, _mockImageTagRepository.Object, _mockLogger.Object, _mockRegistryService.Object, _mockUnitOfWork.Object);
         }
 
         [Fact]

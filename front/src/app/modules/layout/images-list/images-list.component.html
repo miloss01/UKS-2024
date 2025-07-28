@@ -20,35 +20,43 @@
     </div>
   
     <div class="image-list">
-      <div *ngFor="let image of filteredImages" 
+  <div 
+    *ngFor="let image of filteredImages" 
+    class="image-group"
+  >
+    <div 
+      *ngFor="let tag of image.tags" 
       class="image-item"
-      [class.selected]="image === selectedImage"
-      (click)="selectImage(image)">
-        <div>
-          <p class="tag-link">{{ image.tags }}</p>
-  
-          <div class="meta-info">
-            <span class="last-pushed">
-              Last pushed: {{ image.lastPush }} by
-              <span class="author">{{ image.owner }}</span>
-            </span>
-            <div class="digest">
-              Digest: {{ image.digest }}
-            </div>
+      [class.selected]="image === selectedImage && tag === selectedTag"
+      (click)="selectImage(image, tag)"
+    >
+      <div>
+        <p class="tag-link">{{ tag }}</p>
+
+        <div class="meta-info">
+          <span class="last-pushed">
+            Last pushed: {{ image.lastPush }} by
+            <span class="author">{{ image.owner }}</span>
+          </span>
+          <div class="digest">
+            Digest: {{ image.digest }}
           </div>
         </div>
-  
-        <div class="command-container">
-            <span class="docker-command">docker pull {{ image.repositoryName }}:{{ image.tags }}</span>
-            <button 
-                class="copy-button" 
-                (click)="copyToClipboard('docker pull ' + image.repositoryName + ':' + image.tags)"
-            >
-                Copy
-            </button>
-        </div>
+      </div>
+
+      <div class="command-container">
+        <span class="docker-command">docker pull {{ image.repositoryName }}:{{ tag }}</span>
+        <button 
+          class="copy-button" 
+          (click)="copyToClipboard('docker pull ' + image.repositoryName + ':' + tag)"
+        >
+          Copy
+        </button>
       </div>
     </div>
+  </div>
+</div>
+
 
     <div class="pagination-container">
         <button mat-raised-button color="primary" class="pag-btn" (click)="onPageChange(-1)">Previous</button>

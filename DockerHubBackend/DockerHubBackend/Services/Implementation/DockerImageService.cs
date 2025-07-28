@@ -1,24 +1,29 @@
-using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
-using DockerHubBackend.Repository.Implementation;
 using DockerHubBackend.Repository.Interface;
-using DockerHubBackend.Security;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Interface;
-using Microsoft.AspNetCore.Identity;
+using Nest;
 
 namespace DockerHubBackend.Services.Implementation
 {
     public class DockerImageService : IDockerImageService
     {
         private readonly IDockerImageRepository _dockerImageRepository;
+        private readonly IImageTagRepository _imageTagRepository;
         private readonly ILogger<DockerImageService> _logger;
+        private readonly IRegistryService _registryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DockerImageService(IDockerImageRepository dockerImageRepository, ILogger<DockerImageService> logger)
+        public DockerImageService(IDockerImageRepository dockerImageRepository, IImageTagRepository imageTagRepository, ILogger<DockerImageService> logger, IRegistryService registryService, IUnitOfWork unitOfWork)
         {
             _dockerImageRepository = dockerImageRepository;
+            _imageTagRepository = imageTagRepository;
             _logger = logger;
+            _registryService = registryService;
+            _unitOfWork = unitOfWork;
         }
 
         public PageDTO<DockerImage> GetDockerImages(int page, int pageSize, string? searchTerm, string? badges)
@@ -30,28 +35,73 @@ namespace DockerHubBackend.Services.Implementation
             return result;
         }
 
-        private async Task<DockerImage?> getImage(Guid id)
-		{
+        private async Task<DockerImage> getImageWithRepository(Guid id)
+        {
             _logger.LogInformation("Fetching Docker image with ID: {Id}", id);
 
-            var repository = await _dockerImageRepository.GetDockerImageById(id);
-			if (repository == null)
-			{
+            var repository = await _dockerImageRepository.GetDockerImageByIdWithRepository(id);
+            if (repository == null)
+            {
                 _logger.LogError("Docker image with ID: {Id} not found.", id);
                 throw new NotFoundException($"Docker image with id {id.ToString()} not found.");
-			}
+            }
 
             _logger.LogInformation("Docker image with ID: {Id} found.", id);
             return repository;
+        }
+
+
+        public async Task DeleteDockerImage(Guid id)
+        {
+            _logger.LogInformation("Attempting to delete Docker image with ID: {Id}", id);
+
+            await using var tx = await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                DockerImage image = await getImageWithRepository(id);
+                await _dockerImageRepository.Delete(id);
+                await _registryService.DeleteDockerImage(image.Digest, image.Repository.Name);
+
+                await _unitOfWork.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                _logger.LogInformation("Successfully deleted Docker image with ID: {Id}", id);
+            }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                _logger.LogError(ex, "Failed to delete Docker image with ID: {Id}", id);
+                throw new Exception("Something went wrong");
+            }
+            
+        }
+
+        public async Task DeleteTagForDockerImage(Guid imageId, string tagName)
+        {
+			_logger.LogInformation("Attempting to delete {TagName} Docker image with ID: {ImageId}", tagName, imageId);
+			var tag = await _imageTagRepository.GetByDockerImageIdAndName(imageId, tagName);
+            if (tag == null) 
+			{
+				_logger.LogError("Image tag with name {TagName} and image ID: {ImageId} not found.", tagName, imageId);
+				throw new NotFoundException($"Docker tag {tagName} with image id {imageId.ToString()} not found.");
+			}
+            if ( await is_last_tag_in_image(imageId))
+            {
+				await DeleteDockerImage(imageId);
+
+			}
+            else
+            {
+                await _imageTagRepository.Delete(tag.Id);
+                _logger.LogInformation("Deleted tag with {Id}", tag.Id);
+            }
 		}
 
-		public async Task DeleteDockerImage(Guid id)
+		private async Task<bool> is_last_tag_in_image(Guid imageId)
 		{
-            _logger.LogInformation("Attempting to delete Docker image with ID: {Id}", id);
-            DockerImage? _ = await getImage(id);
-
-			await _dockerImageRepository.Delete(id);
-            _logger.LogInformation("Successfully deleted Docker image with ID: {Id}", id);
-        }
-    }
+			var tags = await _imageTagRepository.GetByDockerImageId(imageId);
+            return tags.Count <= 1;
+		}
+	}
 }

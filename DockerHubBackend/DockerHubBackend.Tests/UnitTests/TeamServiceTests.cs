@@ -202,7 +202,6 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task AddMembers_ValidTeam_AddsMembers()
         {
             var teamId = Guid.NewGuid();
-
             var standardUser = new StandardUser
             {
                 Email = "a@example.com",

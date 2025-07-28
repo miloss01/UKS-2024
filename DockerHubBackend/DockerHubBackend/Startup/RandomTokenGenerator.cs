@@ -8,7 +8,7 @@ namespace DockerHubBackend.Startup
         private static readonly string UppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private static readonly string LowercaseChars = "abcdefghijklmnopqrstuvwxyz";
         private static readonly string Digits = "0123456789";
-        private static readonly string SpecialChars = "!@#$%^&*()-_=+,.?";
+        private static readonly string SpecialChars = "!@$%^&*()";
 
         public string GenerateRandomPassword(int length)
         {

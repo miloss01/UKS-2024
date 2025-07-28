@@ -1,13 +1,11 @@
-﻿using System.ComponentModel;
-using DockerHubBackend.Dto.Request;
+﻿using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Services.Interface;
-using Microsoft.AspNetCore.Routing.Template;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace DockerHubBackend.Services.Implementation
 {
@@ -111,7 +109,7 @@ namespace DockerHubBackend.Services.Implementation
             if (dr == null) 
             {
                 _logger.LogError("Repository with ID {RepositoryId} not found", teamPermissionDto.RepositoryId);
-                throw new NotFoundException("Repositoy not found."); 
+                throw new NotFoundException("Repository not found."); 
             }
 
             Team? t = await _repository.Get(Guid.Parse(teamPermissionDto.TeamId));
@@ -182,7 +180,7 @@ namespace DockerHubBackend.Services.Implementation
 
         private async Task<ICollection<StandardUser>> toStandardUsers(ICollection<MemberDto> memberDtos)
         {
-            _logger.LogInformation("Converting email DTOs to standard users");
+            _logger.LogInformation("Converting member DTOs to standard users");
             ICollection<StandardUser?> members = new HashSet<StandardUser?>();
             foreach (MemberDto memberDto in memberDtos)
             {

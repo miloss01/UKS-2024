@@ -1,0 +1,21 @@
+name: Dev Branch Backend CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ["DockerHubBackend/**"]
+    branches: [ "dev" ]
+  pull_request:
+    paths: ["DockerHubBackend/**"]
+    types: [opened, synchronize, reopened]
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/dotnet-build-and-test.yml
+      

@@ -1,0 +1,15 @@
+name: Dev Branch Frontend CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ["front/**"]
+    branches: ["dev"]
+  pull_request:
+    paths: ["front/**"]
+    types: ["opened", "synchronize", "reopened"]
+    branches: ["dev"]
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/angular-build.yml

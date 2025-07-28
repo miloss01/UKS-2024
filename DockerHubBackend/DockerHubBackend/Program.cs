@@ -18,8 +18,10 @@ using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using Nest;
 using Serilog.Formatting.Elasticsearch;
+using DockerHubBackend.Repository.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 
@@ -89,6 +91,7 @@ builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IImageTagRepository, ImageTagRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -99,7 +102,10 @@ builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IRegistryService, RegistryService>();
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.AddScoped<ILogService, LogService>();
+
 
 builder.Services.AddControllers();
 
@@ -136,15 +142,24 @@ builder.Host.UseSerilog((context, config) =>
         //});
 });
 
+var port = builder.Configuration["Port"] ?? "5156";
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(int.Parse(port));
+});
+
 var app = builder.Build();
 
 //await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
+var applyMigrations = builder.Configuration["Database:ApplyMigrations"] == "true";
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    if (applyMigrations) app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
