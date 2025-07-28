@@ -19,9 +19,7 @@ import { DockerImageService } from 'app/services/docker-image.service';
 export class ImagesListComponent implements OnChanges {
 
   @Input() images: DockerImageDTO[] = [];
-
   @Input() forDeleting: boolean = false;
-
   filteredImages = [...this.images];
   selectedImage: DockerImageDTO | null= null;
   selectedTag: string | null = null
@@ -31,7 +29,19 @@ export class ImagesListComponent implements OnChanges {
   pageSize = 5;
   totalNumberOfPages = 0;
 
-  constructor(private readonly dockerImageService: DockerImageService){}
+  constructor(private readonly dockerImageService: DockerImageService){
+  }
+
+  ngOnInit() {
+  this.images = this.images.flatMap(image =>
+    image.tags.map(tag => ({
+      ...image,
+      tags: [tag]
+    }))
+  );
+  this.filteredImages = this.images
+}
+
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['images']) {
@@ -41,6 +51,7 @@ export class ImagesListComponent implements OnChanges {
       this.applyFilters();
     }
   }
+
 
   applyFilters(): void {
     let filtered = this.images.filter(image => 
