@@ -202,8 +202,8 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             TeamPermissionRequestDto permissionDto = new TeamPermissionRequestDto
             {
-                TeamId = team.Id,
-                RepositoryId = repo.Id,
+                TeamId = team.Id.ToString(),
+                RepositoryId = repo.Id.ToString(),
                 Permission = "ReadOnly"
             };
 
