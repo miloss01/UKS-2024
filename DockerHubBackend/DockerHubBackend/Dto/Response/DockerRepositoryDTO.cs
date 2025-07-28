@@ -30,7 +30,7 @@ namespace DockerHubBackend.Dto.Response
 			IsPublic = dockerRepository.IsPublic;
 			StarCount = dockerRepository.StarCount;
 			Owner = dockerRepository.OrganizationOwner == null
-				? (dockerRepository.UserOwner == null ? null : dockerRepository.UserOwner.Email)
+				? (dockerRepository.UserOwner == null ? null : dockerRepository.UserOwner.Username)
 				: dockerRepository.OrganizationOwner.Name;
 			LastPushed = dockerRepository.CreatedAt.ToString();
 			Images = dockerRepository.Images.Select(img => new DockerImageDTO

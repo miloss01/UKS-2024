@@ -202,7 +202,7 @@ namespace DockerHubBackend.Tests.UnitTests
 			Assert.Equal(createDto.Name, result.Name);
 			Assert.Equal(createDto.Description, result.Description);
 			Assert.Equal(createDto.IsPublic, result.IsPublic);
-			Assert.Equal(user.Email, result.Owner);
+			Assert.Equal(user.Username, result.Owner);
 
 			_mockUserRepository.Verify(svc => svc.GetUserById(ownerGuid), Times.Once);
 			_mockOrganizationRepository.Verify(svc => svc.GetOrganizationById(ownerGuid), Times.Once);
