@@ -190,5 +190,10 @@ namespace DockerHubBackend.Repository.Implementation
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Organization?> GetOrganizationByName(string name)
+        {
+            return await _context.Organizations.FirstOrDefaultAsync(o => o.Name == name && !o.IsDeleted);
+        }
     }
 }

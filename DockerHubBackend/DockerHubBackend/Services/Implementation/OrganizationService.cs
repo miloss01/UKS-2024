@@ -30,10 +30,19 @@ namespace DockerHubBackend.Services.Implementation
         public async Task<Guid?> AddOrganization(AddOrganizationDto organization)
         {
             _logger.LogInformation("Adding a new organization: {OrganizationName}", organization.Name);
+
+            var existing = await _orgRepository.GetOrganizationByName(organization.Name);
+            if (existing != null)
+            {
+                _logger.LogWarning("Organization with name {OrganizationName} already exists.", organization.Name);
+                throw new OrganizationAlreadyExistsException(organization.Name);
+            }
+
             var result = await _orgRepository.AddOrganization(organization);
             if (result == null)
             {
                 _logger.LogError("Failed to add organization: {OrganizationName}", organization.Name);
+                throw new Exception("Error database saving");
             }
             else
             {

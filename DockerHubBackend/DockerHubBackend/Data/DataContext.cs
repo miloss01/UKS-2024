@@ -22,7 +22,9 @@ namespace DockerHubBackend.Data
         {
 
             modelBuilder.Entity<Organization>().ToTable("Organizations");
-
+            modelBuilder.Entity<Organization>()
+                .HasIndex(o => o.Name)
+                .IsUnique();
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Members)
                 .WithMany(m => m.MemberOrganizations);

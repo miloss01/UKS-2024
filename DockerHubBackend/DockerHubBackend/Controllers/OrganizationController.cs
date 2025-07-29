@@ -34,13 +34,19 @@ namespace DockerHubBackend.Controllers
             {
                 return BadRequest("Invalid dto");
             }
-            var addedOrganization = await _orgService.AddOrganization(dto);
-            if(addedOrganization == null)
+            try
             {
-                return BadRequest("Error database saving");
+                var addedOrganization = await _orgService.AddOrganization(dto);
+                return Ok(addedOrganization);
             }
-
-            return Ok(addedOrganization);
+            catch (OrganizationAlreadyExistsException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         [HttpGet("{email}")]

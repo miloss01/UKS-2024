@@ -15,5 +15,6 @@ namespace DockerHubBackend.Repository.Interface
         Task DeleteOrganization(Guid organizationId);
         Task UpdateOrganization(Guid organizationId, string imageLocation, string description);
         Task<Organization?> GetOrganizationByIdWithRepositories(Guid id);
+        Task<Organization?> GetOrganizationByName(string name);
     }
 }
