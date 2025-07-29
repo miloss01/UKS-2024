@@ -102,7 +102,9 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
-            var allUsers = await _context.Users.ToListAsync();
+            var allUsers = await _context.Users
+                                .OfType<StandardUser>()
+                                .ToListAsync();
 
             var membersDto = organization.Members.Select(m => new MemberDto
             {
