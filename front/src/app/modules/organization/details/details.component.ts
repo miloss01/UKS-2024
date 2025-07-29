@@ -9,11 +9,12 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { MatDialog } from '@angular/material/dialog';
 import { TeamsComponent } from "app/modules/layout/teams/all-teams/teams.component";
 import { Member } from 'app/models/models';
+import { AllRepositoriesComponent } from "app/modules/repository/all-repositories/all-repositories.component";
 
 @Component({
   selector: 'app-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent, TeamsComponent],
+  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent, TeamsComponent, AllRepositoriesComponent],
   templateUrl: './details.component.html',
   styleUrl: './details.component.css'
 })

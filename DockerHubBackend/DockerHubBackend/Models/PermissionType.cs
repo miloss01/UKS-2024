@@ -2,6 +2,8 @@
 {
     public enum PermissionType
     {
-        ReadOnly, ReadWrite, Admin  // DO NOT CHANGE THE ORDER, add new values only to the end
+        ReadOnly = 0, 
+        ReadWrite = 1, 
+        Admin = 2  // DO NOT CHANGE THE ORDER, add new values only to the end
     }
 }

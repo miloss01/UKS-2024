@@ -36,5 +36,10 @@ export class RepositoryService {
   return this.http.delete<DockerRepositoryDTO>(url);    
 }
 
+  GetOrganizationRepositories(id: string) : Observable<DockerRepositoryDTO[]> {
+    const url = `${environment.apiHost}dockerRepositories/org-repository/${id}`;
+    return this.http.get<DockerRepositoryDTO[]>(url);    
+  }
+
 }
 

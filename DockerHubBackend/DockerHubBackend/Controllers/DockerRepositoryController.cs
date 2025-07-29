@@ -267,5 +267,25 @@ namespace DockerHubBackend.Controllers
 
             return Ok(allGuids);
         }
+
+        [HttpGet("org-repository/{id}")]
+        public async Task<IActionResult> GetOrganizationRepositories(string id)
+        {
+            var parsed = Guid.TryParse(id, out var organizationId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad User id.");
+            }
+            try
+            {
+                var repositories = await _dockerRepositoryService.GetRepositoriesByOrganizationId(organizationId);
+                return Ok(repositories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while getting the repositories.", Details = ex.Message });
+            }
+        }
     }
 }

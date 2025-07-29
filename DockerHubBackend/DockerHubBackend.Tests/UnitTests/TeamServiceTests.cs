@@ -55,17 +55,26 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Get_ValidTeamId_ReturnsTeamDto()
         {
             var teamId = Guid.NewGuid();
-            var team = new Team { Id = teamId, Name = "Bravo", Description = "Test",
+            var team = new Team
+            {
+                Id = teamId,
+                Name = "Bravo",
+                Description = "Test",
                 OrganizationId = Guid.NewGuid(),
-                Organization = new Organization { Name = "Org", ImageLocation = "img.jpg", OwnerId = Guid.NewGuid(), Owner = new StandardUser
+                Organization = new Organization
                 {
-                    Email = "a@example.com",
-                    Password = "password123",
-                    Username = "username",
-                    Location = "Earth",
-                    Badge = Badge.NoBadge,
-                    CreatedAt = DateTime.UtcNow
-                },
+                    Name = "Org",
+                    ImageLocation = "img.jpg",
+                    OwnerId = Guid.NewGuid(),
+                    Owner = new StandardUser
+                    {
+                        Email = "a@example.com",
+                        Password = "password123",
+                        Username = "username",
+                        Location = "Earth",
+                        Badge = Badge.NoBadge,
+                        CreatedAt = DateTime.UtcNow
+                    },
                 }
             };
 
@@ -89,15 +98,21 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var orgId = Guid.NewGuid();
             var dto = new TeamDto { Name = "Charlie", OrganizationId = orgId, Members = new List<MemberDto>() };
-            var org = new Organization { Id = orgId, Name = "Org", ImageLocation = "img.jpg", OwnerId = Guid.NewGuid(), Owner = new StandardUser
+            var org = new Organization
             {
-                Email = "a@example.com",
-                Password = "password123",
-                Username = "username",
-                Location = "Earth",
-                Badge = Badge.NoBadge,
-                CreatedAt = DateTime.UtcNow
-            },
+                Id = orgId,
+                Name = "Org",
+                ImageLocation = "img.jpg",
+                OwnerId = Guid.NewGuid(),
+                Owner = new StandardUser
+                {
+                    Email = "a@example.com",
+                    Password = "password123",
+                    Username = "username",
+                    Location = "Earth",
+                    Badge = Badge.NoBadge,
+                    CreatedAt = DateTime.UtcNow
+                },
             };
             var createdTeam = new Team { Id = Guid.NewGuid(), Name = "Charlie", OrganizationId = orgId, Organization = org };
 
@@ -118,15 +133,21 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var orgId = Guid.NewGuid();
             var dto = new TeamDto { Name = "Charlie", OrganizationId = orgId };
-            var org = new Organization { Id = orgId, Name = "Org", ImageLocation = "img.jpg", OwnerId = Guid.NewGuid(), Owner = new StandardUser
+            var org = new Organization
             {
-                Email = "a@example.com",
-                Password = "password123",
-                Username = "username",
-                Location = "Earth",
-                Badge = Badge.NoBadge,
-                CreatedAt = DateTime.UtcNow
-            },
+                Id = orgId,
+                Name = "Org",
+                ImageLocation = "img.jpg",
+                OwnerId = Guid.NewGuid(),
+                Owner = new StandardUser
+                {
+                    Email = "a@example.com",
+                    Password = "password123",
+                    Username = "username",
+                    Location = "Earth",
+                    Badge = Badge.NoBadge,
+                    CreatedAt = DateTime.UtcNow
+                },
             };
             var team = new Team { Name = "Charlie", OrganizationId = orgId, Organization = org };
 
@@ -140,16 +161,27 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task Delete_ValidTeamId_ReturnsDeletedTeam()
         {
             var teamId = Guid.NewGuid();
-            var team = new Team { Id = teamId, Name = "Delta", OrganizationId = Guid.NewGuid(), Organization = new Organization { Name = "Org", ImageLocation = "img.jpg", OwnerId = Guid.NewGuid(), Owner = new StandardUser
+            var team = new Team
             {
-                Email = "a@example.com",
-                Password = "password123",
-                Username = "username",
-                Location = "Earth",
-                Badge = Badge.NoBadge,
-                CreatedAt = DateTime.UtcNow
-            },
-            } };
+                Id = teamId,
+                Name = "Delta",
+                OrganizationId = Guid.NewGuid(),
+                Organization = new Organization
+                {
+                    Name = "Org",
+                    ImageLocation = "img.jpg",
+                    OwnerId = Guid.NewGuid(),
+                    Owner = new StandardUser
+                    {
+                        Email = "a@example.com",
+                        Password = "password123",
+                        Username = "username",
+                        Location = "Earth",
+                        Badge = Badge.NoBadge,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                }
+            };
 
             _repository.Setup(r => r.Delete(teamId)).ReturnsAsync(team);
 
@@ -170,7 +202,6 @@ namespace DockerHubBackend.Tests.UnitTests
         public async Task AddMembers_ValidTeam_AddsMembers()
         {
             var teamId = Guid.NewGuid();
-            
             var standardUser = new StandardUser
             {
                 Email = "a@example.com",
@@ -235,8 +266,8 @@ namespace DockerHubBackend.Tests.UnitTests
             var team = new Team { Id = Guid.NewGuid(), Name = "TeamX", Organization = org, OrganizationId = org.Id, Members = new HashSet<StandardUser>() };
             var dto = new TeamPermissionRequestDto
             {
-                TeamId = team.Id,
-                RepositoryId = repo.Id,
+                TeamId = team.Id.ToString(),
+                RepositoryId = repo.Id.ToString(),
                 Permission = "ReadOnly"
             };
 
@@ -257,8 +288,8 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var dto = new TeamPermissionRequestDto
             {
-                TeamId = Guid.NewGuid(),
-                RepositoryId = Guid.NewGuid(),
+                TeamId = Guid.NewGuid().ToString(),
+                RepositoryId = Guid.NewGuid().ToString(),
                 Permission = "Write"
             };
 
@@ -277,7 +308,7 @@ namespace DockerHubBackend.Tests.UnitTests
             var team = new Team { Id = Guid.NewGuid(), Name = "Team1", Organization = org, OrganizationId = org.Id, Members = new HashSet<StandardUser>() };
             var permission = new TeamPermission { TeamId = team.Id, RepositoryId = repo.Id, Team = team, Repository = repo, Permission = PermissionType.ReadOnly };
 
-            _repository.Setup(r => r.GetTeamPermission(dto.RepositoryId, dto.TeamId)).Returns(permission);
+            _repository.Setup(r => r.GetTeamPermission(Guid.Parse(dto.RepositoryId), Guid.Parse(dto.TeamId))).Returns(permission);
 
             await Assert.ThrowsAsync<BadRequestException>(() => _teamService.AddPermissions(dto));
         }
@@ -287,13 +318,13 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var dto = new TeamPermissionRequestDto
             {
-                TeamId = Guid.NewGuid(),
-                RepositoryId = Guid.NewGuid(),
+                TeamId = Guid.NewGuid().ToString(),
+                RepositoryId = Guid.NewGuid().ToString(),
                 Permission = "Write"
             };
 
-            _repository.Setup(r => r.GetTeamPermission(dto.RepositoryId, dto.TeamId)).Returns((TeamPermission?)null);
-            _dockerRepositoryRepository.Setup(r => r.Get(dto.RepositoryId)).ReturnsAsync((DockerRepository?)null);
+            _repository.Setup(r => r.GetTeamPermission(Guid.Parse(dto.RepositoryId), Guid.Parse(dto.TeamId))).Returns((TeamPermission?)null);
+            _dockerRepositoryRepository.Setup(r => r.Get(Guid.Parse(dto.RepositoryId))).ReturnsAsync((DockerRepository?)null);
 
             await Assert.ThrowsAsync<NotFoundException>(() => _teamService.AddPermissions(dto));
         }
@@ -303,14 +334,14 @@ namespace DockerHubBackend.Tests.UnitTests
         {
             var dto = new TeamPermissionRequestDto
             {
-                TeamId = Guid.NewGuid(),
-                RepositoryId = Guid.NewGuid(),
+                TeamId = Guid.NewGuid().ToString(),
+                RepositoryId = Guid.NewGuid().ToString(),
                 Permission = "Write"
             };
 
-            _repository.Setup(r => r.GetTeamPermission(dto.RepositoryId, dto.TeamId)).Returns((TeamPermission?)null);
-            _dockerRepositoryRepository.Setup(r => r.Get(dto.RepositoryId)).ReturnsAsync(new DockerRepository { Name = "Repo"});
-            _repository.Setup(r => r.Get(dto.TeamId)).ReturnsAsync((Team?)null);
+            _repository.Setup(r => r.GetTeamPermission(Guid.Parse(dto.RepositoryId), Guid.Parse(dto.TeamId))).Returns((TeamPermission?)null);
+            _dockerRepositoryRepository.Setup(r => r.Get(Guid.Parse(dto.RepositoryId))).ReturnsAsync(new DockerRepository { Name = "Repo" });
+            _repository.Setup(r => r.Get(Guid.Parse(dto.TeamId))).ReturnsAsync((Team?)null);
 
             await Assert.ThrowsAsync<NotFoundException>(() => _teamService.AddPermissions(dto));
         }
@@ -378,6 +409,5 @@ namespace DockerHubBackend.Tests.UnitTests
             Assert.Single(result);
             Assert.Equal(PermissionType.ReadOnly, result.First().Permission);
         }
-
     }
 }

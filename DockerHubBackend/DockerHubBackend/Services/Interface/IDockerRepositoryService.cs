@@ -25,5 +25,6 @@ namespace DockerHubBackend.Services.Interface
         public void AddStarRepository(Guid userId, Guid repositoryId);
         public void RemoveStarRepository(Guid userId, Guid repositoryId);
         public PageDTO<DockerRepository> GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges);
+        public Task<List<DockerRepositoryDTO>> GetRepositoriesByOrganizationId(Guid id);
     }
 }

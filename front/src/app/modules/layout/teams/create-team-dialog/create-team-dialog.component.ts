@@ -33,12 +33,12 @@ export class CreateTeamDialogComponent {
 
   onSubmit(): void {
     if (this.teamForm.valid) {
-      this.dialogRef.close(this.teamForm.value); 
+      this.dialogRef.close({isConfirmed: true, data: this.teamForm.value}); 
     }
   }
 
   onCancel(): void {
-    this.dialogRef.close(); 
+    this.dialogRef.close({isConfirmed: false}); 
   }
 
 }

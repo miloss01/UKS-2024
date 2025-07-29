@@ -20,6 +20,8 @@ export class ImagesListComponent implements OnChanges {
 
   @Input() images: DockerImageDTO[] = [];
   @Input() forDeleting: boolean = false;
+  @Input() permisionType: number = 0;
+
   filteredImages = [...this.images];
   selectedImage: DockerImageDTO | null= null;
   selectedTag: string | null = null
