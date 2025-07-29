@@ -1,6 +1,7 @@
 ﻿using Amazon.S3.Model;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response.Organization;
+using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
@@ -49,14 +50,24 @@ namespace DockerHubBackend.Tests.UnitTests
         }
 
         [Fact]
-        public async Task AddOrganization_NullResult_ShouldReturnNull()
+        public async Task AddOrganization_WhenNameExists_ShouldThrowOrganizationAlreadyExistsException()
         {
-            var dto = new AddOrganizationDto { Name = "Invalid Org" };
-            _orgRepoMock.Setup(r => r.AddOrganization(dto)).ReturnsAsync((Guid?)null);
+            var dto = new AddOrganizationDto { Name = "ExistingOrg" };
 
-            var result = await _orgService.AddOrganization(dto);
+            _orgRepoMock.Setup(r => r.GetOrganizationByName(dto.Name))
+                        .ReturnsAsync(new Organization
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = dto.Name,
+                            ImageLocation = "img/test.jpg",
+                            OwnerId = Guid.NewGuid(),
+                            Owner = new StandardUser { Id = Guid.NewGuid(), Email = "owner@email.com", Password = "pass", Username = "owner" }
+                        });
 
-            Assert.Null(result);
+            var ex = await Assert.ThrowsAsync<OrganizationAlreadyExistsException>(() =>
+                _orgService.AddOrganization(dto));
+
+            Assert.Equal("Name 'ExistingOrg' is already taken", ex.Message);
         }
 
         [Fact]
