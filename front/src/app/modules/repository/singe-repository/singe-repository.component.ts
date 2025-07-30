@@ -52,7 +52,7 @@ export class SingeRepositoryComponent {
   }
 
   private handlePermissionWhenUserIsTheOwner() {
-    const userEmail: string = this.authService.userData.value?.userEmail || "";
+    const userEmail: string = this.authService.userData.value?.username || "";
     if (this.repository.owner == userEmail) {
       this.permisionType = 2
     }

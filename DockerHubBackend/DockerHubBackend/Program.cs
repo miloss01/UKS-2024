@@ -117,8 +117,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<GlobalExceptionHandler>();
 });
 
+
 builder.Services.AddSingleton<IElasticClient>(new ElasticClient(
-    new ConnectionSettings(new Uri("http://localhost:9200"))
+    new ConnectionSettings(new Uri(builder.Configuration["Elasticsearch:Url"]))
         .DefaultIndex("logstash-*")
         .DisableDirectStreaming()
     ));

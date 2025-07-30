@@ -160,7 +160,7 @@ namespace DockerHubBackend.Services.Implementation
 			var badge = Badge.NoBadge;
 			if (userOwner != null && userOwner.GetType().Name != "StandardUser")
 			{
-				badge = Badge.VerifiedPublisher;
+				badge = Badge.DockerOfficialImage;
 			}
 			// Create the repo
 			var newRepository = new DockerRepository
