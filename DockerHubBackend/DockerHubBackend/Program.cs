@@ -119,7 +119,7 @@ builder.Services.AddControllers(options =>
 
 
 builder.Services.AddSingleton<IElasticClient>(new ElasticClient(
-    new ConnectionSettings(new Uri(builder.Configuration["Elasticsearch:Url"]))
+    new ConnectionSettings(new Uri("http://elasticsearch:9200"))
         .DefaultIndex("logstash-*")
         .DisableDirectStreaming()
     ));
@@ -130,17 +130,8 @@ builder.Services.AddHostedService<StartupScript>();
 builder.Host.UseSerilog((context, config) =>
 {
     config
-        //.MinimumLevel.Information() 
         .WriteTo.Console()
-        .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day);
-        //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
-        //{
-        //    AutoRegisterTemplate = true,
-        //    IndexFormat = "logstash-{0:yyyy.MM.dd}",  // Format logova u Elasticsearch-u
-        //    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7, // Dodajte ovo ako koristite Elasticsearch 7+
-        //    EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
-        //    CustomFormatter = new ElasticsearchJsonFormatter()
-        //});
+        .WriteTo.File("/app/Logs/log-.log", rollingInterval: RollingInterval.Day);
 });
 
 var port = builder.Configuration["Port"] ?? "5156";

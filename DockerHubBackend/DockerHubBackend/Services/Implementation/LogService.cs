@@ -12,7 +12,7 @@ using DockerHubBackend.Services.Interface;
 public class LogService : BackgroundService, ILogService
 {
     private static long lastReadPosition = 0; // offset
-    private static readonly string logsDirectoryPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Logs");
+    private static readonly string logsDirectoryPath = "/app/Logs";
     private static Timer _timer;
     private static readonly HttpClient _httpClient = new HttpClient();
     private static readonly Dictionary<string, string> LevelMap = new(StringComparer.OrdinalIgnoreCase)
@@ -32,13 +32,13 @@ public class LogService : BackgroundService, ILogService
         "level", "message", "timestamp", "exception"
     };
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
+
         _timer = new Timer(AsyncProcessLogs, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
         stoppingToken.Register(() => _timer.Dispose());
-
-        return Task.CompletedTask;
     }
 
     private static string FindLogsDirectory()
@@ -132,7 +132,7 @@ public class LogService : BackgroundService, ILogService
             );
 
             // Elasticsearch endpoint
-            var elasticsearchUri = "http://localhost:9200/logstash-logs/_doc";
+            var elasticsearchUri = "http://elasticsearch:9200/logstash-logs/_doc";
 
             var response = await _httpClient.PostAsync(elasticsearchUri, jsonContent);
 
