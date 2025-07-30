@@ -11,12 +11,13 @@ services:
       ASPNETCORE_ENVIRONMENT: "Development"
       CONNECTION_STRING: ${ConnectionStrings__DefaultConnection}
       PORT: ${PORT}
-      APPLY_MIGRATIONS: true
+      APPLY_MIGRATIONS: "true"
     depends_on:
       - postgres
       - elasticsearch
     volumes:
-      - ./Startup/super_admin_cred.json:/app/Startup/super_admin_cred.json:ro
+      - ./Logs:/app/Logs
+      - ./Startup/super_admin_cred.json:/app/Startup/super_admin_cred.json
 
   postgres:
     image: postgres:15
