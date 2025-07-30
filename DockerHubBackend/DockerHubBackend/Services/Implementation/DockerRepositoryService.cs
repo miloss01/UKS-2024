@@ -185,12 +185,9 @@ namespace DockerHubBackend.Services.Implementation
 			return repositoryDto;
 		}
 
-		public async Task DeleteDockerRepository(Guid id)
-		{
-			_logger.LogInformation("Deleting Docker repository with ID: {Id}", id);
-
-
-            await using var tx = await _unitOfWork.BeginTransactionAsync();
+        public async Task DeleteDockerRepository(Guid id)
+        {
+            _logger.LogInformation("Deleting Docker repository with ID: {Id}", id);
 
             try
             {
@@ -202,23 +199,21 @@ namespace DockerHubBackend.Services.Implementation
                 {
                     await _registryService.DeleteDockerImage(image.Digest, repository.Name);
                 }
+
+                _logger.LogInformation("Successfully deleted Docker repository with ID: {Id}", id);
             }
-			catch (NotFoundException)
+            catch (NotFoundException)
             {
-                await tx.RollbackAsync();
                 throw;
-			}
+            }
             catch (Exception ex)
             {
-                await tx.RollbackAsync();
                 _logger.LogError(ex, "Failed to delete Docker repository with ID: {Id}", id);
                 throw new Exception("Something went wrong");
             }
-            
-			_logger.LogInformation("Successfully deleted Docker repository with ID: {Id}", id);
-		}
+        }
 
-		public DockerRepository GetDockerRepositoryById(Guid id)
+        public DockerRepository GetDockerRepositoryById(Guid id)
 		{
 			_logger.LogInformation("Fetching Docker repository with ID: {RepositoryId}", id);
 			var dockerRepository = _dockerRepositoryRepository.GetFullDockerRepositoryById(id);

@@ -55,7 +55,51 @@ namespace DockerHubBackend.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task AddOrganization_ShouldReturnBadRequest_OnServiceError()
+        public async Task AddOrganization_ShouldReturnConflict_WhenOrganizationAlreadyExists()
+        {
+            var ownerEmail = "owner@email.com";
+            var userId = Guid.NewGuid();
+
+            await SeedDatabaseAsync(async db =>
+            {
+                var user = new StandardUser
+                {
+                    Id = userId,
+                    Email = ownerEmail,
+                    Username = "owner",
+                    Password = "pass"
+                };
+
+                var existingOrg = new Organization
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Existing Org",
+                    OwnerId = userId,
+                    ImageLocation = "img/existing.jpg"
+                };
+
+                db.Users.Add(user);
+                db.Organizations.Add(existingOrg);
+            });
+
+            var dto = new AddOrganizationDto
+            {
+                Name = "Existing Org",
+                Description = "New description",
+                ImageLocation = "img/new.jpg",
+                OwnerEmail = ownerEmail
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/api/organization", dto);
+
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Contains("Name 'Existing Org' is already taken", content);
+        }
+
+        [Fact]
+        public async Task AddOrganization_ShouldReturnInternalServerError_WhenOwnerDoesNotExist()
         {
             var dto = new AddOrganizationDto
             {
@@ -67,7 +111,8 @@ namespace DockerHubBackend.Tests.IntegrationTests
 
             var response = await _httpClient.PostAsJsonAsync("/api/organization", dto);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+
             var content = await response.Content.ReadAsStringAsync();
             Assert.Contains("Error database saving", content);
         }

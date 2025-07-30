@@ -71,8 +71,6 @@ export class EditOrganizationComponent {
     if(this.oldDescription != this.organizationDescription || this.oldFileName != this.fileName) {
       this.organizationService.updateOrganization(updateDto).subscribe({
         next: (response) => {
-          console.log('Organization updated successfully:', response);
-
           if (this.oldFileName != this.fileName && this.imageFile != null) {
             const updateImageDto = {
               oldFileName: this.authService.userData?.value?.userEmail+"/"+this.id+"/"+this.oldFileName,  

@@ -33,13 +33,11 @@ export class ListOrganizationsComponent implements OnInit {
   {}
   
   ngOnInit() {
-    console.log(this.authService.userData?.value?.userEmail)
     this.fetchUserOrganizations();
   }
 
   setImages() {
     this.organizations.forEach((org) => {
-      console.log(org.ownerEmail+"/"+org.id+"/"+org.imageLocation)
       this.imageService.getImageUrl(org.ownerEmail+"/"+org.id+"/"+org.imageLocation).subscribe({
         next: (response) => {
           org.imageUrl = response.imageUrl; 
@@ -58,7 +56,6 @@ export class ListOrganizationsComponent implements OnInit {
       this.orgService.getOrganizations(email).subscribe({
         next: (data) => {
           this.organizations = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());;  
-          console.log(data)
           this.filteredOrganizations = data;  
           this.updatePagination();
           this.setImages()

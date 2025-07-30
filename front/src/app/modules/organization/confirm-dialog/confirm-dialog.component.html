@@ -2,7 +2,7 @@
   Are you sure you want to {{ data.action }} 
   <strong>{{ data.itemName || data.userEmail }}</strong>?
 </h2>
-<div mat-dialog-actions>
+<div mat-dialog-actions class="buttons">
   <button mat-button (click)="onCancel()">Cancel</button>
   <span class="spacer"></span>
   <button mat-raised-button color="primary" (click)="onConfirm()">Yes, sure</button>

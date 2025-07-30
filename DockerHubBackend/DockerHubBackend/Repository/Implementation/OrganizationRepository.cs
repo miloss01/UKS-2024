@@ -102,7 +102,9 @@ namespace DockerHubBackend.Repository.Implementation
                 return null;
             }
 
-            var allUsers = await _context.Users.ToListAsync();
+            var allUsers = await _context.Users
+                                .OfType<StandardUser>()
+                                .ToListAsync();
 
             var membersDto = organization.Members.Select(m => new MemberDto
             {
@@ -189,6 +191,11 @@ namespace DockerHubBackend.Repository.Implementation
             organization.Description = description;
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Organization?> GetOrganizationByName(string name)
+        {
+            return await _context.Organizations.FirstOrDefaultAsync(o => o.Name == name && !o.IsDeleted);
         }
     }
 }
