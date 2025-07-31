@@ -127,7 +127,10 @@ builder.Services.AddHostedService<LogService>();
 builder.Services.AddHostedService<StartupScript>();
 
 // confing serilog 
-var logDirectory = builder.Configuration["Logging:LogDirectory"];
+var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == "true";
+var logDirectory = isRunningInDocker
+    ? "/app/Logs"
+    : "Logs";
 builder.Host.UseSerilog((context, config) =>
 {
     config

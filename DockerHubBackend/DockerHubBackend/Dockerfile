@@ -18,6 +18,7 @@ RUN apt-get update && \
     dpkg-reconfigure -f noninteractive tzdata
 
 ENV TZ=Europe/Belgrade
+ENV DOTNET_RUNNING_IN_DOCKER=true
 
 COPY --from=build /out .
 

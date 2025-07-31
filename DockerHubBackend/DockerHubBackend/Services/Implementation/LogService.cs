@@ -49,7 +49,12 @@ public class LogService : BackgroundService, ILogService
 
     private string FindLogsDirectory()
     {
-        var logsDirectoryPath = _configuration["Logging:LogDirectory"];
+        var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == "true";
+
+        string logsDirectoryPath = isRunningInDocker
+            ? "/app/Logs"
+            : Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Logs")
+;
         if (!Directory.Exists(logsDirectoryPath))
         {
             Console.WriteLine($"Logs directory not found: {logsDirectoryPath}");
