@@ -11,8 +11,14 @@ using DockerHubBackend.Services.Interface;
 
 public class LogService : BackgroundService, ILogService
 {
+    private readonly IConfiguration _configuration;
+
+    public LogService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     private static long lastReadPosition = 0; // offset
-    private static readonly string logsDirectoryPath = "/app/Logs";
     private static Timer _timer;
     private static readonly HttpClient _httpClient = new HttpClient();
     private static readonly Dictionary<string, string> LevelMap = new(StringComparer.OrdinalIgnoreCase)
@@ -41,8 +47,9 @@ public class LogService : BackgroundService, ILogService
         stoppingToken.Register(() => _timer.Dispose());
     }
 
-    private static string FindLogsDirectory()
+    private string FindLogsDirectory()
     {
+        var logsDirectoryPath = _configuration["Logging:LogDirectory"];
         if (!Directory.Exists(logsDirectoryPath))
         {
             Console.WriteLine($"Logs directory not found: {logsDirectoryPath}");
@@ -52,7 +59,7 @@ public class LogService : BackgroundService, ILogService
         return logsDirectoryPath;
     }
 
-    private static string GetLatestLogFilePath()
+    private string GetLatestLogFilePath()
     {
         string logsDirectory = FindLogsDirectory();
         if (logsDirectory == null)
@@ -73,7 +80,7 @@ public class LogService : BackgroundService, ILogService
         return latestLogFile;
     }
 
-    private static async void AsyncProcessLogs(object state)
+    private async void AsyncProcessLogs(object state)
     {
         try
         {
@@ -105,7 +112,7 @@ public class LogService : BackgroundService, ILogService
         }
     }
 
-    private static async Task SendLogToElasticsearch(string logLine)
+    private async Task SendLogToElasticsearch(string logLine)
     {
         try
         {
@@ -132,7 +139,8 @@ public class LogService : BackgroundService, ILogService
             );
 
             // Elasticsearch endpoint
-            var elasticsearchUri = "http://elasticsearch:9200/logstash-logs/_doc";
+            var baseUrl = _configuration["Elasticsearch:Url"];
+            var elasticsearchUri = $"{baseUrl}/logstash-logs/_doc";
 
             var response = await _httpClient.PostAsync(elasticsearchUri, jsonContent);
 

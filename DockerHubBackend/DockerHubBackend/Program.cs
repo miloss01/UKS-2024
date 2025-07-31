@@ -119,7 +119,7 @@ builder.Services.AddControllers(options =>
 
 
 builder.Services.AddSingleton<IElasticClient>(new ElasticClient(
-    new ConnectionSettings(new Uri("http://elasticsearch:9200"))
+    new ConnectionSettings(new Uri(builder.Configuration["Elasticsearch:Url"]))
         .DefaultIndex("logstash-*")
         .DisableDirectStreaming()
     ));
@@ -127,11 +127,15 @@ builder.Services.AddHostedService<LogService>();
 builder.Services.AddHostedService<StartupScript>();
 
 // confing serilog 
+var logDirectory = builder.Configuration["Logging:LogDirectory"];
 builder.Host.UseSerilog((context, config) =>
 {
     config
         .WriteTo.Console()
-        .WriteTo.File("/app/Logs/log-.log", rollingInterval: RollingInterval.Day);
+        .WriteTo.File(
+            Path.Combine(logDirectory, "log-.log"),
+            rollingInterval: RollingInterval.Day
+        );
 });
 
 var port = builder.Configuration["Port"] ?? "5156";
