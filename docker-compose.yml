@@ -2,25 +2,29 @@ version: '3.8'
 
 services:
   backend:
-    image: miloss01/uks-backend:302fc72
+    image: miloss01/uks-backend:cd089ed
     container_name: backend-container
     ports:
       - "${HOST_PORT}:${APP_PORT}"
     environment:
-      ASPNETCORE_ENVIRONMENT: "Release"
+      ASPNETCORE_ENVIRONMENT: "Release" # or "Development"
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=uks-database;Username=admin;Password=admin"
       Port: ${APP_PORT}
-      Database__ApplyMigrations: true
+      Database__ApplyMigrations: "false"
       AWS__AccessKey: ""
       AWS__SecretKey: ""
+      Elasticsearch__Url: "http://elasticsearch:9200"
+      Registry__AuthServerAddress: "http://host.docker.internal:5001"
+      Registry__RegistryAddress: "http://host.docker.internal:5000"
     depends_on:
       - postgres
       - elasticsearch
     volumes:
-      - ./Startup/super_admin_cred.json:/app/Startup/super_admin_cred.json:ro
+      - ./Logs:/app/Logs
+      - ./Startup/super_admin_cred.json:/app/Startup/super_admin_cred.json
 
   frontend:
-    image: miloss01/uks-frontend:302fc72
+    image: miloss01/uks-frontend:cd089ed
     container_name: frontend-container
     ports:
       - "4200:80"
@@ -72,7 +76,7 @@ services:
       - registry-webhook-server
 
   registry-auth-server:
-    image: miloss01/uks-registry-auth-server:302fc72
+    image: miloss01/uks-registry-auth-server:cd089ed
     container_name: registry-auth-server-container
     ports:
       - "5001:5001"
@@ -84,7 +88,7 @@ services:
       - ./certs:/app/cert:ro
 
   registry-webhook-server:
-    image: miloss01/uks-registry-webhook-server:302fc72
+    image: miloss01/uks-registry-webhook-server:cd089ed
     container_name: registry-webhook-server-container
     ports:
       - "5002:5002"

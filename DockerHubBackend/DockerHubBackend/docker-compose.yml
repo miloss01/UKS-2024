@@ -2,22 +2,36 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: miloss01/uks-backend:cd089ed
+    container_name: backend-container
     ports:
-      - "5156:5156"
+      - "${HOST_PORT}:${APP_PORT}"
     environment:
-      ASPNETCORE_ENVIRONMENT: "Development"
-      CONNECTION_STRING: ${ConnectionStrings__DefaultConnection}
-      PORT: ${PORT}
-      APPLY_MIGRATIONS: "true"
+      ASPNETCORE_ENVIRONMENT: "Release"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=uks-database;Username=admin;Password=admin"
+      Port: ${APP_PORT}
+      Database__ApplyMigrations: "false"
+      AWS__AccessKey: ""
+      AWS__SecretKey: ""
+      Elasticsearch__Url: "http://elasticsearch:9200"
+      Registry__AuthServerAddress: "http://host.docker.internal:5001"
+      Registry__RegistryAddress: "http://host.docker.internal:5000"
     depends_on:
       - postgres
       - elasticsearch
     volumes:
       - ./Logs:/app/Logs
       - ./Startup/super_admin_cred.json:/app/Startup/super_admin_cred.json
+
+  frontend:
+    image: miloss01/uks-frontend:cd089ed
+    container_name: frontend-container
+    ports:
+      - "4200:80"
+    environment:
+      APIHOST: "http://localhost:${HOST_PORT}/api/"
+    depends_on:
+      - backend
 
   postgres:
     image: postgres:15
@@ -41,6 +55,47 @@ services:
       - "9200:9200"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
+
+  registry:
+    image: registry:2.8.3
+    container_name: registry-container
+    ports:
+      - "5000:5000"
+    restart: always
+    environment:
+      REGISTRY_AUTH: token
+      REGISTRY_AUTH_TOKEN_REALM: "http://host.docker.internal:5001/token"
+      REGISTRY_AUTH_TOKEN_SERVICE: "uks-registry"
+      REGISTRY_AUTH_TOKEN_ISSUER: "uks.registry-auth"
+      REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE: /certs/cert.pem
+    volumes:
+      - ./certs:/certs
+      - ./config.yml:/etc/docker/registry/config.yml
+    depends_on:
+      - registry-auth-server
+      - registry-webhook-server
+
+  registry-auth-server:
+    image: miloss01/uks-registry-auth-server:cd089ed
+    container_name: registry-auth-server-container
+    ports:
+      - "5001:5001"
+    environment:
+      - UKS_AUTH_PORT=5001
+      - UKS_AUTH_DEBUG=1
+      - UKS_DATABASE_URI=postgres://admin:admin@host.docker.internal:5432/uks-database
+    volumes:
+      - ./certs:/app/cert:ro
+
+  registry-webhook-server:
+    image: miloss01/uks-registry-webhook-server:cd089ed
+    container_name: registry-webhook-server-container
+    ports:
+      - "5002:5002"
+    environment:
+      - UKS_WEBHOOK_PORT=5002
+      - UKS_WEBHOOK_DEBUG=True
+      - UKS_DATABASE_URI=postgres://admin:admin@host.docker.internal:5432/uks-database
 
 volumes:
   postgres_data:
