@@ -11,8 +11,14 @@ using DockerHubBackend.Services.Interface;
 
 public class LogService : BackgroundService, ILogService
 {
+    private readonly IConfiguration _configuration;
+
+    public LogService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     private static long lastReadPosition = 0; // offset
-    private static readonly string logsDirectoryPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Logs");
     private static Timer _timer;
     private static readonly HttpClient _httpClient = new HttpClient();
     private static readonly Dictionary<string, string> LevelMap = new(StringComparer.OrdinalIgnoreCase)
@@ -32,17 +38,23 @@ public class LogService : BackgroundService, ILogService
         "level", "message", "timestamp", "exception"
     };
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
+
         _timer = new Timer(AsyncProcessLogs, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
         stoppingToken.Register(() => _timer.Dispose());
-
-        return Task.CompletedTask;
     }
 
-    private static string FindLogsDirectory()
+    private string FindLogsDirectory()
     {
+        var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == "true";
+
+        string logsDirectoryPath = isRunningInDocker
+            ? "/app/Logs"
+            : Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Logs")
+;
         if (!Directory.Exists(logsDirectoryPath))
         {
             Console.WriteLine($"Logs directory not found: {logsDirectoryPath}");
@@ -52,7 +64,7 @@ public class LogService : BackgroundService, ILogService
         return logsDirectoryPath;
     }
 
-    private static string GetLatestLogFilePath()
+    private string GetLatestLogFilePath()
     {
         string logsDirectory = FindLogsDirectory();
         if (logsDirectory == null)
@@ -73,7 +85,7 @@ public class LogService : BackgroundService, ILogService
         return latestLogFile;
     }
 
-    private static async void AsyncProcessLogs(object state)
+    private async void AsyncProcessLogs(object state)
     {
         try
         {
@@ -105,7 +117,7 @@ public class LogService : BackgroundService, ILogService
         }
     }
 
-    private static async Task SendLogToElasticsearch(string logLine)
+    private async Task SendLogToElasticsearch(string logLine)
     {
         try
         {
@@ -132,7 +144,8 @@ public class LogService : BackgroundService, ILogService
             );
 
             // Elasticsearch endpoint
-            var elasticsearchUri = "http://localhost:9200/logstash-logs/_doc";
+            var baseUrl = _configuration["Elasticsearch:Url"];
+            var elasticsearchUri = $"{baseUrl}/logstash-logs/_doc";
 
             var response = await _httpClient.PostAsync(elasticsearchUri, jsonContent);
 

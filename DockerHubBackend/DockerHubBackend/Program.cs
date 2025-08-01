@@ -127,20 +127,18 @@ builder.Services.AddHostedService<LogService>();
 builder.Services.AddHostedService<StartupScript>();
 
 // confing serilog 
+var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == "true";
+var logDirectory = isRunningInDocker
+    ? "/app/Logs"
+    : "Logs";
 builder.Host.UseSerilog((context, config) =>
 {
     config
-        //.MinimumLevel.Information() 
         .WriteTo.Console()
-        .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day);
-        //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
-        //{
-        //    AutoRegisterTemplate = true,
-        //    IndexFormat = "logstash-{0:yyyy.MM.dd}",  // Format logova u Elasticsearch-u
-        //    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7, // Dodajte ovo ako koristite Elasticsearch 7+
-        //    EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
-        //    CustomFormatter = new ElasticsearchJsonFormatter()
-        //});
+        .WriteTo.File(
+            Path.Combine(logDirectory, "log-.log"),
+            rollingInterval: RollingInterval.Day
+        );
 });
 
 var port = builder.Configuration["Port"] ?? "5156";
