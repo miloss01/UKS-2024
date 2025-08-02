@@ -34,7 +34,6 @@ export class AddOrganizationComponent {
     if (inputElement.files && inputElement.files.length > 0) {
       this.imageFile = inputElement.files[0];
 
-      // Prikaz slike kao preview
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagePreview = e.target?.result as string;
@@ -63,18 +62,14 @@ export class AddOrganizationComponent {
          if(this.imagePreview != null && this.imageFile != null) 
           {
             let fileName = this.authService.userData?.value?.userEmail+"/"+response+"/"+this.imageFile.name
-            console.log(fileName)
-            console.log(this.imageFile)
             this.imgService.uploadImage(fileName, this.imageFile).subscribe({
               next: (response) => {
-                console.log('Slika je upload-ovana!', response);
-                console.log('Organizacija sacuvana!', response);
                 this.snackBar.open('Successfully created an organization', 'Close', { duration: 3000 });
                 this.isUploading = false;
                 this.dialogRef.close(true);
               },
               error: (error) => {
-                console.error('Greška prilikom cuvanja slidze!', error);
+                console.error('Saving picture error!', error);
                 this.isUploading = false; 
               }
             });
@@ -82,9 +77,7 @@ export class AddOrganizationComponent {
       },
       error: (error) => {
         this.isUploading = false; 
-        console.error('Greška prilikom cuvanja organizacije!', error);
-        this.snackBar.open('Error while creating an organization', 'Close', { duration: 3000 });
-        this.dialogRef.close(false);
+        this.snackBar.open(error?.error?.message, 'Close', { duration: 3000 });
       }
     });
   }

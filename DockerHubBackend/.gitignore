@@ -787,4 +787,4 @@ fabric.properties
 
 **/Migrations/*
 **/super_admin_cred.json
-
+**/.env

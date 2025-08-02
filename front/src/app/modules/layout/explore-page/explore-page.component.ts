@@ -27,7 +27,7 @@ interface BadgeHelper {
   styleUrl: './explore-page.component.css'
 })
 export class ExplorePageComponent implements OnInit {
-  dockerImages: DockerImageDTO[] = [];
+  dockerRepositories: DockerRepositoryDTO[] = [];
   badges: BadgeHelper[] = [
     { name: 'NoBadge', selected: false },
     { name: 'DockerOfficialImage', selected: false },
@@ -48,8 +48,7 @@ export class ExplorePageComponent implements OnInit {
   userId: string = "";
   userRole: string = "";
 
-  constructor(private dockerImageService: DockerImageService, 
-              private dockerRepositoryService: RepositoryService,
+  constructor(private dockerRepositoryService: RepositoryService,
               private authService: AuthService,
               private snackBar: MatSnackBar) {}
 
@@ -127,7 +126,7 @@ export class ExplorePageComponent implements OnInit {
     this.page = 1;
     this.oldSearchTerm = this.searchTerm;
     this.oldBadges = this.badges.map(badge => ({ ...badge }));
-    this.getDockerImages();
+    this.getDockerRepositories();
   }
 
   onPageChange(change: number): void {
@@ -140,25 +139,25 @@ export class ExplorePageComponent implements OnInit {
 
     this.page = newPage;
 
-    this.getDockerImages();
+    this.getDockerRepositories();
   }
 
   onPageSizeChange(event: Event): void {
     const newPageSize = (event.target as HTMLSelectElement).value;
     this.pageSize = Number(newPageSize);
     this.page = 1;
-    this.getDockerImages();
+    this.getDockerRepositories();
   }
 
-  getDockerImages(): void {
-    this.dockerImageService.getDockerImages(
+  getDockerRepositories(): void {
+    this.dockerRepositoryService.getDockerRepositories(
       this.page, 
       this.pageSize, 
       this.oldSearchTerm, 
       this.getSelectedBadges(this.oldBadges)
     ).subscribe({
-      next: (res: PageDTO<DockerImageDTO>) => {
-        this.dockerImages = res.data;
+      next: (res: PageDTO<DockerRepositoryDTO>) => {
+        this.dockerRepositories = res.data;
         this.totalNumberOfElements = res.totalNumberOfElements;
         this.totalNumberOfPages = Math.ceil(this.totalNumberOfElements / this.pageSize);
         this.page = this.totalNumberOfElements != 0 ? this.page : 0

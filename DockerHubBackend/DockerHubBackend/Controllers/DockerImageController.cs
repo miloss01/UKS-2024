@@ -40,7 +40,8 @@ namespace DockerHubBackend.Controllers
                                     LastPush = img.LastPush != null ? img.LastPush.ToString() : null,
                                     ImageId = img.Id.ToString(),
                                     StarCount = img.Repository.StarCount,
-                                    Tags = img.Tags,
+                                    Tags = img.Tags.Select(tag => tag.Name).ToList(),
+                                    Digest = img.Digest,
                                     Owner = img.Repository.OrganizationOwner == null ? img.Repository.UserOwner.Email : img.Repository.OrganizationOwner.Name
                                 }).ToList(),
                                 pagedDockerImages.TotalNumberOfElements
@@ -63,6 +64,31 @@ namespace DockerHubBackend.Controllers
 			{
 				await _dockerImageService.DeleteDockerImage(repositoryId);
 				return Ok(new { message = "Image deleted successfully." });
+			}
+			catch (NotFoundException ex)
+			{
+				return NotFound(new { error = ex.Message });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { error = ex.Message });
+			}
+		}
+
+		[HttpDelete("delete-tag/{imageId}/{tagName}")]
+		public async Task<IActionResult> DeleteImageById(string imageId, string tagName)
+		{
+			var parsed = Guid.TryParse(imageId, out var imageID);
+
+			if (!parsed)
+			{
+				throw new NotFoundException("Image not found. Bad image id.");
+			}
+
+			try
+			{
+				await _dockerImageService.DeleteTagForDockerImage(imageID, tagName);
+				return Ok(new { message = "Image TAG deleted successfully." });
 			}
 			catch (NotFoundException ex)
 			{

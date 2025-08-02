@@ -18,4 +18,8 @@ export class DockerImageService {
   deleteDockerImage(id: string): Observable<void>{
     return this.http.delete<void>(`${environment.apiHost}dockerImages/delete/${id}`);
   }
+
+  deleteDockerImageTag(imageId: string, tagName: string): Observable<void>{
+    return this.http.delete<void>(`${environment.apiHost}dockerImages/delete-tag/${imageId}/${tagName}`);
+  }
 }

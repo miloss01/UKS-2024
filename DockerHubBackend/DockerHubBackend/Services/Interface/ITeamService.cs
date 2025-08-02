@@ -1,5 +1,6 @@
 ﻿using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 
 namespace DockerHubBackend.Services.Interface
@@ -12,7 +13,7 @@ namespace DockerHubBackend.Services.Interface
 
         public Task<TeamDto?> Get(Guid id);
 
-        public Task<TeamDto> AddMembers(Guid teamId, ICollection<EmailDto> memberDtos);
+        public Task<TeamDto> AddMembers(Guid teamId, ICollection<MemberDto> memberDtos);
 
         public Task<TeamPermissionResponseDto> AddPermissions(TeamPermissionRequestDto teamPermissionDto);
 
@@ -21,6 +22,8 @@ namespace DockerHubBackend.Services.Interface
         public Task<TeamDto> Delete(Guid id);
 
         public Task<ICollection<TeamPermission>> GetTeamPermissions(Guid id);
+
+        public Task<PermissionType> GetPermissionByUserAndRepository(string userId, string repositoryId);
         
     }
 }

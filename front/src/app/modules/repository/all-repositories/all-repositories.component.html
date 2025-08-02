@@ -2,7 +2,7 @@
     <div class="fields-container">
     <mat-form-field appearance="outline">
       <mat-label>Namespace</mat-label>
-      <mat-select>
+      <mat-select [(ngModel)]="selectedNamespace" (selectionChange)="applyFilters()">
         @for (namespace of namespaces; track namespace) {
             <mat-option [value]="namespace">{{namespace}}</mat-option>
         }
@@ -12,7 +12,7 @@
     <mat-form-field appearance="outline">
         <mat-icon matPrefix>search</mat-icon>
 
-      <input matInput placeholder="Search" [(ngModel)]="searchQuery">
+      <input matInput placeholder="Search" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
     </mat-form-field>
   
     <mat-form-field appearance="outline">
@@ -29,11 +29,11 @@
 </div>  
 
 <div class="mat-elevation-z2">
-<table mat-table matSort [dataSource]="repositorySource" 
-(matSortChange)="announceSortChange($event)">
+<table mat-table [dataSource]="repositorySource" matSort (matSortChange)="announceSortChange($event)">
+
     <ng-container matColumnDef="name">
         <th mat-header-cell mat-sort-header *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let element"> {{element.owner}}/{{ element.name }} </td>
+        <td mat-cell *matCellDef="let element"> {{ element.name }} </td>
     </ng-container>
 
     <ng-container matColumnDef="lastPushed">
@@ -42,12 +42,12 @@
     </ng-container>
 
     <ng-container matColumnDef="contains">
-        <th mat-header-cell *matHeaderCellDef> Contains </th>
-        <td mat-cell *matCellDef="let element"> {{ element.images.length }} tags</td>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef> Contains </th>
+        <td mat-cell *matCellDef="let element"> {{ element.images.length }} img</td>
     </ng-container>
 
     <ng-container matColumnDef="visibility">
-        <th mat-header-cell *matHeaderCellDef> Visibility </th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef> Visibility </th>
         <td mat-cell *matCellDef="let element"> {{ element.isPublic ? 'Public' : 'Private' }} </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

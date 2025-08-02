@@ -16,19 +16,22 @@ namespace DockerHubBackend.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamPermission> TeamPermissions { get; set; }
         public DbSet<VerificationToken> VerificationTokens { get; set; }
+        public DbSet<ImageTag> ImageTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             modelBuilder.Entity<Organization>().ToTable("Organizations");
-
+            modelBuilder.Entity<Organization>()
+                .HasIndex(o => o.Name)
+                .IsUnique();
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Members)
                 .WithMany(m => m.MemberOrganizations);
             modelBuilder.Entity<StandardUser>()
                 .HasMany(u => u.MyOrganizations)
                 .WithOne(o => o.Owner);
-            modelBuilder.Entity<StandardUser>()
+            modelBuilder.Entity<BaseUser>()
                 .HasMany(u => u.MyRepositories)
                 .WithOne(r => r.UserOwner);
             modelBuilder.Entity<Organization>()
@@ -92,11 +95,6 @@ namespace DockerHubBackend.Data
                 .HasOne<BaseUser>(vt => vt.User)
                 .WithOne(u => u.VerificationToken)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<DockerImage>()
-                .Property(p => p.Tags)
-                .HasConversion(v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
 
             base.OnModelCreating(modelBuilder);
         }

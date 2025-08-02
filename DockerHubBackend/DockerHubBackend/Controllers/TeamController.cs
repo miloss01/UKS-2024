@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using DockerHubBackend.Models;
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Dto.Request;
+using DockerHubBackend.Dto.Response.Organization;
 
 namespace DockerHubBackend.Controllers
 {
@@ -54,7 +55,7 @@ namespace DockerHubBackend.Controllers
 
 
         [HttpPut("member/{id}")]
-        public async Task<IActionResult> UpdateMembers([FromBody] ICollection<EmailDto> memberDtos, [FromRoute] Guid id)
+        public async Task<IActionResult> UpdateMembers([FromBody] ICollection<MemberDto> memberDtos, [FromRoute] Guid id)
         {
             var result = await _teamService.AddMembers(id, memberDtos);
             return Ok(result);
@@ -78,6 +79,13 @@ namespace DockerHubBackend.Controllers
         public async Task<IActionResult> GetRepositories([FromRoute] Guid id)
         {
             ICollection<TeamPermission> res = await _teamService.GetTeamPermissions(id);
+            return Ok(res);
+        }
+
+        [HttpGet("permission/{userId}/{repositoryId}")]
+        public async Task<IActionResult> GetPermission([FromRoute] string userId, [FromRoute] string repositoryId)
+        {
+            PermissionType res = await _teamService.GetPermissionByUserAndRepository(userId, repositoryId);
             return Ok(res);
         }
     }

@@ -1,6 +1,9 @@
 <div class="team-details-container">
-  <!-- Team Details Section -->
-   <h1>Team Details</h1>
+  <div class="header-container">
+    <span class="back-icon" (click)="goBack()">&#8592;</span>
+    <h1 class="organization-title">Team Details</h1>
+  </div>
+
   <div class="team-details">
     <div class="left">
       <h2>{{ team?.name }}</h2>
@@ -13,12 +16,17 @@
       </ul>
     </div>
     <div class="buttons">
-      <button mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
-      <button mat-raised-button color="warn" (click)="openDeleteDialog()">Delete Team</button>
+      <button *ngIf="isOwner" mat-raised-button color="primary" (click)="openEditDialog()">Edit Team</button>
+      <button *ngIf="isOwner" mat-raised-button color="warn" (click)="openDeleteDialog()">Delete Team</button>
     </div>
   </div>
 
+  <div class="repository-header">
   <h3>Repositories</h3>
+  <button *ngIf="isOwner" mat-raised-button color="primary" (click)="openAddRepositoryDialog()">
+    Grant Permission
+  </button>
+</div>
   <div id="table-container">
     <table mat-table [dataSource]="repositories" class="mat-elevation-z8">
       <ng-container matColumnDef="name">

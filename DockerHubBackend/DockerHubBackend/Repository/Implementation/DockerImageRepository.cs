@@ -27,6 +27,7 @@ namespace DockerHubBackend.Repository.Implementation
                     .ThenInclude(repo => repo.UserOwner)
                 .Include(img => img.Repository)
                     .ThenInclude(repo => repo.OrganizationOwner)
+                .Include(img => img.Tags)
                 .Where(img => !img.IsDeleted)
                 .Where(img => img.Repository.IsPublic)
                 .Where(img => !badgeList.Any() ||
@@ -55,5 +56,10 @@ namespace DockerHubBackend.Repository.Implementation
 		{
 			return await _context.DockerImages.FirstOrDefaultAsync(repo => repo.Id == id);
 		}
-	}
+
+        public async Task<DockerImage?> GetDockerImageByIdWithRepository(Guid id)
+        {
+            return await _context.DockerImages.Include(image => image.Repository).FirstOrDefaultAsync(image => image.Id == id);
+        }
+    }
 }

@@ -66,15 +66,19 @@
 
   <mat-tab label="Teams">
     <div class="tab-content">
-      <h2>Teams</h2>
-      <p>Ovde se prikazuje lista timova.</p>
+      <app-teams [organizationId]="id" [members]="members" [isOwner]="isOwner"></app-teams>
     </div>
   </mat-tab>
 
   <mat-tab label="Repositories">
     <div class="tab-content">
-      <h2>Repositories</h2>
-      <p>Ovde se prikazuje lista repozitorijuma.</p>
+      <app-all-repositories 
+        [isOrganization]=true 
+        [name]="name"
+        [id]="id"
+        [isOwner]="isOwner"
+        >
+      </app-all-repositories>
     </div>
   </mat-tab>
 </mat-tab-group>

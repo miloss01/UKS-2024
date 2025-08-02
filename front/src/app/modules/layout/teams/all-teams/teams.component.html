@@ -1,6 +1,6 @@
 <div id="header-container">
     <p id="title">Teams</p>
-    <button mat-raised-button color="primary" id="create-team-btn" (click)="openCreateTeamForm()">Create Team</button>
+    <button *ngIf="isOwner" mat-raised-button color="primary" id="create-team-btn" (click)="openCreateTeamForm()">Create Team</button>
   </div>
 
 <div id="table-container">

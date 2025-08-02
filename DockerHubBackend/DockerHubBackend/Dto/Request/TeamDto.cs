@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
@@ -11,7 +12,7 @@ namespace DockerHubBackend.Dto.Request
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public ICollection<EmailDto>? Members { get; set; }
+        public ICollection<MemberDto>? Members { get; set; }
         public Guid OrganizationId { get; set; }
 
         [SetsRequiredMembers]
@@ -21,7 +22,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(string name, string desription, ICollection<EmailDto> members, Guid organizationId)
+        public TeamDto(string name, string desription, ICollection<MemberDto> members, Guid organizationId)
         {
             Name = name;
             Members = members;
@@ -30,7 +31,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(string name, string desription, ICollection<EmailDto> members)
+        public TeamDto(string name, string desription, ICollection<MemberDto> members)
         {
             Name = name;
             Members = members;
@@ -38,7 +39,7 @@ namespace DockerHubBackend.Dto.Request
         }
 
         [SetsRequiredMembers]
-        public TeamDto(Guid id, string name, string desription, ICollection<EmailDto> members)
+        public TeamDto(Guid id, string name, string desription, ICollection<MemberDto> members)
         {
             Id = id;
             Name = name;
@@ -49,12 +50,13 @@ namespace DockerHubBackend.Dto.Request
         [SetsRequiredMembers]
         public TeamDto(Team team)
         {
-            ICollection<EmailDto> memberDtos = new HashSet<EmailDto>();
-            foreach (StandardUser user in team.Members) memberDtos.Add(new EmailDto { Email = user.Email });
+            ICollection<MemberDto> memberDtos = new HashSet<MemberDto>();
+            foreach (StandardUser user in team.Members) memberDtos.Add(new MemberDto { Id = user.Id, Email = user.Email, IsOwner = false  });
             Id = team.Id;
             Name = team.Name;
             Members = memberDtos;
             Description = team.Description;
+            OrganizationId = team.OrganizationId;
         }
         public Team ToTeam(Organization organization)
         {

@@ -21,7 +21,8 @@ namespace DockerHubBackend.Repository.Implementation
         { 
             return await _context.DockerRepositories
 				                 .Where(repo => repo.UserOwnerId == id)
-						         .ToListAsync();
+								 .Include(repo => repo.Images)
+								 .ToListAsync();
 		}
 
 		public DockerRepository GetFullDockerRepositoryById(Guid id)
@@ -31,6 +32,7 @@ namespace DockerHubBackend.Repository.Implementation
                 .Include(dockerRepository => dockerRepository.UserOwner)
                 .Include(dockerRepository => dockerRepository.OrganizationOwner)
                 .Include(dockerRepository => dockerRepository.Images)
+                    .ThenInclude(img => img.Tags)
                 .FirstOrDefault(dockerRepository => dockerRepository.Id == id);
         }
 
@@ -38,6 +40,7 @@ namespace DockerHubBackend.Repository.Implementation
 		{
 			return await _context.DockerRepositories
 								 .Where(repo => repo.OrganizationOwnerId == id)
+								 .Include(repo => repo.Images)
 								 .ToListAsync();
 		}
         public List<DockerRepository> GetStarRepositoriesForUser(Guid userId)
@@ -113,6 +116,51 @@ namespace DockerHubBackend.Repository.Implementation
             user.StarredRepositories.Remove(repository);
             repository.StarCount -= 1;
             _context.SaveChanges();
+        }
+
+        public PageDTO<DockerRepository> GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges)
+        {
+            searchTerm = searchTerm ?? string.Empty;
+            badges = badges ?? string.Empty;
+
+            var badgeList = badges.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(badge => Enum.TryParse<Badge>(badge, true, out _))
+                .Select(badge => Enum.Parse<Badge>(badge, true))
+                .ToList();
+
+            var dockerRepositories = _context.DockerRepositories
+                .AsQueryable()
+                .Include(repo => repo.UserOwner)
+                .Include(repo => repo.OrganizationOwner)
+                .Include(repo => repo.Images)
+                    .ThenInclude(img => img.Tags)
+                .Where(repo => !repo.IsDeleted)
+                .Where(repo => repo.IsPublic)
+                .Where(repo => !badgeList.Any() ||
+                              badgeList.Contains(repo.Badge))
+                .Where(repo => repo.Name.Contains(searchTerm) ||
+                              repo.Id.ToString().Contains(searchTerm))
+                .ToList();
+
+            var pageDto = new PageDTO<DockerRepository>(
+                            dockerRepositories
+                             .OrderByDescending(repo => repo.Badge == Badge.DockerOfficialImage)
+                             .ThenByDescending(repo => repo.Badge == Badge.VerifiedPublisher)
+                             .ThenByDescending(repo => repo.Badge == Badge.SponsoredOSS)
+                             .ThenByDescending(repo => repo.Badge == Badge.NoBadge)
+                             .ThenByDescending(repo => repo.StarCount)
+                             .Skip((page - 1) * pageSize)
+                             .Take(pageSize)
+                             .ToList(),
+                            dockerRepositories.Count
+                        );
+
+            return pageDto;
+        }
+
+        public async Task<DockerRepository?> GetDockerRepositoryByIdWithImages(Guid id)
+        {
+            return await _context.DockerRepositories.Include(repo => repo.Images).FirstOrDefaultAsync(repo => repo.Id == id);
         }
     }
 }

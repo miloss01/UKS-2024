@@ -1,0 +1,30 @@
+name: Build and Push Registry Webhook Server
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths: ["RegistryWebhookServer/**"]
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  prepare-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.extract_tag.outputs.TAG }}
+    steps:
+      - name: Get commit hash
+        id: extract_tag
+        run: |
+          echo "Tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+  build-and-push:
+    needs: prepare-tag
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      repository-name: uks-registry-webhook-server
+      image-tag: ${{ needs.prepare-tag.outputs.tag }}
+      local-path: ./RegistryWebhookServer
+    secrets: inherit

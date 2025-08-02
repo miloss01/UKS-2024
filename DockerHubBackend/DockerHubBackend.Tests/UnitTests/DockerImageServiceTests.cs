@@ -2,8 +2,12 @@
 using DockerHubBackend.Dto.Response;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Implementation;
+using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -16,19 +20,27 @@ namespace DockerHubBackend.Tests.UnitTests
     public class DockerImageServiceTests
     {
         private readonly Mock<IDockerImageRepository> _mockDockerImageRepository;
-        private readonly DockerImageService _service;
+        private readonly Mock<IImageTagRepository> _mockImageTagRepository;
+		private readonly DockerImageService _service;
+        private readonly Mock<ILogger<DockerImageService>> _mockLogger = new Mock<ILogger<DockerImageService>>();
+        private readonly Mock<IRegistryService> _mockRegistryService;
+        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
 
         public DockerImageServiceTests()
         {
             _mockDockerImageRepository = new Mock<IDockerImageRepository>();
-            _service = new DockerImageService(_mockDockerImageRepository.Object);
+            _mockImageTagRepository = new Mock<IImageTagRepository>();
+            _mockRegistryService = new Mock<IRegistryService>();
+            _mockUnitOfWork = new Mock<IUnitOfWork>();
+            _mockUnitOfWork.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(Mock.Of<IDbContextTransaction>());
+            _service = new DockerImageService(_mockDockerImageRepository.Object, _mockImageTagRepository.Object, _mockLogger.Object, _mockRegistryService.Object, _mockUnitOfWork.Object);
         }
 
         [Fact]
         public void GetDockerImages_SearchTermAndBadgesEmpty_ReturnsAllDockerImages()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);
@@ -52,8 +64,8 @@ namespace DockerHubBackend.Tests.UnitTests
         [Fact]
         public void GetDockerImages_SearchTermNotEmpty_ReturnsDockerImagesWhichIdContainsSearchTerm()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = null, Digest = "123" };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);
@@ -76,8 +88,8 @@ namespace DockerHubBackend.Tests.UnitTests
         [Fact]
         public void GetDockerImages_BadgesNotEmpty_ReturnsDockerImagesWhichRepositoryHasProvidedBadge()
         {
-            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo1", Badge = Badge.DockerOfficialImage } };
-            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VerifiedPublisher } };
+            var dockerImage1 = new DockerImage { Id = Guid.NewGuid(), Digest = "123", DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo1", Badge = Badge.DockerOfficialImage } };
+            var dockerImage2 = new DockerImage { Id = Guid.NewGuid(), Digest = "123", DockerRepositoryId = Guid.NewGuid(), Repository = new DockerRepository { Name = "repo2", Badge = Badge.VerifiedPublisher } };
 
             var dockerImages = new List<DockerImage>();
             dockerImages.Add(dockerImage1);

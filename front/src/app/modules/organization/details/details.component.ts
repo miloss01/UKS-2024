@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { MaterialModule } from 'app/infrastructure/material/material.module';
 import { FormsModule } from '@angular/forms';
@@ -7,11 +7,14 @@ import { PaginatorComponent } from '../paginator/paginator.component';
 import { OrganizationService } from 'app/services/organization.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TeamsComponent } from "app/modules/layout/teams/all-teams/teams.component";
+import { Member } from 'app/models/models';
+import { AllRepositoriesComponent } from "app/modules/repository/all-repositories/all-repositories.component";
 
 @Component({
   selector: 'app-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, MaterialModule, PaginatorComponent, TeamsComponent, AllRepositoriesComponent],
   templateUrl: './details.component.html',
   styleUrl: './details.component.css'
 })
@@ -24,10 +27,10 @@ export class DetailsComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   displayedAllUsers: any[] = [];
-  members: any[] = [];
+  members: Member[] = [];
   displayedMembers: any[] = [];
 
-  searchQuery = ''
+  searchQuery = '';
   pageSize: number = 2;
   currentPage: number = 1;
 
@@ -60,9 +63,6 @@ export class DetailsComponent implements OnInit {
         this.users = data.otherUsers;
         this.filteredUsers = [...this.users];
         this.updateDisplayedUsers();
-
-        console.log(data)
-        console.log("ok")
       },
       error: (err) => {
         this.members = [];

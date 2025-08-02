@@ -22,7 +22,8 @@ export interface LoginCredentials {
 export interface UserData{
   userId: string,
   userEmail: string,
-  userRole: UserRole
+  userRole: UserRole,
+  username: string,
 }
 export interface RegisterUserDto{
   email: string,
@@ -31,7 +32,7 @@ export interface RegisterUserDto{
   password: string
 }
 
-export interface StandardUser{
+export interface BaseUser{
   id: string,
   email: string,
   username: string,
@@ -80,6 +81,7 @@ export interface DockerImageDTO {
   lastPush: string;
   owner: string;
   createdAt: string;
+  digest: string;
 }
 
 export interface PageDTO<T> {
@@ -104,4 +106,16 @@ export interface MinifiedStandardUserDTO {
 
 export interface NewBadgeDTO {
   badge: string;
+}
+
+export interface ILogs {
+  timestamp: string,
+  level: string,
+  message: string
+}
+
+export interface Member {
+  id: string,
+  email: string,
+  isOwner: boolean
 }

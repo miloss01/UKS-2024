@@ -4,7 +4,11 @@ using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
+using DockerHubBackend.Repository.Utils;
 using DockerHubBackend.Services.Implementation;
+using DockerHubBackend.Services.Interface;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -19,15 +23,21 @@ namespace DockerHubBackend.Tests.UnitTests
         private readonly Mock<IDockerRepositoryRepository> _mockDockerRepositoryRepository;
         private readonly Mock<IUserRepository> _mockUserRepository;
         private readonly Mock<IOrganizationRepository> _mockOrganizationRepository;
+		private readonly Mock<IRegistryService> _mockRegistryService;
 
 		private readonly DockerRepositoryService _service;
+        private readonly Mock<ILogger<DockerRepositoryService>> _mockLogger = new Mock<ILogger<DockerRepositoryService>>();
+		private readonly Mock<IUnitOfWork> _mockUnitOfWork;
 
         public DockerRepositoryServiceTests()
         {
             _mockDockerRepositoryRepository = new Mock<IDockerRepositoryRepository>();
             _mockUserRepository = new Mock<IUserRepository>();
             _mockOrganizationRepository = new Mock<IOrganizationRepository>();
-			_service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object, _mockOrganizationRepository.Object);
+            _mockUnitOfWork = new Mock<IUnitOfWork>();
+            _mockUnitOfWork.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(Mock.Of<IDbContextTransaction>());
+            _mockRegistryService = new Mock<IRegistryService>();
+            _service = new DockerRepositoryService(_mockDockerRepositoryRepository.Object, _mockUserRepository.Object, _mockOrganizationRepository.Object, _mockLogger.Object, _mockRegistryService.Object, _mockUnitOfWork.Object);
         }
 
         [Fact]
@@ -192,7 +202,7 @@ namespace DockerHubBackend.Tests.UnitTests
 			Assert.Equal(createDto.Name, result.Name);
 			Assert.Equal(createDto.Description, result.Description);
 			Assert.Equal(createDto.IsPublic, result.IsPublic);
-			Assert.Equal(user.Email, result.Owner);
+			Assert.Equal(user.Username, result.Owner);
 
 			_mockUserRepository.Verify(svc => svc.GetUserById(ownerGuid), Times.Once);
 			_mockOrganizationRepository.Verify(svc => svc.GetOrganizationById(ownerGuid), Times.Once);
@@ -250,7 +260,7 @@ namespace DockerHubBackend.Tests.UnitTests
 			var repository = new DockerRepository { Id = repositoryId, Name = "TestRepo" };
 
 			_mockDockerRepositoryRepository
-				.Setup(repo => repo.GetDockerRepositoryById(repositoryId))
+				.Setup(repo => repo.GetDockerRepositoryByIdWithImages(repositoryId))
 				.ReturnsAsync(repository);
 
 			_mockDockerRepositoryRepository
@@ -261,7 +271,7 @@ namespace DockerHubBackend.Tests.UnitTests
 			await _service.DeleteDockerRepository(repositoryId);
 
 			// Assert
-			_mockDockerRepositoryRepository.Verify(repo => repo.GetDockerRepositoryById(repositoryId), Times.Once);
+			_mockDockerRepositoryRepository.Verify(repo => repo.GetDockerRepositoryByIdWithImages(repositoryId), Times.Once);
 			_mockDockerRepositoryRepository.Verify(repo => repo.Delete(repositoryId), Times.Once);
 		}
 
@@ -280,7 +290,7 @@ namespace DockerHubBackend.Tests.UnitTests
 			var exception = await Assert.ThrowsAsync<NotFoundException>(() => _service.DeleteDockerRepository(repositoryId));
 			Assert.Equal($"Docker repository with id {repositoryId} not found.", exception.Message);
 
-			_mockDockerRepositoryRepository.Verify(repo => repo.GetDockerRepositoryById(repositoryId), Times.Once);
+			_mockDockerRepositoryRepository.Verify(repo => repo.GetDockerRepositoryByIdWithImages(repositoryId), Times.Once);
 			_mockDockerRepositoryRepository.Verify(repo => repo.Delete(It.IsAny<Guid>()), Times.Never);
 		}
 

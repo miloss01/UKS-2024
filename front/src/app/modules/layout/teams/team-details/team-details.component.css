@@ -17,6 +17,47 @@
   background-color: #f9f9f9;
 }
 
+  .back-icon {
+    cursor: pointer;
+    font-size: 40px;
+    color: #3f51b5;
+    transition: color 0.3s ease;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0 20px 20px;
+  }
+  
+  .repository-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.repository-header h3 {
+  margin: 0;
+}
+
+.repository-header button {
+  margin-left: auto;
+  margin-right: 0.5em;
+}
+
+.back-icon:hover {
+  color: #1e88e5;
+}
+
+.organization-title {
+  margin: 0;
+  font-size: 40px;
+  color: #333;
+}
+
 #description {
   word-wrap: break-word;
   word-break: break-word;

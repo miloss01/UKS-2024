@@ -1,0 +1,107 @@
+<div class="log-search-container">
+    <div class="input-section">
+      <h2>Search Logs</h2>
+  
+      <form (ngSubmit)="onSubmit()" class="form-container">
+        <!-- Input query -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Text or Query</mat-label>
+          <textarea matInput [(ngModel)]="query" name="query" placeholder="(level:warning or level:error) and message:error occurred" rows="4"></textarea>
+        </mat-form-field>
+
+        <!--Input level-->
+        <mat-form-field appearance="fill">
+          <mat-select placeholder="Select level..." [(ngModel)]="selectedOption" name="level">
+            <mat-option *ngFor="let option of options" [value]="option">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Input date time -->
+        <div class="date-range">
+          <div class="date-time-row">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Start date</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="picker" 
+                [(ngModel)]="startDate" 
+                name="startDate"
+                (dateChange)="onStartDateChange($event)"
+              />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Start time</mat-label>
+              <input matInput type="time" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()">
+            </mat-form-field>
+          </div>
+        
+          <div class="date-time-row">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>End date</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="endDatePicker" 
+                [(ngModel)]="endDate" 
+                name="endDate"
+                (dateChange)="onEndDateChange($event)"
+              />
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+            </mat-form-field>
+        
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>End time</mat-label>
+              <input matInput type="time" [(ngModel)]="endTime" name="endTime" (ngModelChange)="onEndTimeChange()">
+            </mat-form-field>
+          </div>
+        </div>
+  
+        <!-- Button for search -->
+        <div class="button-row">
+          <button [disabled]="!isFormValid()" mat-raised-button color="primary" type="submit" class="submit-button">Search logs</button>
+          <button mat-raised-button type="button" (click)="clearForm()">Clear</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Table -->
+    <div class="table-container">
+        <table mat-table [dataSource]="logs" class="mat-elevation-z8 full-width">
+      
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef class="timestamp-column"> Timestamp </th>
+            <td mat-cell *matCellDef="let element" class="timestamp-column"> {{ element.timestamp | date:'dd.MM.yyyy HH:mm:ss' }} </td>
+          </ng-container>
+      
+          <!-- Level Column -->
+          <ng-container matColumnDef="level">
+            <th mat-header-cell *matHeaderCellDef class="level-column"> Level </th>
+            <td mat-cell *matCellDef="let element" class="level-column"> {{ element.level }} </td>
+          </ng-container>
+      
+          <!-- Message Column -->
+          <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef class="message-column"> Message </th>
+            <td mat-cell *matCellDef="let element" class="message-column"> 
+              <span matTooltip="{{ element.message }}" matTooltipPosition="above">
+                {{ element.message }}
+              </span>
+            </td>
+          </ng-container>
+      
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="getLogRowClass(row)"></tr>
+        </table>
+      </div>    
+    </div>    
+    
+    <div class="canvas">
+      <canvas id="logChart" width="400" height="200"></canvas>
+    </div>  
+  

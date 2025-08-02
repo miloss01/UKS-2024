@@ -18,6 +18,7 @@ import { AuthGuard } from './security/auth.guard';
 import { UserRole } from './models/models';
 import { RoleGuard } from './security/role.guard';
 import { UserBadgesComponent } from './modules/layout/user-badges/user-badges.component';
+import { LogsComponent } from './modules/layout/logs/logs.component';
 
 export const routes: Routes = [
   { path: 'all-user-repo', component: AllRepositoriesComponent, canActivate: [AuthGuard] },
@@ -28,11 +29,12 @@ export const routes: Routes = [
   { path: 'password/change', component: ChangePasswordPageComponent },
   { path: 'explore', component: ExplorePageComponent },
   { path: 'explore/repository/:id', component: PublicRepositoryOverviewComponent },
-  { path: 'sign-up', component: RegisterPageComponent, canActivate: [PreventAuthGuard] },
+  { path: 'sign-up', component: RegisterPageComponent, canActivate: [PreventAuthGuard], data: { title: 'Sign Up', isAdmin: false } },
+  { path: 'sign-up-admin', component: RegisterPageComponent, canActivate: [AuthGuard], data: { title: 'Sign Up Admin', isAdmin: true } },
   { path: 'organizations', component: ListOrganizationsComponent, canActivate: [AuthGuard] },
   { path: 'org-details/:id', component: DetailsComponent, canActivate: [AuthGuard] },
-  { path: 'teams', component: TeamsComponent, canActivate: [AuthGuard] },
   { path: 'team-details/:id', component: TeamDetailsComponent, canActivate: [AuthGuard] },
   { path: 'badges', component: UserBadgesComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
+  { path: 'logs', component: LogsComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: [UserRole.Admin, UserRole.SuperAdmin]} },
   { path: '**', component: LandingPageComponent }
 ];

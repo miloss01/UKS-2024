@@ -4,6 +4,7 @@ using DockerHubBackend.Exceptions;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Security;
+using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -23,6 +24,19 @@ namespace DockerHubBackend.Controllers
         public DockerRepositoryController(IDockerRepositoryService dockerRepositoryService)
         {
             _dockerRepositoryService = dockerRepositoryService;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult GetDockerRepositories(int page, int pageSize, string? searchTerm, string? badges)
+        {
+            var pagedDockerRepositories = _dockerRepositoryService.GetDockerRepositories(page, pageSize, searchTerm, badges);
+            var pageDTO = new PageDTO<DockerRepositoryDTO>(
+                                pagedDockerRepositories.Data.Select(repo => new DockerRepositoryDTO(repo)).ToList(),
+                                pagedDockerRepositories.TotalNumberOfElements
+                            );
+
+            return Ok(pageDTO);
         }
 
         [HttpGet("{id}")]
@@ -252,6 +266,26 @@ namespace DockerHubBackend.Controllers
                 .Select(repository => repository.Id.ToString());
 
             return Ok(allGuids);
+        }
+
+        [HttpGet("org-repository/{id}")]
+        public async Task<IActionResult> GetOrganizationRepositories(string id)
+        {
+            var parsed = Guid.TryParse(id, out var organizationId);
+
+            if (!parsed)
+            {
+                throw new NotFoundException("User not found. Bad User id.");
+            }
+            try
+            {
+                var repositories = await _dockerRepositoryService.GetRepositoriesByOrganizationId(organizationId);
+                return Ok(repositories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while getting the repositories.", Details = ex.Message });
+            }
         }
     }
 }

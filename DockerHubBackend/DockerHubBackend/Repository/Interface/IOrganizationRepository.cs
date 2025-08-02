@@ -14,5 +14,7 @@ namespace DockerHubBackend.Repository.Interface
         Task<string> AddMemberToOrganization(Guid organizationId, Guid userId);
         Task DeleteOrganization(Guid organizationId);
         Task UpdateOrganization(Guid organizationId, string imageLocation, string description);
+        Task<Organization?> GetOrganizationByIdWithRepositories(Guid id);
+        Task<Organization?> GetOrganizationByName(string name);
     }
 }

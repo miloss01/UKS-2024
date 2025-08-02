@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'app/env/environment';
-import { DockerRepositoryDTO } from 'app/models/models';
+import { DockerRepositoryDTO, PageDTO } from 'app/models/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -34,4 +34,18 @@ export class RepositoryService {
   getNotAllowedToStarRepositoriesForUser(userId: string) : Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiHost}dockerRepositories/star/notallowed/${userId}`);
   }
+
+  getDockerRepositories(page: number, pageSize: number, searchTerm: string, badges: string): Observable<PageDTO<DockerRepositoryDTO>>{
+      return this.http.get<PageDTO<DockerRepositoryDTO>>(`${environment.apiHost}dockerRepositories?page=${page}&pageSize=${pageSize}&searchTerm=${searchTerm}&badges=${badges}`);
+    }
+  
+  getByOrganizationId(id: string) {
+    return this.http.get<DockerRepositoryDTO[]>(`${environment.apiHost}dockerRepositories/org-repository/${id}`);
+  }
+
+  GetUsersPermisionForRepository(userId: string, repositoryId: string) : Observable<number> {
+    const url = `${environment.apiHost}team/permission/${userId}/${repositoryId}`;
+    return this.http.get<number>(url);    
+  }
+  
 }

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DockerHubBackend.Data;
 using DockerHubBackend.Dto.Request;
 using DockerHubBackend.Dto.Response;
+using DockerHubBackend.Dto.Response.Organization;
 using DockerHubBackend.Models;
 using DockerHubBackend.Repository.Interface;
 using DockerHubBackend.Repository.Utils;
@@ -28,7 +29,7 @@ namespace DockerHubBackend.Repository.Implementation
                     team.Id,
                     team.Name,
                     team.Description,
-                    team.Members.Select(member => new EmailDto
+                    team.Members.Select(member => new MemberDto
                     {
                         Email = member.Email,
                     }).ToList()
@@ -43,6 +44,7 @@ namespace DockerHubBackend.Repository.Implementation
             var team = await _context.Teams
                 .Where(team => team.Id == id)
                 .Include(team => team.Members)
+                .Include(team => team.Organization)
                 .FirstOrDefaultAsync();
             return team;
         }
@@ -89,6 +91,16 @@ namespace DockerHubBackend.Repository.Implementation
         {
             return await _context.Teams.Include(team => team.Organization)
                 .FirstOrDefaultAsync(team => team.Name == teamName && team.Organization.Id == orgId);
+        }
+
+        public async Task<PermissionType> GetPermissionByUserAndRepository(Guid userId, Guid repositoryId)
+        {
+            var permission = await _context.TeamPermissions
+            .Where(tp => tp.RepositoryId == repositoryId &&
+                         tp.Team.Members.Any(m => m.Id == userId))
+            .MaxAsync(tp => (PermissionType?)tp.Permission);
+
+            return permission ?? PermissionType.ReadOnly;
         }
     }
 }

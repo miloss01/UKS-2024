@@ -19,18 +19,31 @@ import { DockerImageService } from 'app/services/docker-image.service';
 export class ImagesListComponent implements OnChanges {
 
   @Input() images: DockerImageDTO[] = [];
-
   @Input() forDeleting: boolean = false;
+  @Input() permisionType: number = 0;
 
   filteredImages = [...this.images];
   selectedImage: DockerImageDTO | null= null;
+  selectedTag: string | null = null
   sortOption = 'newest';
   filterTag = '';
   page = 0;
   pageSize = 5;
   totalNumberOfPages = 0;
 
-  constructor(private readonly dockerImageService: DockerImageService){}
+  constructor(private readonly dockerImageService: DockerImageService){
+  }
+
+  ngOnInit() {
+  this.images = this.images.flatMap(image =>
+    image.tags.map(tag => ({
+      ...image,
+      tags: [tag]
+    }))
+  );
+  this.filteredImages = this.images
+}
+
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['images']) {
@@ -40,6 +53,7 @@ export class ImagesListComponent implements OnChanges {
       this.applyFilters();
     }
   }
+
 
   applyFilters(): void {
     let filtered = this.images.filter(image => 
@@ -98,11 +112,16 @@ export class ImagesListComponent implements OnChanges {
     navigator.clipboard.writeText(text);
   }
 
-  selectImage(image: any) {
-    this.selectedImage = image;
-  }
+  // selectImage(image: any) {
+  //   this.selectedImage = image;
+  // }
 
-  DeleteTag(): void {
+  selectImage(image: any, tag: string) {
+  this.selectedImage = image;
+  this.selectedTag = tag;
+}
+
+  DeleteImage(): void {
     if (this.selectedImage) {
       console.log('Selected Image:', this.selectedImage);
       this.dockerImageService.deleteDockerImage(this.selectedImage.imageId).subscribe({
@@ -111,6 +130,33 @@ export class ImagesListComponent implements OnChanges {
             this.filteredImages = this.filteredImages.filter(
               image => image.imageId !== this.selectedImage?.imageId
             );
+        
+            // Optionally clear the selection
+            this.selectedImage = null;
+          },
+          error: (error) => {
+            console.error('Error creating repository:', error);
+          }
+        });     
+      }
+  }
+
+  DeleteTag(): void {
+    if (this.selectedImage && this.selectedTag) {
+      console.log('Selected Image:', this.selectedImage);
+      console.log('Selected Image Tag:', this.selectedTag);
+      this.dockerImageService.deleteDockerImageTag(this.selectedImage.imageId, this.selectedTag).subscribe({
+          next: (response: void) => {
+            console.log('Deleted:', response);
+            this.filteredImages = this.filteredImages.map(image => {
+                if (image.imageId === this.selectedImage?.imageId) {
+                  return {
+                    ...image,
+                    tags: image.tags.filter(tag => tag !== this.selectedTag)
+                  };
+                }
+                return image;
+              });
         
             // Optionally clear the selection
             this.selectedImage = null;

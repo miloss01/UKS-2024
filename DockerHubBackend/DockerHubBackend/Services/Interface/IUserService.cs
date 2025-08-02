@@ -7,7 +7,7 @@ namespace DockerHubBackend.Services.Interface
     public interface IUserService
     {
         Task ChangePassword(ChangePasswordDto changePasswordDto);
-        Task<StandardUserDto> RegisterStandardUser(RegisterUserDto registerUserDto);
+        Task<BaseUserDTO> Register<TUser>(RegisterUserDto registerUserDto) where TUser : BaseUser;
         List<StandardUser> GetAllStandardUsers();
         void ChangeUserBadge(Badge badge, Guid userId);
     }

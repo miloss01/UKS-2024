@@ -1,5 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { AfterViewInit, Component, inject, Signal, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit, Signal, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -18,50 +18,88 @@ import { OrganizationService } from 'app/services/organization.service';
   templateUrl: './all-repositories.component.html',
   styleUrl: './all-repositories.component.css'
 })
-export class AllRepositoriesComponent  implements AfterViewInit{
+export class AllRepositoriesComponent implements OnInit, AfterViewInit {
   namespaces: string[] = []
   categories: string[] = ["c1", "c2", "c3"]
-  searchQuery: Signal<string> = signal("");
+  selectedNamespace: string = "";
+  searchQuery: string = "";
   displayedColumns: string[] = ["name", "lastPushed", "contains", "visibility"]
-  repositories: DockerRepositoryDTO[] = []
-  
+  repositories: DockerRepositoryDTO[] = [];
+  @Input() isOrganization = false;
+  @Input() name!: string | null;
+  @Input() id!: string | null;
+  @Input() isOwner: boolean | null = false;
       
-  repositorySource = new MatTableDataSource(this.repositories)
+  repositorySource = new MatTableDataSource<DockerRepositoryDTO>(this.repositories)
 
   router = inject(Router)
   private _liveAnnouncer = inject(LiveAnnouncer);
-
-  @ViewChild(MatSort)
-  sort: MatSort = new MatSort;
-
-  @ViewChild(MatPaginator)
-  paginator!: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly repositoryService: RepositoryService,
               private readonly authService: AuthService,
               private readonly organizationService: OrganizationService
             ) 
-  {
-    this.fillNamespaces()
-    const userId: string = this.authService.userData.value?.userId || ""
+  { }
+
+  ngOnInit(): void {
+    this.fillNamespaces();
+    if(this.isOrganization && this.id) {
+      this.getOnlyOrganizationRepositories();
+      return
+    }
+    this.getAllUserRepositories(); 
+  }
+
+  private getAllUserRepositories() {
+    const userId: string = this.authService.userData.value?.userId || "";
     this.repositoryService.GetUsersRepositories(userId).subscribe({
       next: (response: DockerRepositoryDTO[]) => {
         console.log(response)
         this.repositories = response
-        this.repositorySource = new MatTableDataSource(this.repositories)
+        this.repositorySource.data = response;
+
+        this.repositorySource.filterPredicate = (data, filter) => {
+          const searchTerms = JSON.parse(filter);
+          const matchName = data.name.toLowerCase().includes(searchTerms.name);
+          const matchNamespace =
+            !searchTerms.namespace || data.owner.toLowerCase() === searchTerms.namespace;
+          return matchName && matchNamespace;
+        };
 
       },
       error: (error) => {
         console.error('Error creating repository:', error);
       }
-    }); 
+    });
+  }
 
+  private getOnlyOrganizationRepositories() {
+    if(!this.id) return
+    this.repositoryService.GetOrganizationRepositories(this.id)
+      .subscribe({
+        next: (response: DockerRepositoryDTO[]) => {
+          console.log(response);
+          this.repositories = response;
+          this.repositorySource = new MatTableDataSource(this.repositories);
+        },
+        error: (error) => {
+          console.error('Error creating repository:', error);
+        }
+      });
   }
 
   fillNamespaces() {
-    const userEmail: string = this.authService.userData.value?.userEmail || ""
-    this.namespaces.push(userEmail)
-    this.organizationService.getOrganizations(userEmail).subscribe({
+    if(this.isOrganization && this.name) {
+      this.namespaces.push(this.name);
+      return;
+    }
+    console.log(this.authService.userData.value)
+    const username: string = this.authService.userData.value?.username || ""
+    const email: string = this.authService.userData.value?.userEmail || ""
+    this.namespaces.push(username)
+    this.organizationService.getOrganizations(email).subscribe({
       next: (data) => {
         console.log(data)
         data.forEach(organization => {
@@ -72,7 +110,6 @@ export class AllRepositoriesComponent  implements AfterViewInit{
         console.error('Error fetching organizations:', err);
       }
     });
-
   }
 
   ngAfterViewInit() {
@@ -80,25 +117,31 @@ export class AllRepositoriesComponent  implements AfterViewInit{
     this.repositorySource.paginator = this.paginator
   }
 
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+  announceSortChange(event: any) {
+    console.log('Sort changed: ', event);
   }
 
   onCreate(): void {
-    this.router.navigate(["/create-repo"])
-    
+    this.router.navigate(['/create-repo'], 
+      { queryParams: { 
+          id: this.id, 
+          name: this.name,
+          isOwner: this.isOwner
+        } 
+      }
+    );
   }
 
   openRepository(repository: DockerRepositoryDTO): void {
     console.log(repository)
     this.router.navigate(["/single-repo", repository.id])
+  }
+
+  applyFilters() {
+    const filterValue = {
+      name: this.searchQuery.trim().toLowerCase(),
+      namespace: this.selectedNamespace.trim().toLowerCase(),
+    };
+    this.repositorySource.filter = JSON.stringify(filterValue);
   }
 }

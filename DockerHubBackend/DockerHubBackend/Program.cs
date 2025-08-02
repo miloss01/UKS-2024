@@ -14,8 +14,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Nest;
+using Serilog.Formatting.Elasticsearch;
+using DockerHubBackend.Repository.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 
@@ -26,7 +32,7 @@ var jwtCookieName = builder.Configuration["JWT:CookieName"];
 // Add services to the container.
 
 // Authentication
-builder.Services.AddScoped<IPasswordHasher<string>, PasswordHasher<string>>();
+builder.Services.AddScoped<IPasswordHasher<string>, BCryptPasswordHasher>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -77,6 +83,7 @@ builder.Services.AddCors(options =>
 
 // Database
 builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
@@ -84,6 +91,7 @@ builder.Services.AddScoped<IDockerImageRepository, DockerImageRepository>();
 builder.Services.AddScoped<IDockerRepositoryRepository, DockerRepositoryRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IImageTagRepository, ImageTagRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -94,8 +102,13 @@ builder.Services.AddScoped<IDockerRepositoryService, DockerRepositoryService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IRegistryService, RegistryService>();
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+builder.Services.AddScoped<ILogService, LogService>();
+
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -104,17 +117,48 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<GlobalExceptionHandler>();
 });
 
+
+builder.Services.AddSingleton<IElasticClient>(new ElasticClient(
+    new ConnectionSettings(new Uri(builder.Configuration["Elasticsearch:Url"]))
+        .DefaultIndex("logstash-*")
+        .DisableDirectStreaming()
+    ));
+builder.Services.AddHostedService<LogService>();
 builder.Services.AddHostedService<StartupScript>();
+
+// confing serilog 
+var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == "true";
+var logDirectory = isRunningInDocker
+    ? "/app/Logs"
+    : "Logs";
+builder.Host.UseSerilog((context, config) =>
+{
+    config
+        .WriteTo.Console()
+        .WriteTo.File(
+            Path.Combine(logDirectory, "log-.log"),
+            rollingInterval: RollingInterval.Day
+        );
+});
+
+var port = builder.Configuration["Port"] ?? "5156";
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(int.Parse(port));
+});
 
 var app = builder.Build();
 
-await DatabaseContextSeed.SeedDataAsync(app.Services);
+//await DatabaseContextSeed.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
+var applyMigrations = builder.Configuration["Database:ApplyMigrations"] == "true";
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    if (applyMigrations) app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
@@ -126,3 +170,5 @@ app.UseCors("CORS_CONFIG");
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

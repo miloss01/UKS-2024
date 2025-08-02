@@ -1,4 +1,4 @@
-<h2>{{repository.owner}}/{{repository.name}}
+<h2>{{repository.name}}
     @if (repository.isPublic) {
         <mat-icon aria-hidden="false" aria-label="Public">public</mat-icon>
     } @else {
@@ -28,13 +28,15 @@
         } @else {
             <p class="add-a-description">Add a description</p>   
         }
-        <button  mat-button (click)="onDescriptionEddit()"><mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon></button>    
+        @if (permisionType == 2){        
+            <button  mat-button (click)="onDescriptionEddit()"><mat-icon aria-hidden="false" aria-label="Edit icon">edit</mat-icon></button>    
+        }    
     </div>
 }
 
 <h3>Docker commands</h3>
 <p>To push a new tag to this repository:</p>
-<p class="code-block">docker push {{repository.owner}}/{{repository.name}}:tagname</p>
+<p class="code-block">docker push {{repository.name}}:tagname</p>
 
 <h3 class="margin-top">Tags</h3>
 @if (repository.images.length) {

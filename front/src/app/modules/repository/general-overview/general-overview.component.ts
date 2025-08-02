@@ -24,6 +24,7 @@ export class GeneralOverviewComponent {
     starCount: 0,
     badge: ''
   }
+  @Input() permisionType: number = 0;
   desctiptionEdditing: boolean = false
   descriptionFormControl = new FormControl('');
 

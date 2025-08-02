@@ -1,0 +1,30 @@
+name: Build and Push Registry Auth Server
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths: ["RegistryAuthServer/**"]
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  prepare-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.extract_tag.outputs.TAG }}
+    steps:
+      - name: Get commit hash
+        id: extract_tag
+        run: |
+          echo "Tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+  build-and-push:
+    needs: prepare-tag
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      repository-name: uks-registry-auth-server
+      image-tag: ${{ needs.prepare-tag.outputs.tag }}
+      local-path: ./RegistryAuthServer
+    secrets: inherit

@@ -6,6 +6,7 @@ import { DockerRepositoryDTO } from 'app/models/models';
 import { ActivatedRoute } from '@angular/router';
 import { ImagesListComponent } from 'app/modules/layout/images-list/images-list.component';
 import { RepositoryService } from 'app/services/repository.service';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-singe-repository',
@@ -27,17 +28,44 @@ export class SingeRepositoryComponent {
     starCount: 0,
     badge: ''
   }
+  permisionType: number = 0;
   route = inject(ActivatedRoute);
 
-  constructor(private readonly repositoryService: RepositoryService){}
+  constructor(private readonly repositoryService: RepositoryService,
+                  private readonly authService: AuthService,){}
 
   ngOnInit(): void {
+    this.getRepository();
+    this.getPermisionType();
+  }
+
+  private getPermisionType() {
+    this.route.params.subscribe(params => {
+      const repoId = params['id'];
+      const userId: string = this.authService.userData.value?.userId || "";
+      this.repositoryService.GetUsersPermisionForRepository(userId, repoId).subscribe(permision => {
+        this.permisionType = permision; 
+        this.handlePermissionWhenUserIsTheOwner()
+        console.log(this.permisionType)
+      });
+    });
+  }
+
+  private handlePermissionWhenUserIsTheOwner() {
+    const userEmail: string = this.authService.userData.value?.username || "";
+    if (this.repository.owner == userEmail) {
+      this.permisionType = 2
+    }
+  }
+
+  private getRepository() {
     this.route.params.subscribe(params => {
       const id = params['id'];
       this.repositoryService.getDockerRepositoryById(id).subscribe(repo => {
         this.repository = repo; // Assign fetched repository details
-      })
-      console.log(id)
-    })
+        this.handlePermissionWhenUserIsTheOwner()
+      });
+      console.log(id);
+    });
   }
 }

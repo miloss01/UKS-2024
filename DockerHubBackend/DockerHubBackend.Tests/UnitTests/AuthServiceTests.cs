@@ -6,6 +6,7 @@ using DockerHubBackend.Security;
 using DockerHubBackend.Services.Implementation;
 using DockerHubBackend.Startup;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace DockerHubBackend.Tests.UnitTests
@@ -18,6 +19,7 @@ namespace DockerHubBackend.Tests.UnitTests
         private readonly AuthService _service;
         private readonly Mock<IVerificationTokenRepository> _mockVerificationTokenRepository;
         private readonly Mock<IRandomTokenGenerator> _mockRandomTokenGenerator;
+        private readonly Mock<ILogger<AuthService>> _mockLogger = new Mock<ILogger<AuthService>>();
 
         public AuthServiceTests()
         {
@@ -26,7 +28,7 @@ namespace DockerHubBackend.Tests.UnitTests
             _mockJwtHelper = new Mock<IJwtHelper>();
             _mockVerificationTokenRepository = new Mock<IVerificationTokenRepository>();
             _mockRandomTokenGenerator = new Mock<IRandomTokenGenerator>();
-            _service = new AuthService(_mockUserRepository.Object, _mockJwtHelper.Object, _mockPasswordHasher.Object, _mockVerificationTokenRepository.Object, _mockRandomTokenGenerator.Object);
+            _service = new AuthService(_mockUserRepository.Object, _mockJwtHelper.Object, _mockPasswordHasher.Object, _mockVerificationTokenRepository.Object, _mockRandomTokenGenerator.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -42,7 +44,7 @@ namespace DockerHubBackend.Tests.UnitTests
                       .Returns(PasswordVerificationResult.Success);
 
 
-            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email))
+            _mockJwtHelper.Setup(jwt => jwt.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email, user.Username))
                          .Returns("dummyToken");
 
 
