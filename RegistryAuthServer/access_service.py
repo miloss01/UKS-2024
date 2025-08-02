@@ -96,25 +96,38 @@ class AccessService:
             connection = psycopg2.connect(self.connection_string)
             cursor = connection.cursor()
 
+
             query = """
                 SELECT 1
                 FROM "DockerRepositories" AS r
-                WHERE r."IsDeleted" = false AND r."Name" = %s
+                WHERE r."IsDeleted" = false AND r."Name" = %(repository_name)s
                 AND (
-                    r."UserOwnerId" = %s
+                    r."UserOwnerId" = %(user_id)s
                     OR EXISTS (
                         SELECT 1
                         FROM "TeamPermissions" AS tp
                         WHERE tp."Permission" IN (1, 2)
                             AND tp."RepositoryId" = r."Id"
+                            AND EXISTS(
+                                SELECT 1
+                                FROM "StandardUserTeam" AS ut
+                                WHERE ut."TeamsId" = tp."TeamId"
+                                    AND ut."MembersId" = %(user_id)s
+                            )
+                    )
+                    OR EXISTS(
+                        SELECT 1
+                        FROM "Organizations" AS o
+                        WHERE o."Id" = r."OrganizationOwnerId"
+                            AND o."OwnerId" = %(user_id)s
+                            AND o."IsDeleted" = false
                     )
                 )
                 LIMIT 1;
             """
 
-
-            # Execute the query with parameters
-            cursor.execute(query, (repository_name, user_id))
+            # Execute the query with named parameters
+            cursor.execute(query, {"repository_name": repository_name, "user_id": user_id})
 
             # Fetch the result
             result = cursor.fetchone()

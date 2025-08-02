@@ -49,9 +49,9 @@ def update_database(tag, repository, timestamp, digest):
 
         # Check if DockerImage already exists by Digest
         query = """
-            SELECT "Id" FROM "DockerImages" WHERE "Digest" = %s;
+            SELECT "Id" FROM "DockerImages" WHERE "Digest" = %s AND "DockerRepositoryId" = %s;
         """
-        cursor.execute(query, (digest,))
+        cursor.execute(query, (digest, repository_id))
         image_id = cursor.fetchone()
         image_id = image_id[0] if image_id else None
 

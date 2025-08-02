@@ -95,9 +95,6 @@ namespace DockerHubBackend.Data
                 .HasOne<BaseUser>(vt => vt.User)
                 .WithOne(u => u.VerificationToken)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<DockerImage>()
-                .HasIndex(di => di.Digest)
-                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }
